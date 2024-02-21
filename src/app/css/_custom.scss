@@ -1,0 +1,94 @@
+//**************** custom ******************
+//this file should ONLY have custom variables, functions, or mixins that will be used across the project
+//use shared.scss for custom css classes that are inserted as needed
+
+
+//**************** variables ******************
+
+//$section_colors: type, category, area;
+
+$colors: map.merge($colors, (
+	primary: #224063,
+	primary_hover: lighten(#224063, 10%)
+));
+
+//these can override primeNG theme (but will need to update the primeng_theme.css file to use var() instead of hard coding)
+$colors: map.merge($colors, (
+	background_faded: rgba(get_color('background'), .9),
+
+	button: get_color('primary'),
+	button_hover: darken(get_color('primary'), 10%),
+	button_label: #fff,
+	button_secondary: lighten(get_color('text'), 30%), //same as text_light
+	button_disabled: #f2f5fc,
+	button_disabled_label: #6c757d,
+
+	clean_logo: #5689F5,
+	clean_logo_gradient: linear-gradient(to right, #00FFFF, #53E43B),
+	clean_logo_gradient_reverse: linear-gradient(to right, #00FFFF, #53E43B),
+
+	divider: #eee,
+
+	header_background: #224064,
+	header_background_gradient: linear-gradient(to right, #152438, #224064),
+	header_label: #9ca5ad,
+	header_link: lighten(#d5618c, 50%),
+	header_link_hover: lighten(#d5618c, 30%),
+	header_popup_background: #d5618c,
+
+	interface_background: #f8f9fa,
+	interface_background_tint: #f2f5fc,
+	interface_border: #dee2e6,
+
+	link: lighten(get_color('primary'), 20%),
+	link_hover: get_color('primary'),
+
+	status_error: #f88,
+	status_error_text: #a33,
+	status_warning: #fef2e8,
+	status_warning_text: #d46213,
+/*
+	section_type: #6ea,
+	section_type_dark: darken(#6ea, 10%),
+	section_category: #e6a,
+	section_category_dark: darken(#e6a, 10%),
+	section_area: #6ae,
+	section_area_dark: darken(#6ae, 10%),
+*/
+));
+
+//create an alternative map here for dark color scheme color variables
+$dark_scheme_colors: map.merge($colors, (
+	background: get_color('text'),
+	background_faded: rgba(get_color('text'), .9),
+
+	button_secondary: #777,
+
+	divider: #777,
+
+	text: get_color('background'),
+));
+
+$automatic_dark_scheme_colors: false;
+
+
+$indexes: map.merge($indexes, (
+	controls: 5000,
+));
+
+//**************** function and mixin ******************
+
+@mixin p-button-xs() {
+    padding: ($padding * .65) ($padding);
+
+	.p-button-label {
+		font: {
+			weight: normal;
+		}
+	}
+}
+
+//**************** webfont ******************
+
+$font_family: 'Inter', sans-serif;
+$font_family_header: 'Inter', sans-serif;

@@ -1,0 +1,8 @@
+{
+  "hostname": "https://mmli.fastapi.staging.mmli1.ncsa.illinois.edu",
+  "basePath": "",
+
+  "signInUrl": "https://mmli1.ncsa.illinois.edu/oauth2/start?rd=http%3A%2F%2Flocalhost:4200%2Fconfiguration",
+  "signOutUrl": "https://mmli1.ncsa.illinois.edu/oauth2/sign_out?rd=http%3A%2F%2Flocalhost:4200%2Fconfiguration",
+  "userInfoUrl": "https://mmli1.ncsa.illinois.edu/oauth2/userinfo"
+}

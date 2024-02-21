@@ -1,0 +1,7 @@
+dist/*
+.angular/*
+node_modules/*
+chart/charts/*
+.env
+Dockerfile
+docker-compose.*

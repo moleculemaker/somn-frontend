@@ -1,0 +1,382 @@
+//**************** mixins ******************
+
+//collection of mixins, most are from bootstrap
+
+
+@mixin hide_overflow() {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+
+	white-space: nowrap;
+}
+
+@mixin show_overflow() {
+	white-space: normal;
+	overflow: visible;
+}
+
+@mixin clearfix {
+	*zoom: 1;
+
+	&:before,
+	&:after {
+		display: table;
+		content: '';
+
+		//Fixes Opera/contenteditable bug:
+		//http://nicolasgallagher.com/micro-clearfix-hack/#comment-36952
+		line-height: 0;
+	}
+
+	&:after {
+		clear: both;
+	}
+}
+
+@mixin position($position) {
+	position: #{'-webkit-#{$position}'};
+	position: #{'-moz-#{$position}'};
+	position: #{'-ms-#{$position}'};
+	position: #{'-o-#{$position}'};
+	position: $position;
+}
+
+//hide scrollbar for chrome and safari and IE (believe the firefox tag is depreciated)
+//https://stackoverflow.com/questions/16670931/hide-scroll-bar-but-while-still-being-able-to-scroll
+@mixin hide_scrollbars() {
+	-ms-overflow-style: none;  // IE 10+
+	overflow: -moz-scrollbars-none;  // Firefox
+
+	&::-webkit-scrollbar {
+		display: none;  // Safari and Chrome
+//		width: 0px; //remove scrollbar space
+//		height: 0px;
+//		background: transparent; //optional: just make scrollbar invisible
+	}
+}
+
+//appearance
+@mixin appearance($appearance:none) {
+	-webkit-appearance: $appearance;
+	-moz-appearance: $appearance;
+	appearance: $appearance;
+}
+
+
+//**************** if a TRUE mouse hover is supported (better than touch device) ******************
+//https://stackoverflow.com/questions/40532204/media-query-for-devices-supporting-hover
+
+@mixin hover-supported {
+	@media not all and (hover: none) {
+		&:hover {
+			@content;
+		}
+	}
+}
+
+
+//**************** border ******************
+
+// Border Radius
+@mixin border-radius($radius) {
+	-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	border-radius: $radius;
+}
+
+// Single Corner Border Radius
+@mixin border-top-left-radius($radius) {
+	-webkit-border-top-left-radius: $radius;
+	-moz-border-radius-topleft: $radius;
+	border-top-left-radius: $radius;
+}
+@mixin border-top-right-radius($radius) {
+	-webkit-border-top-right-radius: $radius;
+	-moz-border-radius-topright: $radius;
+	border-top-right-radius: $radius;
+}
+@mixin border-bottom-right-radius($radius) {
+	-webkit-border-bottom-right-radius: $radius;
+	-moz-border-radius-bottomright: $radius;
+	border-bottom-right-radius: $radius;
+}
+@mixin border-bottom-left-radius($radius) {
+	-webkit-border-bottom-left-radius: $radius;
+	-moz-border-radius-bottomleft: $radius;
+	border-bottom-left-radius: $radius;
+}
+
+// Single Side Border Radius
+@mixin border-top-radius($radius) {
+	@include border-top-right-radius($radius);
+	@include border-top-left-radius($radius);
+}
+
+@mixin border-right-radius($radius) {
+	@include border-top-right-radius($radius);
+	@include border-bottom-right-radius($radius);
+}
+
+@mixin border-bottom-radius($radius) {
+	@include border-bottom-right-radius($radius);
+	@include border-bottom-left-radius($radius);
+}
+
+@mixin border-left-radius($radius) {
+	@include border-top-left-radius($radius);
+	@include border-bottom-left-radius($radius);
+}
+
+@mixin gradient-striped($color: #555, $angle: 45deg) {
+	background-color: $color;
+	background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, rgba(255,255,255,.15)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255,255,255,.15)), color-stop(.75, rgba(255,255,255,.15)), color-stop(.75, transparent), to(transparent));
+	background-image: -webkit-linear-gradient($angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+	background-image: -moz-linear-gradient($angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+	background-image: -o-linear-gradient($angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+	background-image: linear-gradient($angle, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+}
+
+@mixin repeating-bars($deg:45deg, $start_color:#000, $end_color:transparent, $width:2px) {
+	background-image: -webkit-repeating-linear-gradient($deg, $start_color, $start_color $width, $end_color $width, $end_color ($width * 2));
+	background-image: -o-repeating-linear-gradient($deg, $start_color, $start_color $width, $end_color $width, $end_color ($width * 2));
+	background-image: -moz-repeating-linear-gradient($deg, $start_color, $start_color $width, $end_color $width, $end_color ($width * 2));
+	background-image: repeating-linear-gradient($deg, $start_color, $start_color $width, $end_color $width, $end_color ($width * 2));
+}
+
+//**************** shadow ******************
+
+//provides variable control to shadow
+@mixin shadow($distance:8, $color:#000, $horizontal:0, $vertical:0) {
+	@include box-shadow($horizontal + px $vertical + px $distance + px $color);
+}
+
+//provides variable control to inner shadow
+@mixin inner_shadow($distance:8, $color:#000, $horizontal:0, $vertical:0) {
+	@include box-shadow(inset $horizontal + px $vertical + px $distance + px $color);
+}
+
+// Drop shadows
+@mixin box-shadow($shadow) {
+	-webkit-box-shadow: $shadow;
+	-moz-box-shadow: $shadow;
+	box-shadow: $shadow;
+}
+
+//**************** opacity ******************
+
+// Opacity
+@mixin opacity($opacity) {
+	opacity: $opacity * .01; // same as / 100;
+	filter: alpha(opacity=$opacity);
+}
+
+
+//**************** transition ******************
+
+// Transitions
+@mixin transition($transition) {
+	-webkit-transition: $transition;
+	-moz-transition: $transition;
+	-o-transition: $transition;
+	transition: $transition;
+}
+
+@mixin transition-delay($transition-delay) {
+	-webkit-transition-delay: $transition-delay;
+	-moz-transition-delay: $transition-delay;
+	-o-transition-delay: $transition-delay;
+	transition-delay: $transition-delay;
+}
+
+@mixin animation($animation) {
+	-webkit-animation: $animation;
+	animation: $animation;
+}
+
+@mixin animation-name($name) {
+	-webkit-animation-name: $name;
+	animation-name: $name;
+}
+
+@mixin animation-delay($delay) {
+	-webkit-animation-delay: $delay;
+	animation-delay: $delay;
+}
+
+@mixin animation-duration($duration) {
+	-webkit-animation-duration: $duration;
+	animation-duration: $duration;
+}
+
+@mixin animation-fill-mode($fill_mode) {
+	-webkit-animation-fill-mode: $fill_mode;
+	animation-fill-mode: $fill_mode;
+}
+
+@mixin keyframes($name) {
+	@-webkit-keyframes #{$name} {
+		@content;
+	}
+
+	@keyframes #{$name} {
+		@content;
+	}
+}
+
+//**************** transform ******************
+
+// Transformations
+@mixin translate($x, $y) {
+	-webkit-transform: translate($x, $y);
+	-moz-transform: translate($x, $y);
+	-ms-transform: translate($x, $y);
+	-o-transform: translate($x, $y);
+	transform: translate($x, $y);
+}
+
+@mixin translate3d($x, $y, $z) {
+	-webkit-transform: translate3d($x, $y, $z);
+	-moz-transform: translate3d($x, $y, $z);
+	-o-transform: translate3d($x, $y, $z);
+	transform: translate3d($x, $y, $z);
+}
+
+//transform origin
+@mixin transform-origin($origin) {
+	moz-transform-origin: $origin;
+	-o-transform-origin: $origin;
+	-ms-transform-origin: $origin;
+	-webkit-transform-origin: $origin;
+	transform-origin: $origin;
+}
+
+//transform-style
+@mixin transform-style($style:'preserve-3d') {
+	-webkit-transform-style: $style;
+	-moz-transform-style: $style;
+	transform-style: $style;
+}
+
+//perspective
+@mixin perspective($depth:1700px) {
+	-webkit-perspective: $depth;
+	-moz-perspective: $depth;
+	perspective: $depth;
+}
+
+//perspective-origin
+@mixin perspective-origin($origin:'0px 50%') {
+	-webkit-perspective-origin: $origin;
+	-moz-perspective-origin: $origin;
+	perspective-origin: $origin;
+}
+
+@mixin rotate($degrees) {
+	-webkit-transform: rotate($degrees);
+	-moz-transform: rotate($degrees);
+	-ms-transform: rotate($degrees);
+	-o-transform: rotate($degrees);
+	transform: rotate($degrees);
+}
+
+@mixin scale($ratio) {
+	-webkit-transform: scale($ratio);
+	-moz-transform: scale($ratio);
+	-ms-transform: scale($ratio);
+	-o-transform: scale($ratio);
+	transform: scale($ratio);
+}
+
+@mixin transform($text) {
+	-webkit-transform: $text;
+	-moz-transform: $text;
+	-ms-transform: $text;
+	-o-transform: $text;
+	transform: $text;
+}
+
+// Backface visibility
+// Prevent browsers from flickering when using CSS 3D transforms.
+// Default value is `visible`, but can be changed to `hidden
+// See git pull https://github.com/dannykeane/bootstrap.git backface-visibility for examples
+@mixin backface-visibility($visibility) {
+	-webkit-backface-visibility: $visibility;
+	-moz-backface-visibility: $visibility;
+	backface-visibility: $visibility;
+}
+
+
+//**************** other ******************
+
+// Placeholder text
+// -------------------------
+@mixin placeholder($color:get_color(text)) {
+	&:-moz-placeholder {
+		color: $color;
+		text: {
+//			transform: uppercase;
+		}
+	}
+	&:-ms-input-placeholder {
+		color: $color;
+		text: {
+//			transform: uppercase;
+		}
+	}
+	&::-webkit-input-placeholder {
+		color: $color;
+		text: {
+//			transform: uppercase;
+		}
+	}
+}
+
+// Block level inputs
+@mixin input-block-level {
+	display: block;
+	width: 100%;
+
+	@include box-sizing(border-box); // Makes inputs behave like true block-level elements
+}
+
+// Box sizing
+@mixin box-sizing($boxmodel) {
+	-webkit-box-sizing: $boxmodel;
+	-moz-box-sizing: $boxmodel;
+	box-sizing: $boxmodel;
+}
+
+// Background clipping
+// Heads up: FF 3.6 and under need "padding" instead of "padding-box"
+@mixin background-clip($clip) {
+	-webkit-background-clip: $clip;
+	-moz-background-clip: $clip;
+	background-clip: $clip;
+}
+
+// text fill color
+@mixin text-fill-color($color) {
+	-webkit-text-fill-color: $color;
+	-moz-text-fill-color: $color;
+	text-fill-color: $color;
+}
+
+@mixin tab-focus() {
+	//Default
+	outline: thin dotted #333;
+
+	//Webkit
+	outline: 5px auto -webkit-focus-ring-color;
+	outline-offset: -2px;
+}
+
+// User select
+// For selecting text on the page
+@mixin user-select($select) {
+	-webkit-user-select: $select;
+	-moz-user-select: $select;
+	-ms-user-select: $select;
+	-o-user-select: $select;
+	user-select: $select;
+}

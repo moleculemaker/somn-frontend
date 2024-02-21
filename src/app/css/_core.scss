@@ -1,0 +1,82 @@
+@use "sass:map";
+
+//**************** config ******************
+
+$site_path: '../';
+
+
+//**************** colors ******************
+
+$colors: (
+	default: #1aa0dc,
+
+	primary: #1aa0dc,
+	secondary: #f3aa33,
+
+	text: #555,
+	background: #fff,
+);
+
+$dark_scheme_colors: map.merge($colors, (
+	text: map.get($colors, 'background'),
+	background: map.get($colors, 'text')
+));
+
+$activate_dark_scheme_colors: false;
+
+
+//**************** font ******************
+
+$font_size_default: .9rem;
+$font_family: sans-serif;
+$font_family_header: sans-serif;
+
+
+//**************** indexes ******************
+
+$indexes: (
+	default: 1000,
+
+	interface: 4500,
+
+	modal: 8000,
+	loading: 9000 //above everything
+);
+
+
+//**************** sizes ******************
+
+$padding: 1rem;
+
+$page_width: 1180px;
+
+$mobile: 479px;
+$tablet: 767px;
+$desktop: $tablet + 1; //to provide simple shortcut for media queries
+$desktop_large: 1900px;
+
+$app_desired_width: 920px;
+$app_desired_height: 720px;
+$app_min_width: $mobile; //trigger minimum breakpoint
+$app_min_height: $mobile;
+
+$border_radius: 6px; //match default primeNG border-radius
+
+$font_size_min: 10px;
+
+//**************** core ******************
+
+@import 'core/css_var';
+@import 'core/easing';
+@import 'core/functions';
+@import 'core/inline-svg-function';
+@import 'core/mixins';
+@import 'core/responsive';
+@import 'core/trigonometry';
+
+
+//**************** custom ******************
+
+//load custom libraries (only sass that has variables, mixins, or custom functions)
+@import 'custom';
+

@@ -1,0 +1,100 @@
+<div class="page_container">
+
+    <div class="container">
+        <div class="card" *ngIf="disableCopyPaste">
+            <p-messages [(value)]="highTrafficMessage" [enableService]="false" [closable]="false"></p-messages>
+        </div>
+        <h3>Select document for analysis</h3>
+        <h5>Choose an input method below</h5>
+
+        <p-panel styleClass="padded">
+            <ng-template pTemplate="header">
+                <p-selectButton [options]="inputMethods" [(ngModel)]="selectedInputMethod" optionValue="value">
+                    <ng-template let-item>
+                        <i [class]="item.icon"></i>{{item.label}}
+                    </ng-template>
+                </p-selectButton>
+            </ng-template>
+
+            <div class="panel_content">
+                <ng-container *ngIf="selectedInputMethod == 'upload_file'">
+                    <div class="panel_bar">
+                        <div>Document Center</div>
+                        <div class="spacer"></div>
+                        <!-- <button pButton [disabled]="uploaded_files.length == 0"  label="Clear all files" (click)="clearAllFiles()"
+                            class="p-button-text p-button-xs"></button> -->
+                        <input type="file" name="file" #file_upload accept="application/pdf" (change)="onFileSelected($event)" multiple>
+                        <button *ngIf="uploaded_files.length > 0 && false" pButton class="p-button-outlined" (click)="file_upload.click()"><i class="pi pi-plus"></i> Add file(s) </button>
+                    </div>
+
+                  <div *ngIf="uploaded_files.length == 0" class="dropzone" fileDragDrop (filesChangeEmiter)="onFileDropped($event)">
+                    <div class="text-wrapper">
+                      <div class="centered">
+                        <input type="file" #file_upload accept="application/pdf" (change)="onFileSelected($event)">
+                        <p-button (click)="file_upload.click()"><i class="pi pi-plus"></i>Add file </p-button>
+                        <p class="drag-comment">Drag and drop PDF or choose from computer to upload</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p-table *ngIf="uploaded_files.length > 0" [value]="uploaded_files" [tableStyle]="{ 'min-width': '50rem' }" class="files_table">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="file_name" class="files_table_data_col">File Name <p-sortIcon field="file_name"></p-sortIcon></th>
+                            <th pSortableColumn="size" class="files_table_data_col">Size <p-sortIcon field="size"></p-sortIcon></th>
+                            <!-- <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+                            <th>Status Detail</th> -->
+                            <th class="files_table_button_col"> </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-file let-i="rowIndex">
+                        <tr>
+                            <td>{{file.name}}</td>
+                            <td>{{(file.size/1000).toPrecision(6)}} Kb</td>
+                            <!-- <td>qwe</td>
+                            <td>qwe</td> -->
+                            <td class="column_controls" style="text-align: right;">
+                              <p-button (click)="deleteFile(i)" styleClass="p-button-text p-button-xs">Delete</p-button>
+                              <p-button (click)="viewFile(i)" styleClass="p-button-text p-button-xs">View</p-button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="summary">
+                      <div class="flex align-items-center justify-content-between">
+                        <i class="pi pi-file"></i> {{uploaded_files ? uploaded_files.length : 0 }} file(s) uploaded
+                      </div>
+                  </ng-template>
+                  </p-table>
+                </ng-container>
+
+                <ng-container *ngIf="selectedInputMethod == 'use_example'">
+                    <div class="panel_bar">
+                        <h3>Example PDF</h3>
+                    </div>
+
+                    <div class="example_data">
+                        <chemscraper-pdf-viewer pdfUrl="assets/chemscraper_example.pdf"></chemscraper-pdf-viewer>
+                    </div>
+                </ng-container>
+            </div>
+
+        </p-panel>
+
+        <ng-container *ngIf="selectedInputMethod == 'upload_file'">
+            <h3>Email</h3>
+            <h5>Leave an email to get a notification when your result is ready.</h5>
+            <br>
+            <div class="spacer"></div>
+            <input type="email" name="email" pInputTextarea placeholder="Email" [(ngModel)]="userEmail" ngModel
+                #email="ngModel" email="true" (input)="enterEmail()">
+        </ng-container>
+
+        <div class="controls">
+            <div class="buttons">
+                <br>
+                <button pButton type="button" [disabled]="uploaded_files.length == 0" label="Analyze using ChemScraper" (click)="submitData()"
+                    icon="pi pi-arrow-right" iconPos="right" styleClass="p-button-xs" [disabled]="(selectedInputMethod=='upload_file') || disableCopyPaste"></button>
+            </div>
+        </div>
+    </div>
+</div>

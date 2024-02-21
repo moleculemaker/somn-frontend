@@ -1,0 +1,23 @@
+<div class="pdf-viewer-container">
+  <div class="fixed-header">
+    <div class="header_group">
+      <p-button id="prev" (click)="onPrevPage()" icon="pi pi-arrow-circle-left" styleClass="p-button-text p-button-rounded p-button-xs"></p-button>
+
+      <div class="page_info"><span id="page_num">{{pageNumber}}</span> / <span id="page_count">{{totalPages}}</span></div>
+
+      <p-button id="next" (click)="onNextPage()" icon="pi pi-arrow-circle-right" styleClass="p-button-text p-button-rounded p-button-xs"></p-button>
+    </div>
+
+    <div class="header_group">
+      <p-button id="zoomOut" (click)="zoomOut()" icon="pi pi-minus-circle" styleClass="p-button-text p-button-rounded p-button-xs"></p-button>
+
+      <div>{{getCurrentZoom()}}%</div>
+
+      <p-button id="zoomIn" (click)="zoomIn()" icon="pi pi-plus-circle" styleClass="p-button-text p-button-rounded p-button-xs"></p-button>
+    </div>
+  </div>
+  <div>
+    <canvas id="pdf-canvas" class="scrollable-canvas" (click)="onCanvasClick($event)" (mousemove)="onCanvasMouseMove($event)" (mouseout)="onCanvasMouseOut($event)"></canvas>
+  </div>
+</div>
+<div #tooltip class="tooltip" [ngStyle]="tooltipStyle">{{hoveredMoleculeTooltipText}}</div>

@@ -1,0 +1,44 @@
+<p-panel class="export-menu-panel">
+  <ng-template pTemplate="header">
+    <i class="p-button-icon-left pi pi-download"></i><span class="export-header-title">Export</span>
+    <div class="spacer"></div>
+
+  </ng-template>
+  <div class="card flex justify-content-center">
+    <div class="format-options">
+      <div class="field-checkbox">
+        <p-checkbox [value]="'CDXML'" [(ngModel)]="format_checkbox" [inputId]="'CDXML'" (onChange)="onCheckboxesChange()"></p-checkbox>
+        <label for="CDXML" class="p-checkbox-label">CDXML</label>
+      </div>
+      <div *ngIf="exportRequestBody.cdxml" class="record-filter-options">
+        <div class="field-radiobuttons">
+            <p-radioButton [inputId]="'all_molecules'" [value]="'all_molecules'" [(ngModel)]="exportRequestBody.cdxml_filter"></p-radioButton>
+            <label [for]="'all_molecules'" class="p-radiobutton-label">All Molecules</label>
+        </div>
+        <div class="field-radiobuttons">
+          <p-radioButton [inputId]="'single_page'" [value]="'single_page'" [(ngModel)]="exportRequestBody.cdxml_filter"></p-radioButton>
+          <label [for]="'single_page'" class="p-radiobutton-label">Single Page</label>
+        </div>
+        <div class="field-dropdown">
+          <p-dropdown *ngIf="this.exportRequestBody.cdxml_filter == 'single_page'" [options]="pages" [(ngModel)]="selectedPage" optionLabel="label"></p-dropdown>
+        </div>
+      </div>
+      <hr>
+      <div class="field-checkbox">
+        <p-checkbox [value]="'CSV'" [(ngModel)]="format_checkbox" [inputId]="'CSV'" (onChange)="onCheckboxesChange()"></p-checkbox>
+        <label for="CSV" class="p-checkbox-label">CSV</label>
+      </div>
+      <div *ngIf="exportRequestBody.csv" class="record-filter-options">
+        <div class="field-radiobuttons">
+            <p-radioButton [inputId]="'full_table'" [value]="'full_table'" [(ngModel)]="exportRequestBody.csv_filter"></p-radioButton>
+            <label [for]="'full_table'" class="p-radiobutton-label">Full Table (all results)</label>
+        </div>
+        <div class="field-radiobuttons">
+          <p-radioButton [inputId]="'current_view'" [value]="'current_view'" [(ngModel)]="exportRequestBody.csv_filter"></p-radioButton>
+          <label [for]="'current_view'" class="p-radiobutton-label">Current Table view (filtered/sorted)</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer"> <p-button [disabled]="isExportDisabled" (click)="export()">Export</p-button> </ng-template>
+</p-panel>

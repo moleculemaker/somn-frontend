@@ -1,0 +1,11 @@
+//**************** functions ******************
+
+//map function
+@function get_map_value($name:'default', $map:$colors) {
+	@if not map-has-key($map, $name) {$name: 'default';}
+	@return map-get($map, $name);
+}
+
+//shortcuts for specific maps
+@function get_color($name:'default', $map:$colors) {@return get_map_value($name, $map);}
+@function get_index($name:'default') {@return get_map_value($name, $indexes);}

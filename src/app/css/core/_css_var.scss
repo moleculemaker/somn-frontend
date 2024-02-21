@@ -1,0 +1,29 @@
+//**************** css_var ******************
+//create a variable for every color
+//color variables will be -dash based plus -color
+// example: violation_high_hover would convert to --violation-high-hover-color
+// example of how to change these in javascript: document.documentElement.style.setProperty('--interface-color', '#00f');
+
+//creates a varible reference, added here (instead of a mixin) since this could have custom naming schemes for each project
+//default is to use the colors map, css_var('primary') would look in the $colors config
+//for key/value pairs, supply the value (non map) and it will use that  css_var('padding', $padding);
+
+@function css_var($name:'default', $map:$colors, $suffix:'-color') {
+	@if type-of($map) == 'map' {
+		//map data
+		@return var(#{'--' + str-replace($name, '_', '-') + $suffix}, #{get_map_value($name, $map)});
+	} @else {
+		//key value pair
+		@return var(#{'--' + str-replace($name, '_', '-') + $suffix}, #{$map});
+	}
+}
+
+@mixin define_css_var($name:'default', $map:$colors, $suffix:'-color') {
+	@if type-of($map) == 'map' {
+		//map data
+		--#{str-replace($name + $suffix, '_', '-')}: #{get_map_value($name, $map)};
+	} @else {
+		//key value pair
+		--#{str-replace($name, '_', '-')}: #{$map};
+	}
+}

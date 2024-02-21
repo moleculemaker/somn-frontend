@@ -1,0 +1,15 @@
+ingress:
+  hostname: chemscraper.proxy.localhost
+  tls: false
+  annotations: {}
+
+controller:
+  image: moleculemaker/chemscraper-frontend
+
+config:
+  hostname: "https://mmli.fastapi.staging.mmli1.ncsa.illinois.edu"
+  basePath: ""
+  signInUrl: "https://mmli1.ncsa.illinois.edu/oauth2/start?rd=https%3A%2F%2Fchemscraper.proxy.localhost%2Fconfiguration"
+  signOutUrl: "https://mmli1.ncsa.illinois.edu/oauth2/sign_out?rd=https%3A%2F%2Fchemscraper.proxy.localhost%2Fconfiguration"
+  userInfoUrl: "https://mmli1.ncsa.illinois.edu/oauth2/userinfo"
+extraDeploy: []

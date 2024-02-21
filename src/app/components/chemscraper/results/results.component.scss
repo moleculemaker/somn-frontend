@@ -1,0 +1,693 @@
+/**************** app ******************/
+
+@import '../../../css/core';
+
+//use primeng theme colors whenver possible
+//https://www.primefaces.org/primeng/colors
+
+//**************** custom mixins ******************
+
+
+//**************** css ******************
+
+::ng-deep .p-progressbar {
+    height: .5rem;
+}
+
+.header {
+    @include on_desktop() {
+        display: flex;
+        align-items: flex-end;
+        gap: $padding;
+    }
+
+    margin: {
+        bottom: $padding * 2;
+    }
+
+    h3 {
+        margin: 0px;
+    }
+
+    .info {
+        .details {
+            @include on_desktop() {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-start;
+                gap: (0px) $padding;
+            }
+
+            margin: {
+                top: $padding * .2;
+            }
+
+            font: {
+                size: .75rem;
+            }
+
+            > div {
+                white-space: nowrap;
+            }
+        }
+    }
+
+    .buttons {
+        display: flex;
+        align-items: center;
+        gap: $padding * .5;
+
+        @include not_desktop() {
+            margin: {
+                top: $padding;
+            }
+        }
+
+        .p-button {
+            white-space: nowrap;
+        }
+    }
+
+    .spacer {
+        flex-grow: 1;
+    }
+
+    .copy_and_paste_button {
+        cursor: pointer;
+
+        &:hover {
+            color: css_var(primary-color);
+        }
+    }
+}
+
+a:link, a:visited, a:active {
+    color: #495057;
+}
+
+.card {
+    margin: auto;
+    width: 70%;
+}
+
+:host ::ng-deep .p-message.p-message-info {
+    background: css_var('interface_background_tint');
+    border-width: 0 0 0 0;
+    color: #224063;
+    text-align: center;
+    .p-message-icon {
+        display: none;
+    }
+}
+
+:host ::ng-deep .p-message.p-message-error {
+    border-width: 0 0 0 0;
+    text-align: left;
+}
+
+.table_caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; //flex-end;
+    gap: $padding;
+
+    h3 {
+        margin: 0px;
+    }
+}
+
+.failJob {
+    margin: auto;
+    text-align: center;
+    width: 100%;
+}
+
+.loadingDiv{
+  height: 20rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #F3F5FB;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+  &::ng-deep .p-progress-spinner-circle{
+    stroke: #224063 !important;
+  }
+  & > :first-child {
+    margin-bottom: 48px;
+  }
+}
+
+.loader{
+  .loadingTitle{
+    margin-bottom: 40px;
+  }
+
+  &::ng-deep .p-steps-title{
+    color: #FFFFFF !important;
+  }
+
+  &::ng-deep .completed-stage{
+    background: #224063 !important;
+    color: #FFFFFF !important;
+    border-color: #224063;
+  }
+  &::ng-deep .p-disabled{
+    opacity: 1;
+  }
+
+}
+
+p-panel {
+  ::ng-deep .p-panel-header {
+    gap: $padding * .5;
+
+    background: {
+      color: css_var('interface_background_tint');
+    }
+
+    padding: ($padding);
+
+    .title {
+      font: {
+        weight: bold;
+      }
+    }
+
+    .spacer {
+      flex-grow: 1;
+    }
+  }
+
+  &::ng-deep .result-header-container {
+    display: flex;
+    align-items: center;
+    gap: $padding * .5;
+
+    background: {
+      color: css_var('interface_background');
+    }
+
+    padding: ($padding);
+
+    border: {
+      top: 1px solid css_var('interface_border');
+    }
+
+    .header_group {
+      display: flex;
+      align-items: center;
+      gap: $padding * .5;
+    }
+
+    .spacer {
+      flex-grow: 1;
+    }
+  }
+}
+
+.result-container {
+  display: flex;
+  gap: $padding;
+
+  .column1 {
+    position: relative;
+
+    width: 50%;
+    transition: width 0.3s ease;
+
+    border: {
+      right: 1px solid css_var('interface_border');
+    }
+
+    &.collapsed {
+      width: 2rem;
+
+      .content {
+        width: 0;
+      }
+    }
+
+    ::ng-deep .toggle_splitview_button {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      z-index: 100;
+
+      button {
+        width: 2rem;
+        height: 2rem;
+
+        border: {
+          color: css_var('interface_border');
+          top: 0px;
+          right: 0px;
+        }
+
+        @include border-radius(0px);
+
+        &:not(:hover) {
+          color: css_var('interface_border');
+        }
+
+        .p-button-icon {
+          font: {
+            size: .65rem;
+          }
+        }
+      }
+    }
+
+    .content {
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
+    .document-path-bar {
+      display: flex;
+      align-items: center;
+      gap: $padding * .25;
+
+      height: 2rem; //to match the splitview_button
+
+      padding: {
+        right: 2rem + ($padding * .5); //leave room for splitview_button
+        left: $padding;
+      }
+
+      border: {
+        bottom: 1px solid css_var('interface_border');
+      }
+
+      .pdf_name {
+        font: {
+          weight: bold;
+        }
+      }
+    }
+  }
+
+  .column2 {
+    flex: 1;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    border: {
+      left: 1px solid css_var('interface_border');
+    }
+  }
+
+  .input_pdf_container {
+    overflow: {
+        y: auto;
+    }
+    min: {
+        height: 8rem;
+    }
+    max: {
+        height: 750px;
+    }
+
+    // padding: $padding ($padding * 1.5);
+
+    overflow-wrap: break-word;
+  }
+}
+
+.search-row, .sort-row  {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-row {
+  padding: {
+    top: $padding;
+    right: $padding;
+    bottom: $padding * .25;
+    left: $padding * .25;
+  }
+}
+
+.sort-row {
+  padding: ($padding * 0) ($padding * .25);
+}
+
+.search-input, .sort-text {
+  flex: 8;
+  padding: ($padding * .5) ($padding * .75);
+}
+
+.filter-button, .sort-button {
+  flex: 2;
+  margin-left: 6px;
+}
+
+.table-container {
+  // height: 100%;
+  overflow: hidden;
+}
+
+::ng-deep .molecule_table {
+  .p-paginator {
+    border: {
+      top: 1px solid css_var('interface_border');
+    }
+  }
+
+  .p-datatable-thead {
+    position: relative;
+
+    &:after,
+    &:before {
+      content: '';
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      z-index: get_index(interface);
+
+      pointer-events: none;
+    }
+
+    &:after {
+      top: 0px;
+
+      border: {
+        top: 1px solid css_var('interface_border');
+      }
+    }
+
+    &:after {
+      bottom: 0px;
+
+      border: {
+        bottom: 1px solid css_var('interface_border');
+      }
+    }
+  }
+
+  .column_name {
+    width: 17rem;
+
+    .column_container {
+      display: flex;
+      align-items: flex-start;
+      gap: $padding * .25;
+    }
+  }
+
+  tr.p-highlight {
+    outline: 0px !important;
+
+    > td {
+      border: {
+        bottom: 0px;
+      }
+    }
+  }
+
+  .row_expansion {
+    background: {
+      color: #eff6ff !important;
+    }
+
+    td {
+      border: none !important;
+    }
+  }
+}
+
+.container ::ng-deep .p-sidebar{
+  z-index: get-index(modal) !important;
+}
+
+.molecule-info-container{
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.result-molecules-details-container{
+  .molecule-details-header-container {
+    margin: {
+      bottom: $padding;
+    }
+    padding: $padding * .5;
+  }
+
+  ::ng-deep .p-panel {
+    @include border-radius($border_radius);
+  }
+
+  &::ng-deep .p-panel-header{
+    background: none !important;
+    border-bottom: none !important;
+    padding: 0px !important;
+  }
+
+  &::ng-deep .result-molecules-details-button{
+    height: 0.5rem;
+    font-size: 0.75rem;
+    .p-button-label{
+      font-weight: 400;
+    }
+  }
+
+  &::ng-deep .header-buttons-container{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .tag-buttons{
+      display: flex;
+      gap: 10px;
+    }
+  }
+
+  &::ng-deep .molecule-structure-info-container{
+    flex: 1;
+    margin: 0 10px;
+  }
+
+  &::ng-deep .molecule-details-container{
+    display: inline-grid;
+    flex: 1;
+    margin: 0 10px;
+    margin-bottom: $padding;
+
+    .molecule-details-col1{
+      grid-column: 1;
+      grid-row: 1;
+
+      div:not(:first-child) {
+        margin-top: 24px;
+      }
+
+      > div {
+        padding: {
+//          left: $padding;
+        }
+      }
+    }
+
+    .molecule-details-col2{
+      grid-column: 2;
+      grid-row: 1;
+      margin-left: 40px;
+
+      div:not(:first-child) {
+        margin-top: 24px;
+      }
+    }
+
+    .molecule-details-col3{
+      grid-column: 3;
+      grid-row: 1;
+      margin-left: 40px;
+    }
+
+    .molecule-details-row2{
+      grid-column: 1 / 3;
+      grid-row: 2;
+      margin-top: 24px;
+    }
+
+/*
+    .description {
+      padding: $padding;
+      padding: {
+        top: 0px;
+      }
+    }
+*/
+  }
+}
+
+.molecule-details-header{
+  color: #495057;
+  font-weight: 600;
+  padding-bottom: 5px;
+}
+
+:host ::ng-deep .page-container .container{
+  max-width: 1180px;
+}
+
+:host ::ng-deep .p-panel-content{
+  padding: 0px !important;
+}
+
+.table-container ::ng-deep td{
+  vertical-align: middle;
+}
+
+.svg-column{
+  width: 200px;
+}
+
+:host ::ng-deep .p-datatable-table .p-datatable-tbody > tr > td {
+  overflow-wrap: anywhere;
+}
+
+:host ::ng-deep .export-menu{
+  width: 450px !important;
+}
+
+.structural-info-container{
+  display: inline-grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+
+
+  .extracted-structure-container > div{
+    // border: #Dee2e6 1px;
+    // border-radius: 6px;
+  }
+
+  .extracted-structure-container::ng-deep svg{
+    // grid-column: 1;
+    height: 150px;
+
+  }
+
+  .original-structure-container{
+    // grid-column: 1;
+  }
+
+  .SMILES-container{
+  }
+
+}
+
+.original-context-container{
+  margin: {
+    top: $padding;
+    bottom: $padding;
+  }
+
+  .title_bar {
+    display: flex;
+    align-items: center;
+    gap: $padding * .25;
+
+    margin: {
+      bottom: $padding * .25;
+    }
+
+    .molecule-details-header {
+      padding: 0px;
+    }
+
+    .spacer {
+      flex-grow: 1;
+    }
+
+    .pdf_link {
+      cursor: pointer;
+
+      display: flex;
+      align-items: center;
+      gap: $padding * .25;
+
+      color: css_var('link');
+
+      &:hover {
+        color: css_var('link_hover');
+      }
+    }
+  }
+}
+
+.bordered-div{
+  border: #Dee2e6 1px solid;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.table-controls{
+  margin: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.marvin-filter-container{
+  padding: 5px;
+  border: #CED4DA;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 6px;
+  flex: 1;
+
+  .p-inputgroup{
+    textarea{
+      border-width: 0px;
+    }
+    button{
+      background-color: #F8F9FA;
+      border-color: #CED4DA;
+      border-radius: 6px;
+    }
+  }
+}
+
+.marvin-editor-container {
+  z-index: get_index(modal) !important;
+
+  ::ng-deep .p-dialog {
+    $editor_min_width: 617.5px;
+    $editor_min_height: 650px;
+    height: 50vh;
+    width: 50vw;
+    min-width: $editor_min_width;
+    min-height: $editor_min_height;
+    
+    @media (width <= $editor_min_width) {
+      width: 100vw;
+      min-width: 0px;
+    }
+
+    @media (height <= $editor_min_height) {
+      height: 100vh;
+      min-height: 0px;
+    }
+  }
+
+  .marvin-editor {
+    display: block;
+    height: 100%;
+  }
+}
+
+.table-controls-overlay{
+  padding: 12px;
+}
+
+.table-controls-overlay-heading{
+  font-weight: 700;
+  margin-bottom: 12px;
+}

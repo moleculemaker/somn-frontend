@@ -1,0 +1,83 @@
+
+version: '3.9'
+
+secrets:
+  NPMRC:
+    file: ~/.npmrc
+
+networks:
+  proxy:
+
+
+services:
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "chemscraper-traefik"
+    networks:
+      - proxy
+    command:
+      - --log.level=DEBUG
+      - --api.insecure=true
+
+      - --api=true
+      #- --api.dashboard=true
+      # Entrypoints
+      - --entrypoints.web.address=:80
+      # Docker setup
+      - --providers.docker=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.watch=true
+    ports:
+      - "80:80"
+      #- "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    #labels:
+    #  - "traefik.enable=true"
+    #  - "traefik.http.routers.traefik.entrypoints=web"
+    #  - "traefik.http.routers.traefik.rule=Host(`traefik.chemscraper.proxy.localhost`)"
+    #  - "traefik.http.routers.traefik.service=api@internal"
+
+
+  marvin:
+    image: hub.chemaxon.com/cxn-docker-release/chemaxon/mjs-webservice:latest
+    container_name: "chemscraper-marvin"
+    env_file:
+      - .env
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.marvin.loadbalancer.server.port=8080"
+      - "traefik.http.routers.marvin.rule=Host(`chemscraper.proxy.localhost`) && (PathPrefix(`/rest-v1/`) || PathPrefix(`/demo.html`) || PathPrefix(`/js/`) || PathPrefix(`/gui/`))"
+
+  chemscraper:
+    image: moleculemaker/chemscraper-frontend:staging
+    container_name: chemscraper-frontend
+    build:
+      context: .
+      secrets:
+        - NPMRC
+    env_file:
+      - .env
+    networks:
+      - proxy
+
+    restart: unless-stopped
+
+    #volumes:
+    # - ./src/assets/config/:/usr/share/nginx/html/assets/config
+    # - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    # - ./dist/clean:/usr/share/nginx/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chemscraper.rule=Host(`chemscraper.proxy.localhost`) && PathPrefix(`/`)"
+      - "traefik.http.services.chemscraper.loadbalancer.server.port=80"
+
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE"
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolalloworiginlist=http://localhost:4200,http://chemcraper.proxy.localhost"
+      - "traefik.http.middlewares.cors-headers.headers.accesscontrolmaxage=100"
+      - "traefik.http.middlewares.cors-headers.headers.addvaryheader=true"
+      - "traefik.http.routers.chemscraper.middlewares=cors-headers"

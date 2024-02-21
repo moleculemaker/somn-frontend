@@ -1,0 +1,72 @@
+//**************** styles ******************
+//this css library should only be loaded ONCE PER PAGE (or web component)
+//load _core.scss directly if only needing the supporting css colors, variables, mixins, and other functionality
+
+@import 'core';
+
+
+//this comment will show up when exporting the css...use as instructions on the frontend output as needed
+/*
+
+*************** theme - override as needed *****************
+example: document.documentElement.style.setProperty('--text-color', '#ff0000');
+
+*/
+
+
+
+//****************
+//root css variables
+
+:root {
+	//colors
+	@each $name, $color in $colors {
+		@include define_css_var($name);
+	}
+
+	//misc
+//	@include define_css_var('padding', $padding);
+//	@include define_css_var('border-radius', $border_radius);
+}
+
+//****************
+//support dark color scheme preference
+
+@if $automatic_dark_scheme_colors {
+	:root {
+		@media (prefers-color-scheme: dark) {
+			//colors
+			@each $name, $color in $dark_scheme_colors {
+				@include define_css_var($name, $dark_scheme_colors);
+			}
+		}
+	}
+}
+
+.dark_mode {
+	@media (prefers-color-scheme: dark) {
+		//colors
+		@each $name, $color in $dark_scheme_colors {
+			@include define_css_var($name, $dark_scheme_colors);
+		}
+	}
+}
+
+//****************
+
+@import 'core/reset';
+@import 'shared';
+
+//**************** host ******************
+
+html, body {
+	color: css_var('text');
+	background: {
+		color: css_var('background');
+	}
+
+	font: {
+		family: $font_family;
+		size: $font_size_default;
+	}
+}

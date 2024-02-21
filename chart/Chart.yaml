@@ -1,0 +1,8 @@
+apiVersion: v2
+description: "ChemScraper Frontend"
+name: chemscraper-frontend
+version: 1.0.0
+dependencies:
+- name: common
+  version: ~2.2.0
+  repository: "https://charts.bitnami.com/bitnami"

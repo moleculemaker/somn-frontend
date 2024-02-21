@@ -1,0 +1,32 @@
+ingress:
+  hostname: chemscraper.platform.moleculemaker.org
+  extraHosts:
+  - chemscraper.frontend.mmli1.ncsa.illinois.edu
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    kubernetes.io/tls-acme: "true"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-chemscraper-prod-domain-redirect@kubernetescrd"
+
+controller:
+  image: moleculemaker/chemscraper-frontend:main
+
+config:
+  hostname: "https://mmli.fastapi.mmli1.ncsa.illinois.edu"
+  basePath: ""
+  signInUrl: "https://auth.platform.moleculemaker.org/oauth2/start?rd=https%3A%2F%2Fchemcraper.platform.moleculemaker.org%2Fconfiguration"
+  signOutUrl: "https://auth.platform.moleculemaker.org/oauth2/sign_out?rd=https%3A%2F%2Fchemscraper.platform.moleculemaker.org%2Fconfiguration"
+  userInfoUrl: "https://auth.platform.moleculemaker.org/oauth2/userinfo"
+
+extraDeploy:
+- apiVersion: traefik.containo.us/v1alpha1
+  kind: Middleware
+  metadata:
+    name: chemscraper-prod-domain-redirect
+    namespace: alphasynthesis
+  spec:
+    redirectRegex:
+      regex: "^https://chemscraper.frontend.mmli1.ncsa.illinois.edu/(.*)"
+      replacement: "https://chemscraper.platform.moleculemaker.org/${1}"
+      permanent: true

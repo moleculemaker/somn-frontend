@@ -1,0 +1,365 @@
+/**************** app ******************/
+
+@import './css/core';
+
+//use primeng theme colors whenver possible
+//https://www.primefaces.org/primeng/colors
+
+//**************** custom mixins ******************
+
+
+//**************** css ******************
+
+:host {
+    display: flex;
+    flex-direction: column;
+
+    min: {
+        height: 100vh;
+    }
+}
+
+header {
+    display: flex;
+    align-items: center; //flex-end;
+    gap: $padding;
+
+    padding: 0px ($padding * 2);
+
+    > div {
+        padding: $padding 0px;
+    }
+
+    .label {
+        color: css_var('header_label');
+
+        font: {
+            //design called for Montserrat font, kept as Inter to avoid loading extra fonts only used here?
+            size: .65rem;
+        }
+        text: {
+            transform: uppercase;
+        }
+    }
+
+    h3 {
+        margin: 0px;
+    }
+
+    .divider {
+        height: 4.75rem;
+
+        padding: 0px;
+
+        border: {
+            left: 1px solid rgba(#495057, .3);
+        }
+    }
+
+    .spacer {
+        flex-grow: 1;
+    }
+
+    .user_menu {
+        /* Coming Soon banner = 8000, top banner = 4500, this should be between them */
+        cursor: pointer !important;
+        z-index: 5500;
+    }
+
+    .login_button, .user_menu_button {
+        cursor: pointer !important;
+
+        color: css_var('button_secondary');
+
+        padding: ($padding * .25) ($padding * .5);
+
+        font: {
+            size: .75rem;
+        }
+        text: {
+            transform: uppercase;
+        }
+
+        @include border-radius($border_radius);
+
+        &:hover {
+            color: css_var('background');
+            background: {
+               color: css_var('button_secondary');
+            }
+        }
+    }
+
+    .coming_soon {
+        position: relative;
+
+        &.show_popup {
+            .coming_soon_popup {
+                @include translate(0%, 0%);
+            }
+        }
+
+        .coming_soon_button {
+            cursor: pointer;
+
+            color: css_var('button_secondary');
+
+            padding: ($padding * .25) ($padding * .5);
+
+            font: {
+                size: .75rem;
+            }
+            text: {
+                transform: uppercase;
+            }
+
+            @include border-radius($border_radius);
+
+            &:hover {
+                color: css_var('background');
+                background: {
+                    color: css_var('button_secondary');
+                }
+            }
+        }
+
+        .coming_soon_popup {
+            cursor: pointer;
+
+            position: absolute;
+            right: 0px;
+            top: -($padding);
+            z-index: get_index(modal) + 1;
+
+            width: 30rem;
+
+            padding: $padding ($padding * 1.5);
+
+            color: css_var('background');
+            background: {
+//                color: css_var('background');
+                color: css_var('header_popup_background');
+            }
+
+            @include border-bottom-radius($border_radius);
+            @include transition(#{transform .2s easing($ease-in-out)});
+            @include translate(0%, -100%);
+
+            &:hover {
+                .close_btn {
+                    @include opacity(80);
+                }
+            }
+
+            .close_btn {
+                cursor: pointer;
+
+                position: absolute;
+                right: $padding * .75;
+                top: $padding * .75;
+                z-index: 100;
+
+                @include opacity(50);
+
+                &:hover {
+                    @include opacity(80);
+                }
+            }
+
+            h2,
+            h3 {
+                margin: {
+                    top: $padding * .5;
+                }
+
+                text: {
+                    transform: uppercase;
+                }
+            }
+
+            p {
+                margin: {
+                    top: $padding * .5;
+                }
+
+                font: {
+                    size: .85rem;
+                }
+            }
+
+            a,
+            a:link,
+            a:visited {
+                color: css_var('header_link');
+
+                font: {
+                    weight: bold;
+                }
+            }
+
+            a:hover {
+                color: css_var('header_link_hover');
+            }
+        }
+    }
+}
+
+.tool_header {
+    top: 0px;
+    z-index: get_index(interface);
+    @include position(sticky);
+
+    color: css_var('background');
+    background: {
+        color: css_var('header_background');
+        image: css_var('header_background_gradient');
+    }
+
+    .container {
+        display: flex;
+        align-items: center;
+        gap: $padding;
+    }
+
+    .clean_logo {
+        font: {
+            size: 1.65rem;
+            weight: bold;
+        }
+
+        background: {
+            image: css_var('clean_logo_gradient');
+        }
+
+        @include background-clip(text);
+        @include text-fill-color(transparent);
+    }
+
+    .tagline {
+        font: {
+            size: .7rem;
+            weight: 600;
+        }
+
+        @include opacity(65);
+
+        .line {
+            position: relative;
+
+            height: 3px;
+
+            background: {
+                image: css_var('clean_logo_gradient_reverse');
+            }
+
+            margin: {
+                top: 2px;
+            }
+
+            &:before {
+                content: '';
+                position: absolute;
+                left: -($padding * .65);
+                bottom: 0px;
+                z-index: 100;
+
+                width: 3px;
+                height: 3px;
+
+                background: {
+                    color: css_var('clean_logo');
+                }
+            }
+        }
+    }
+
+    .link {
+        font: {
+            size: .75rem;
+        }
+
+        a,
+        a:link,
+        a:visited {
+            display: flex;
+            align-items: center;
+            gap: $padding * .25;
+
+            color: css_var('background');
+
+            @include opacity(65);
+        }
+
+        a:hover {
+            @include opacity(100);
+        }
+    }
+
+    .spacer {
+        flex-grow: 1;
+    }
+}
+
+.content {
+    flex-grow: 1;
+
+    padding: $padding;
+}
+
+footer {
+    border: {
+        top: 1px solid #C6C6C6;
+    }
+
+    font: {
+        size: .75rem;
+    }
+    text: {
+        transform: uppercase;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: $padding * .5;
+    }
+
+    a:link, a:visited, a:active {
+        color: #495057;
+    }
+}
+
+cite {
+    border: {
+        top: 1px solid #C6C6C6;
+    }
+
+    font: {
+        size: .75rem;
+    }
+    text: {
+        transform: normal;
+    }
+
+    background-color: #F2F5FC;
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: $padding * .5;
+        line-height: 1.5;
+        a:link, a:visited, a:active {
+            color: #224063;
+        }
+
+        .bolded {
+            font-weight: bold;
+            color: #224063;
+
+        }
+    }
+
+
+}

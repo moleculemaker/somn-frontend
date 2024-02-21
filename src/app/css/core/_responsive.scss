@@ -1,0 +1,99 @@
+//**************** responsive media queries ******************
+
+@mixin on_mobile() {
+	@media (max-width: $mobile) {
+		@content;
+	}
+}
+
+@mixin on_tablet() {
+	@media (min-width: $mobile + 1) and (max-width: $tablet) {
+		@content;
+	}
+}
+
+@mixin on_desktop() {
+	@media (min-width: $desktop) {
+		@content;
+	}
+}
+
+@mixin on_desktop_large() {
+	@media (min-width: $desktop_large) {
+		@content;
+	}
+}
+
+@mixin not_mobile() {
+	@media (min-width: $mobile + 1) {
+		@content;
+	}
+}
+
+@mixin not_tablet() {
+	@media (max-width: $mobile), (min-width: $desktop) {
+		@content;
+	}
+}
+
+@mixin not_desktop() {
+	@media (max-width: $tablet) {
+		@content;
+	}
+}
+
+
+
+//**************** page ******************
+
+@mixin on_page_width() {
+	@media (min-width: $page_width) {
+		@content;
+	}
+}
+
+@mixin not_page_width() {
+	@media (max-width: $page_width - 1) {
+		@content;
+	}
+}
+
+
+//**************** app (width and height) ******************
+
+@mixin is_desired_app_size() {
+	@media (min-width: $app_desired_width + 1) and (min-height: $app_desired_height + 1) {
+		@content;
+	}
+}
+
+//smaller than EITHER desired size
+@mixin not_desired_app_size() {
+	@media (max-width: $app_desired_width), (max-height: $app_desired_height) {
+		@content;
+	}
+}
+
+//app is smaller than EITHER min size
+@mixin is_app_small_size() {
+	@media (max-width: $app_min_width), (max-height: $app_min_height) {
+		@content;
+	}
+}
+
+//app is larger than BOTH min size
+@mixin not_app_small_size() {
+	@media (min-width: $app_min_width + 1) and (min-height: $app_min_height + 1) {
+		@content;
+	}
+}
+
+//app is between the min and desired app sizes (think on_tablet)
+@mixin is_app_mid_size() {
+	@media (min-width: $app_min_width + 1) and (min-height: $app_min_height + 1) {
+		@media (max-width: $app_desired_width), (max-height: $app_desired_height) {
+			@content;
+		}
+	}
+}
+

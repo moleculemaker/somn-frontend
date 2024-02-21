@@ -1,0 +1,31 @@
+
+version: '3.9'
+
+secrets:
+  NPMRC:
+    file: ~/.npmrc
+
+networks:
+  proxy:
+
+
+services:
+  chemscraper:
+    image: moleculemaker/chemscraper-frontend:localdev
+    container_name: chemscraper-frontend
+    build:
+      context: .
+      secrets:
+        - NPMRC
+    env_file:
+      - .env
+    ports:
+      - 4200:80
+    networks:
+      - proxy
+
+    restart: unless-stopped
+
+    volumes:
+     - ./src/assets/config/:/usr/share/nginx/html/assets/config
+     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf

@@ -1,0 +1,63 @@
+//https://gist.github.com/JacobDB/0ffffaf8e772c12acf7102edb8a302be#file-inline-svg-function-scss
+
+// Replace letters
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
+}
+
+// Encode symbols
+@function url-encode($string) {
+    $map: (
+        "%": "%25",
+        "<": "%3C",
+        ">": "%3E",
+        " ": "%20",
+        "!": "%21",
+        "*": "%2A",
+        "'": "%27",
+        '"': "%22",
+        "(": "%28",
+        ")": "%29",
+        ";": "%3B",
+        ":": "%3A",
+        "@": "%40",
+        "&": "%26",
+        "=": "%3D",
+        "+": "%2B",
+        "$": "%24",
+        ",": "%2C",
+        "/": "%2F",
+        "?": "%3F",
+        "#": "%23",
+        "[": "%5B",
+        "]": "%5D"
+    );
+
+    $new: $string;
+
+    @each $search, $replace in $map {
+        $new: str-replace($new, $search, $replace);
+    }
+
+    @return $new;
+}
+
+// Format the SVG as a URL
+// svg variable can have {fill_color} for color changes during render
+
+@function inline-svg($string, $fill_color:null) {
+	//added ability to specify fill_color
+	@if ($fill_color == null) {$fill_color: get_color(svg);}
+
+	$string: str-replace($string, '{fill_color}', $fill_color);
+
+    @return url('data:image/svg+xml,#{url-encode($string)}');
+}
+
+
