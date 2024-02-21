@@ -4,19 +4,19 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}
   labels:
-    app: chemscraper-frontend
+    app: somn-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chemscraper-frontend
+      app: somn-frontend
   template:
     metadata:
       labels:
-        app: chemscraper-frontend
+        app: somn-frontend
     spec:
       containers:
-        - name: chemscraper-frontend
+        - name: somn-frontend
           image: {{ .Values.controller.image }}
 
           env:

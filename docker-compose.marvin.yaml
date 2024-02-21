@@ -12,7 +12,7 @@ networks:
 services:
   traefik:
     image: "traefik:v2.10"
-    container_name: "chemscraper-traefik"
+    container_name: "somn-traefik"
     networks:
       - proxy
     command:
@@ -36,13 +36,13 @@ services:
     #labels:
     #  - "traefik.enable=true"
     #  - "traefik.http.routers.traefik.entrypoints=web"
-    #  - "traefik.http.routers.traefik.rule=Host(`traefik.chemscraper.proxy.localhost`)"
+    #  - "traefik.http.routers.traefik.rule=Host(`traefik.somn.proxy.localhost`)"
     #  - "traefik.http.routers.traefik.service=api@internal"
 
 
   marvin:
     image: hub.chemaxon.com/cxn-docker-release/chemaxon/mjs-webservice:latest
-    container_name: "chemscraper-marvin"
+    container_name: "somn-marvin"
     env_file:
       - .env
     networks:
@@ -50,11 +50,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.marvin.loadbalancer.server.port=8080"
-      - "traefik.http.routers.marvin.rule=Host(`chemscraper.proxy.localhost`) && (PathPrefix(`/rest-v1/`) || PathPrefix(`/demo.html`) || PathPrefix(`/js/`) || PathPrefix(`/gui/`))"
+      - "traefik.http.routers.marvin.rule=Host(`somn.proxy.localhost`) && (PathPrefix(`/rest-v1/`) || PathPrefix(`/demo.html`) || PathPrefix(`/js/`) || PathPrefix(`/gui/`))"
 
-  chemscraper:
-    image: moleculemaker/chemscraper-frontend:staging
-    container_name: chemscraper-frontend
+  somn:
+    image: moleculemaker/somn-frontend:staging
+    container_name: somn-frontend
     build:
       context: .
       secrets:
@@ -72,12 +72,12 @@ services:
     # - ./dist/clean:/usr/share/nginx/html
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.chemscraper.rule=Host(`chemscraper.proxy.localhost`) && PathPrefix(`/`)"
-      - "traefik.http.services.chemscraper.loadbalancer.server.port=80"
+      - "traefik.http.routers.somn.rule=Host(`somn.proxy.localhost`) && PathPrefix(`/`)"
+      - "traefik.http.services.somn.loadbalancer.server.port=80"
 
       - "traefik.http.middlewares.cors-headers.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE"
       - "traefik.http.middlewares.cors-headers.headers.accesscontrolallowheaders=*"
       - "traefik.http.middlewares.cors-headers.headers.accesscontrolalloworiginlist=http://localhost:4200,http://chemcraper.proxy.localhost"
       - "traefik.http.middlewares.cors-headers.headers.accesscontrolmaxage=100"
       - "traefik.http.middlewares.cors-headers.headers.addvaryheader=true"
-      - "traefik.http.routers.chemscraper.middlewares=cors-headers"
+      - "traefik.http.routers.somn.middlewares=cors-headers"

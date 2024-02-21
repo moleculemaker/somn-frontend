@@ -10,9 +10,9 @@ networks:
 
 
 services:
-  chemscraper:
-    image: moleculemaker/chemscraper-frontend:localdev
-    container_name: chemscraper-frontend
+  somn:
+    image: moleculemaker/somn-frontend:localdev
+    container_name: somn-frontend
     build:
       context: .
       secrets:

@@ -1,6 +1,6 @@
 apiVersion: v2
-description: "ChemScraper Frontend"
-name: chemscraper-frontend
+description: "Somn Frontend"
+name: somn-frontend
 version: 1.0.0
 dependencies:
 - name: common

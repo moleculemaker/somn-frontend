@@ -1,5 +1,5 @@
 ingress:
-  hostname: chemscraper.frontend.staging.mmli1.ncsa.illinois.edu
+  hostname: somn.frontend.staging.mmli1.ncsa.illinois.edu
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
@@ -7,11 +7,11 @@ ingress:
     traefik.ingress.kubernetes.io/router.tls: "true"
 
 controller:
-  image: moleculemaker/chemscraper-frontend:latest
+  image: moleculemaker/somn-frontend:latest
 
 config:
   hostname: "https://mmli.fastapi.staging.mmli1.ncsa.illinois.edu"
   basePath: ""
-  signInUrl: "https://mmli1.ncsa.illinois.edu/oauth2/start?rd=https%3A%2F%2Fchemscraper.frontend.staging.mmli1.ncsa.illinois.edu%2Fconfiguration"
-  signOutUrl: "https://mmli1.ncsa.illinois.edu/oauth2/sign_out?rd=https%3A%2F%2Fchemscraper.frontend.staging.mmli1.ncsa.illinois.edu%2Fconfiguration"
+  signInUrl: "https://mmli1.ncsa.illinois.edu/oauth2/start?rd=https%3A%2F%2Fsomn.frontend.staging.mmli1.ncsa.illinois.edu%2Fconfiguration"
+  signOutUrl: "https://mmli1.ncsa.illinois.edu/oauth2/sign_out?rd=https%3A%2F%2Fsomn.frontend.staging.mmli1.ncsa.illinois.edu%2Fconfiguration"
   userInfoUrl: "https://mmli1.ncsa.illinois.edu/oauth2/userinfo"

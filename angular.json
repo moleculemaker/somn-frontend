@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "chemscraper": {
+    "somn": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/chemscraper",
+            "outputPath": "dist/somn",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -111,13 +111,13 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "chemscraper:build:production"
+              "browserTarget": "somn:build:production"
             },
             "staging": {
-              "browserTarget": "chemscraper:build:staging"
+              "browserTarget": "somn:build:staging"
             },
             "development": {
-              "browserTarget": "chemscraper:build:development"
+              "browserTarget": "somn:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -125,7 +125,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "chemscraper:build"
+            "browserTarget": "somn:build"
           }
         },
         "test": {
