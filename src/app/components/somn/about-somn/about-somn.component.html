@@ -1,0 +1,407 @@
+<div class="-mb-4 flex h-full flex-col">
+    <div class="mt-6 flex h-full flex-col items-center">
+        <div class="lg:w-screen-lg flex w-full p-4">
+            <a class="font-bold" href="/">
+                <h6>
+                    <i class="pi pi-chevron-left text-xs"></i>
+                    <span class="ml-4">Back to Home page</span>
+                </h6>
+            </a>
+        </div>
+        <div class="lg:w-screen-lg flex w-full grow p-4 pb-0">
+            <nav class="flex max-w-[300px] flex-col">
+                <button
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.ABOUT"
+                    (click)="activePanel$.next(ActiveAboutPanel.ABOUT)"
+                >
+                    <i class="pi pi-info-circle"></i
+                    ><a class="ml-2 font-bold">About</a>
+                </button>
+                <button
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.TRAINING_DATA"
+                    (click)="activePanel$.next(ActiveAboutPanel.TRAINING_DATA)"
+                >
+                    <i class="pi pi-table"></i
+                    ><a class="ml-2 font-bold">Training Data</a>
+                </button>
+                <button
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.GITHUB"
+                    (click)="activePanel$.next(ActiveAboutPanel.GITHUB)"
+                >
+                    <i class="pi pi-github"></i
+                    ><a class="ml-2 font-bold">Github</a>
+                </button>
+                <button
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.PUBLICATIONS"
+                    (click)="activePanel$.next(ActiveAboutPanel.PUBLICATIONS)"
+                >
+                    <i class="pi pi-book"></i
+                    ><a class="ml-2 font-bold">Publication</a>
+                </button>
+                <button
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.GET_INVOLVED"
+                    (click)="activePanel$.next(ActiveAboutPanel.GET_INVOLVED)"
+                >
+                    <i class="pi pi-comment"></i
+                    ><a class="ml-2 font-bold">Get Involved</a>
+                </button>
+            </nav>
+
+            <!-- About -->
+            <main
+                *ngIf="activePanel$.value === ActiveAboutPanel.ABOUT"
+                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
+            >
+                <h1 class="mb-4 font-bold">About</h1>
+                <p class="max-w-screen-md leading-6">
+                    Machine-learning methods have great potential to accelerate
+                    the identification of reaction conditions for chemical
+                    transformations. Somn has been developed to predict
+                    substrate-adaptive conditions for palladium (Pd)–catalyzed
+                    carbon-nitrogen (C–N) couplings. The design and construction
+                    of this tool required the generation of an experimental
+                    dataset that explores a diverse network of reactant pairings
+                    across a set of reaction conditions. A large scope of C–N
+                    couplings was actively learned by neural network models by
+                    using a systematic process to design experiments.
+                </p>
+                <p class="mt-8 max-w-screen-md leading-6">
+                    The models showed good performance in experimental
+                    validation: Ten products were isolated in more than 85%
+                    yield from a range of couplings with out-of-sample reactants
+                    designed to challenge the models. Importantly, the developed
+                    workflow continually improves the prediction capability of
+                    the tool as the corpus of data grows.
+                </p>
+            </main>
+
+            <!-- Training Data -->
+            <main
+                *ngIf="activePanel$.value === ActiveAboutPanel.TRAINING_DATA"
+                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
+            >
+                <div class="flex items-center justify-between">
+                    <h1 class="mb-4 font-bold">Training Data</h1>
+                    <p-button
+                        label="Export"
+                        styleClass="bg-[#224063]"
+                        icon="pi pi-download"
+                    ></p-button>
+                </div>
+                <p class="max-w-screen-md leading-6">
+                    Browse Somn’s training dataset and view overall model
+                    performance plots (training, validation, and test).
+                </p>
+                <div class="my-4">
+                    <p-table
+                        #resultsTable
+                        [value]="(trainingData$ | async) || []"
+                        (onFilter)="filteredTrainingData$.next($event.filteredValue)"
+                        [paginator]="true"
+                        [rows]="10"
+                        [rowsPerPageOptions]="[10, 20, 50]"
+                        tableStyleClass="min-w-[50rem] w-full"
+                        styleClass="border-x border-solid rounded-md border-[--surface-d]"
+                    >
+                        <ng-template pTemplate="caption">
+                            <div class="flex items-center justify-between">
+                                Training Data
+                                <div class="flex items-center gap-2">
+                                    <button
+                                        class="border-green rounded-lg border p-2"
+                                        (click)="showFilters$.next(!showFilters$.value)"
+                                    >
+                                        <i class="pi pi-filter"></i>
+                                        Filter
+                                        <p-chip
+                                            >{{ numFilters$ | async }}</p-chip
+                                        >
+                                    </button>
+                                    <button
+                                        class="border-green rounded-lg border p-2"
+                                        (click)="clearAllFilters()"
+                                    >
+                                        Clear All
+                                    </button>
+                                </div>
+                            </div>
+
+                            <hr *ngIf="showFilters$.value" class="-mx-4 my-2" />
+                            <div *ngIf="showFilters$.value" class="flex gap-2">
+                                <p-columnFilter
+                                    field="arylHalide"
+                                    matchMode="in"
+                                    [showMenu]="false"
+                                    [showClearButton]="false"
+                                >
+                                    <ng-template
+                                        pTemplate="filter"
+                                        let-value
+                                        let-filter="filterCallback"
+                                    >
+                                        <p-multiSelect
+                                            [display]="selectedArylHalides$.value.length > 1 ? 'comma' : 'chip'"
+                                            [maxSelectedLabels]="1"
+                                            [selectedItemsLabel]="'{0} items'"
+                                            [ngModel]="selectedArylHalides$ | async"
+                                            [options]="(arylHalidesOptions$ | async) || []"
+                                            placeholder="Aryl Halides"
+                                            (onChange)="filter($event.value); selectedArylHalides$.next($event.value)"
+                                            display="chip"
+                                            [styleClass]="'max-w-[150px]'"
+                                        >
+                                        </p-multiSelect>
+                                    </ng-template>
+                                </p-columnFilter>
+                                <p-columnFilter
+                                    field="amine"
+                                    matchMode="in"
+                                    [showMenu]="false"
+                                    [showClearButton]="false"
+                                >
+                                    <ng-template
+                                        pTemplate="filter"
+                                        let-value
+                                        let-filter="filterCallback"
+                                    >
+                                        <p-multiSelect
+                                            [display]="selectedAmines$.value.length > 1 ? 'comma' : 'chip'"
+                                            [maxSelectedLabels]="1"
+                                            [selectedItemsLabel]="'{0} items'"
+                                            [ngModel]="selectedAmines$ | async"
+                                            [options]="(aminesOptions$ | async) || []"
+                                            placeholder="Amines"
+                                            (onChange)="filter($event.value); selectedAmines$.next($event.value)"
+                                            [styleClass]="'max-w-[150px]'"
+                                            display="chip"
+                                        >
+                                        </p-multiSelect>
+                                    </ng-template>
+                                </p-columnFilter>
+                                <p-columnFilter
+                                    field="catalyst"
+                                    matchMode="in"
+                                    [showMenu]="false"
+                                    [showClearButton]="false"
+                                >
+                                    <ng-template
+                                        pTemplate="filter"
+                                        let-value
+                                        let-filter="filterCallback"
+                                    >
+                                        <p-multiSelect
+                                            [display]="selectedCatalysts$.value.length > 1 ? 'comma' : 'chip'"
+                                            [maxSelectedLabels]="1"
+                                            [selectedItemsLabel]="'{0} items'"
+                                            [ngModel]="selectedCatalysts$ | async"
+                                            [options]="(catalystsOptions$ | async) || []"
+                                            placeholder="Catalysts"
+                                            (onChange)="filter($event.value); selectedCatalysts$.next($event.value)"
+                                            [styleClass]="'max-w-[150px]'"
+                                            display="chip"
+                                        >
+                                        </p-multiSelect>
+                                    </ng-template>
+                                </p-columnFilter>
+                                <p-columnFilter
+                                    field="solvent"
+                                    matchMode="in"
+                                    [showMenu]="false"
+                                    [showClearButton]="false"
+                                >
+                                    <ng-template
+                                        pTemplate="filter"
+                                        let-value
+                                        let-filter="filterCallback"
+                                    >
+                                        <p-multiSelect
+                                            [display]="selectedSolvents$.value.length > 1 ? 'comma' : 'chip'"
+                                            [maxSelectedLabels]="1"
+                                            [selectedItemsLabel]="'{0} items'"
+                                            [ngModel]="selectedSolvents$ | async"
+                                            [options]="(solventsOptions$ | async) || []"
+                                            placeholder="Solvent"
+                                            (onChange)="filter($event.value); selectedSolvents$.next($event.value)"
+                                            [styleClass]="'max-w-[150px]'"
+                                            display="chip"
+                                        >
+                                        </p-multiSelect>
+                                    </ng-template>
+                                </p-columnFilter>
+                                <p-columnFilter
+                                    field="base"
+                                    matchMode="in"
+                                    [showMenu]="false"
+                                    [showClearButton]="false"
+                                >
+                                    <ng-template
+                                        pTemplate="filter"
+                                        let-value
+                                        let-filter="filterCallback"
+                                    >
+                                        <p-multiSelect
+                                            [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
+                                            [maxSelectedLabels]="1"
+                                            [selectedItemsLabel]="'{0} items'"
+                                            [ngModel]="selectedBases$.value"
+                                            [options]="(basesOptions$ | async) || []"
+                                            placeholder="Bases"
+                                            (ngModelChange)="filter($event); selectedBases$.next($event)"
+                                        >
+                                        </p-multiSelect>
+                                    </ng-template>
+                                </p-columnFilter>
+                                <p-columnFilter
+                                    field="yield"
+                                    matchMode="in"
+                                    [showMenu]="false"
+                                    [showClearButton]="false"
+                                >
+                                    <ng-template
+                                        pTemplate="filter"
+                                        let-value
+                                        let-filter="filterCallback"
+                                    >
+                                        <!-- TODO: customize multi-select -->
+                                        <!-- <p-multiSelect
+                                            [maxSelectedLabels]="1"
+                                            [selectedItemsLabel]="'{0} items'"
+                                            [ngModel]="selectedBases$.value"
+                                            [options]="(basesOptions$ | async) || []"
+                                            placeholder="Bases"
+                                            (ngModelChange)="filter($event); selectedYield$.next($event)"
+                                        >
+                                        </p-multiSelect> -->
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+
+                            <hr class="-mx-4 mt-2" />
+                            <div class="-mx-4 -mb-4 bg-white py-4">
+                                <app-density-plot
+                                    styleClass="h-[220px]"
+                                    [data]="(densityPlotData$ | async) || []"
+                                    (selectedRegionChange)="onYieldRangeChange($event)"
+                                ></app-density-plot>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="arylHalide">
+                                    Aryl Halides<p-sortIcon
+                                        field="arylHalide"
+                                    />
+                                </th>
+                                <th pSortableColumn="amine">
+                                    Amine<p-sortIcon field="amine" />
+                                </th>
+                                <th pSortableColumn="catalyst">
+                                    Catalyst<p-sortIcon field="catalyst" />
+                                </th>
+                                <th pSortableColumn="solvent">
+                                    Solvent<p-sortIcon field="solvent" />
+                                </th>
+                                <th pSortableColumn="base">
+                                    Base<p-sortIcon field="base" />
+                                </th>
+                                <th pSortableColumn="yield">
+                                    Yield %<p-sortIcon field="yield" />
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr>
+                                <td>{{ row.arylHalide }}</td>
+                                <td>{{ row.amine }}</td>
+                                <td>{{ row.catalyst }}</td>
+                                <td>{{ row.solvent }}</td>
+                                <td>{{ row.base }}</td>
+                                <td>{{ row.yield * 100 | number:'1.1-2' }}%</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </main>
+
+            <!-- Github -->
+            <main
+                *ngIf="activePanel$.value === ActiveAboutPanel.GITHUB"
+                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
+            >
+                <h1 class="mb-4 font-bold">Github</h1>
+                <p class="max-w-screen-md leading-6">
+                    Somn is an open-source tool, committed to broadening access
+                    to AI-enabled synthesis planning. Interested in applying
+                    this project framework to another chemical system or
+                    restarting Somn’s active learning workflow with your own
+                    data? Explore Somn’s public code repository here:
+                    <a
+                        class="text-[#0080FF] underline"
+                        href="https://github.com/SEDenmarkLab/Lucid_Somnambulist"
+                    >
+                        <i class="pi pi-external-link mx-2"></i>
+                        https://github.com/SEDenmarkLab/Lucid_Somnambulist
+                    </a>
+                </p>
+            </main>
+
+            <!-- Publications -->
+            <main
+                *ngIf="activePanel$.value === ActiveAboutPanel.PUBLICATIONS"
+                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
+            >
+                <h1 class="mb-4 font-bold">Publications</h1>
+                <p class="max-w-screen-md leading-6">
+                    Learn more about the research process behind the design and
+                    construction of Somn.
+                </p>
+
+                <ul class="mt-8">
+                    <li class="mt-4 flex items-center">
+                        <span class="font-semibold leading-6"
+                            >Science Research Article:</span
+                        >
+                        <a
+                            class="text-[#0080FF] underline"
+                            href="https://www.science.org/doi/10.1126/science.adg2114"
+                            ><i class="pi pi-external-link mx-2"></i>DOI:
+                            10.1126/science.adg2114</a
+                        >
+                    </li>
+                    <li class="mt-4 flex items-center">
+                        <span class="font-semibold leading-6"
+                            >ChemRxiv Manuscript:</span
+                        >
+                        <!-- TODO: add missing link -->
+                        <a class="text-[#0080FF] underline" href=""
+                            ><i class="pi pi-external-link mx-2"></i>DOI:
+                            10.26434/chemrxiv-2022-hspwv-v2</a
+                        >
+                    </li>
+                </ul>
+            </main>
+
+            <!-- Get Involved -->
+            <main
+                *ngIf="activePanel$.value === ActiveAboutPanel.GET_INVOLVED"
+                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
+            >
+                <h1 class="mb-4 font-bold">Get involved</h1>
+                <p class="max-w-screen-md leading-6">
+                    We welcome you questions, suggestions, and feedback! Get in
+                    touch with us via
+                    <a
+                        class="font-semibold text-[#0080FF] underline"
+                        href="mailto:somn-feedback@moleculemaker.org"
+                        >email: somn-feedback@moleculemaker.org</a
+                    >
+                </p>
+            </main>
+        </div>
+    </div>
+</div>

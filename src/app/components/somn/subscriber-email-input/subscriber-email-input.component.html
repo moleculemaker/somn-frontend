@@ -1,0 +1,49 @@
+<form
+    class="flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
+    [formGroup]="subscriptionForm"
+>
+    <div class="flex flex-col">
+        <div class="mb-2 flex items-end justify-center">
+            <span class="mb-1 pr-12">
+                <h2 class="m-0 mr-2 inline">Email</h2>
+                Leave an email to get an notification when your results are
+                ready.</span
+            >
+        </div>
+        <div class="w-full">
+            <input
+                id="subscriber-email"
+                type="email"
+                aria-describedby="subscriber-email-help"
+                [class]="'h-12 w-full'
+                + ((subscriptionForm.controls['subscriberEmail'].invalid
+                    && subscriptionForm.controls['subscriberEmail'].dirty) ? ' ng-invalid ng-dirty' : '')"
+                pInputText
+                formControlName="subscriberEmail"
+            />
+            <small
+                *ngIf="subscriptionForm.controls['subscriberEmail'].invalid
+                    && subscriptionForm.controls['subscriberEmail'].dirty"
+                id="subscriber-email-help"
+                class="p-error mt-2 block"
+                >Email is invalid.</small
+            >
+        </div>
+        <div class="py-4">
+            <p-checkbox
+                name="subscription"
+                styleClass="subscription-checkbox"
+                label="Agree to receive email notifications and updates about Somn."
+                [binary]="true"
+                [formControl]="subscriptionForm.controls['agreeToSubscription']"
+            ></p-checkbox>
+        </div>
+    </div>
+    <p-button
+        label="Get the Overall Stoichiometry"
+        styleClass="bg-[#224063]"
+        [disabled]="subscriptionForm.invalid"
+        iconPos="right"
+        icon="pi pi-arrow-right"
+    ></p-button>
+</form>
