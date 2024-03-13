@@ -101,7 +101,6 @@
                     <p-table
                         #resultsTable
                         [value]="(trainingData$ | async) || []"
-                        (onFilter)="filteredTrainingData$.next($event.filteredValue)"
                         [paginator]="true"
                         [rows]="10"
                         [rowsPerPageOptions]="[10, 20, 50]"
@@ -285,7 +284,7 @@
                             <div class="-mx-4 -mb-4 bg-white py-4">
                                 <app-density-plot
                                     styleClass="h-[220px]"
-                                    [data]="(densityPlotData$ | async) || []"
+                                    [data]="(filteredTrainingDataWithoutYieldRange$ | async) || []"
                                     (selectedRegionChange)="onYieldRangeChange($event)"
                                 ></app-density-plot>
                             </div>

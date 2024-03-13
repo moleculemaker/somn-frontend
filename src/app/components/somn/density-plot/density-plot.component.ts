@@ -69,154 +69,177 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
     minVal: number = this.selectedRegionMin$.value,
     maxVal: number = this.selectedRegionMax$.value,
   ) {
-    if (!this.container) {
-      return;
-    }
+    setTimeout(() => {
+      if (!this.container) {
+        return;
+      }
 
-    let containerEl = this.container.nativeElement;
-    let margin = { top: 0, right: 0, bottom: 0, left: 40 },
-      width = containerEl.clientWidth - margin.left - margin.right,
-      height = containerEl.clientHeight - margin.top - margin.bottom;
+      let containerEl = this.container.nativeElement;
+      let margin = { top: 0, right: 0, bottom: 0, left: 40 },
+        width = containerEl.clientWidth - margin.left - margin.right,
+        height = containerEl.clientHeight - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page if not exist
-    let svgEl = this.container.nativeElement.querySelector("svg");
-    if (svgEl) {
-      containerEl.removeChild(svgEl);
-    }
+      // append the svg object to the body of the page if not exist
+      let svgEl = this.container.nativeElement.querySelector("svg");
+      if (svgEl) {
+        containerEl.removeChild(svgEl);
+      }
 
-    let svg = d3
-      .select(containerEl)
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      let svg = d3
+        .select(containerEl)
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    let x = d3.scaleLinear().domain([0, 1]).range([0, width]);
-    let y = d3.scaleLinear().range([height, 0]).domain([0, 1]);
+      let x = d3.scaleLinear().domain([0, 1]).range([0, width]);
+      let y = d3.scaleLinear().range([height, 0]).domain([0, 1]);
 
-    let density: [number, number][] = [[0, 0]];
+      let density: [number, number][] = [[0, 0]];
 
-    let yields = data.map((d) => d["yield"]);
-    let buckets = new Map();
+      let yields = data.map((d) => d["yield"]);
+      let thresholds = [];
 
-    yields.forEach((y) => {
-      const v = buckets.get(y);
-      buckets.set(y, (v ? v : 0) + 1);
-    });
+      for (let i = 0; i <= 100; i += 1) {
+        thresholds.push(i / 100);
+      }
 
-    let sum = Array.from(buckets.values()).reduce((p, v) => p + v, 0);
+      function kde(kernel: Function, thresholds: number[], data: number[]) {
+        return thresholds.map((t) => [t, d3.mean(data, (d) => kernel(t - d))]);
+      }
 
-    for (const [key, value] of Array.from(buckets.entries()).sort((a, b) =>
-      a[0] < b[0] ? -1 : 1,
-    )) {
-      density.push([key, value / sum]);
-    }
+      function epanechnikov(bandwidth: number) {
+        return (x: number) =>
+          Math.abs((x /= bandwidth)) <= 1
+            ? (0.75 * (1 - x * x)) / bandwidth
+            : 0;
+      }
 
-    density.push([density[density.length - 1][0], 0]);
-
-    let selectedDensity = density.filter(
-      ([x, y]) => x >= minVal / 100 && x <= maxVal / 100,
-    );
-    selectedDensity.unshift([selectedDensity[0][0], 0]);
-    selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
-    selectedDensity.push([1, 0]);
-
-    let lineGenerator = d3
-      .line()
-      .curve(d3.curveBundle.beta(1))
-      .x((d) => x(d[0]))
-      .y((d) => y(d[1]));
-
-    let gradient = svg
-      .append("defs")
-      .append("linearGradient")
-      .attr("id", "gradient")
-      .attr("x1", "0%")
-      .attr("x2", "100%")
-      .attr("y1", "0%")
-      .attr("y2", "0%");
-
-    gradient.append("stop").attr("offset", "0%").attr("stop-color", "#470459");
-
-    gradient.append("stop").attr("offset", "50%").attr("stop-color", "#2E8C89");
-
-    gradient
-      .append("stop")
-      .attr("offset", "100%")
-      .attr("stop-color", "#F5E61D");
-
-    // Plot the area
-    svg
-      .append("path")
-      .attr("fill", "url(#gradient)")
-      .attr("opacity", ".4")
-      .attr("d", lineGenerator(density));
-
-    svg
-      .append("path")
-      .attr("fill", "url(#gradient)")
-      .attr("opacity", "1")
-      .attr("d", lineGenerator(selectedDensity));
-
-    // add the x Axis
-    svg
-      .append("g")
-      .attr("id", "x-axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(
-        d3
-          .axisBottom(x)
-          .tickFormat(d3.format(".0%"))
-          .tickSize(-150)
-          .tickValues([0.0, 0.25, 0.5, 0.75, 1.0]),
+      density.push(
+        ...(kde(epanechnikov(1), thresholds, yields) as [number, number][]),
       );
-    svg
-      .selectAll("#x-axis .tick line")
-      .attr("stroke", "#DEE2E6")
-      .attr("stroke-dasharray", "5")
-      .attr("stroke-width", "2");
-    svg.select("#x-axis .domain").attr("stroke", "transparent");
-    svg
-      .selectAll("#x-axis .tick text")
-      .attr("fill", "#495057")
-      .attr("font-weight", "300")
-      .attr("transform", `translate(0, ${-height})`);
-    svg
-      .selectAll("#x-axis .tick:first-of-type text")
-      .attr("transform", `translate(18, ${-height})`);
-    svg
-      .selectAll("#x-axis .tick:last-of-type text")
-      .attr("transform", `translate(-20, ${-height})`);
-    svg
-      .selectAll("#x-axis .tick:first-of-type")
-      .attr("transform", `translate(1, 0)`);
-    svg
-      .selectAll("#x-axis .tick:last-of-type")
-      .attr("transform", `translate(${width - 1}, 0)`);
 
-    // add the y Axis
-    svg
-      .append("g")
-      .attr("id", "y-axis")
-      .call(d3.axisLeft(y).tickValues([0, 1]));
-    svg.selectAll("#y-axis .domain").attr("stroke", "transparent");
-    svg.selectAll("#y-axis .tick line").attr("stroke", "transparent");
-    svg.selectAll("#y-axis .tick text").attr("font-weight", "300");
-    svg
-      .selectAll("#y-axis .tick:first-of-type text")
-      .attr("transform", "translate(0, -5)");
-    svg
-      .selectAll("#y-axis .tick:last-of-type text")
-      .attr("transform", `translate(0, 16)`);
-    svg
-      .select("#y-axis")
-      .append("text")
-      .style("text-anchor", "end")
-      .attr("fill", "black")
-      .attr("font-weight", "400")
-      .attr("transform", "translate(-20, 70) rotate(-90)")
-      .text("Density");
+      density.push([density[density.length - 1][0], 0]);
+
+      let selectedDensity = density.filter(
+        ([x, y]) => x >= minVal / 100 && x <= maxVal / 100,
+      );
+
+      selectedDensity.unshift(selectedDensity[0]);
+      selectedDensity.unshift([selectedDensity[0][0], 0]);
+      selectedDensity.unshift([selectedDensity[0][0], 0]);
+      selectedDensity.unshift([selectedDensity[0][0], 0]);
+      selectedDensity.unshift([0, 0]);
+
+      selectedDensity.push(selectedDensity[selectedDensity.length - 1]);
+      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
+      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
+      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
+      selectedDensity.push([1, 0]);
+
+      let lineGenerator = d3
+        .line()
+        .curve(d3.curveBasis)
+        .x((d) => x(d[0]))
+        .y((d) => y(d[1]));
+
+      let gradient = svg
+        .append("defs")
+        .append("linearGradient")
+        .attr("id", "gradient")
+        .attr("x1", "0%")
+        .attr("x2", "100%")
+        .attr("y1", "0%")
+        .attr("y2", "0%");
+
+      gradient
+        .append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", "#470459");
+
+      gradient
+        .append("stop")
+        .attr("offset", "50%")
+        .attr("stop-color", "#2E8C89");
+
+      gradient
+        .append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "#F5E61D");
+
+      // Plot the area
+      svg
+        .append("path")
+        .attr("fill", "url(#gradient)")
+        .attr("opacity", ".4")
+        .attr("d", lineGenerator(density));
+
+      svg
+        .append("path")
+        .attr("fill", "url(#gradient)")
+        .attr("opacity", "1")
+        .attr("d", lineGenerator(selectedDensity));
+
+      // add the x Axis
+      svg
+        .append("g")
+        .attr("id", "x-axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(
+          d3
+            .axisBottom(x)
+            .tickFormat(d3.format(".0%"))
+            .tickSize(-150)
+            .tickValues([0.0, 0.25, 0.5, 0.75, 1.0]),
+        );
+      svg
+        .selectAll("#x-axis .tick line")
+        .attr("stroke", "#DEE2E6")
+        .attr("stroke-dasharray", "5")
+        .attr("stroke-width", "2");
+      svg.select("#x-axis .domain").attr("stroke", "transparent");
+      svg
+        .selectAll("#x-axis .tick text")
+        .attr("fill", "#495057")
+        .attr("font-weight", "300")
+        .attr("transform", `translate(0, ${-height})`);
+      svg
+        .selectAll("#x-axis .tick:first-of-type text")
+        .attr("transform", `translate(18, ${-height})`);
+      svg
+        .selectAll("#x-axis .tick:last-of-type text")
+        .attr("transform", `translate(-20, ${-height})`);
+      svg
+        .selectAll("#x-axis .tick:first-of-type")
+        .attr("transform", `translate(1, 0)`);
+      svg
+        .selectAll("#x-axis .tick:last-of-type")
+        .attr("transform", `translate(${width - 1}, 0)`);
+
+      // add the y Axis
+      svg
+        .append("g")
+        .attr("id", "y-axis")
+        .call(d3.axisLeft(y).tickValues([0, 1]));
+      svg.selectAll("#y-axis .domain").attr("stroke", "transparent");
+      svg.selectAll("#y-axis .tick line").attr("stroke", "transparent");
+      svg.selectAll("#y-axis .tick text").attr("font-weight", "300");
+      svg
+        .selectAll("#y-axis .tick:first-of-type text")
+        .attr("transform", "translate(0, -5)");
+      svg
+        .selectAll("#y-axis .tick:last-of-type text")
+        .attr("transform", `translate(0, 16)`);
+      svg
+        .select("#y-axis")
+        .append("text")
+        .style("text-anchor", "end")
+        .attr("fill", "black")
+        .attr("font-weight", "400")
+        .attr("transform", "translate(-20, 70) rotate(-90)")
+        .text("Density");
+    });
 
     return null;
   }

@@ -33,35 +33,48 @@ export class AboutSomnComponent implements OnInit {
 
   showFilters$ = new BehaviorSubject(false);
 
-  selectedArylHalides$ = new BehaviorSubject([]);
-  selectedCatalysts$ = new BehaviorSubject([]);
-  selectedAmines$ = new BehaviorSubject([]);
-  selectedBases$ = new BehaviorSubject([]);
-  selectedSolvents$ = new BehaviorSubject([]);
+  selectedArylHalides$ = new BehaviorSubject<any[]>([]);
+  selectedCatalysts$ = new BehaviorSubject<any[]>([]);
+  selectedAmines$ = new BehaviorSubject<any[]>([]);
+  selectedBases$ = new BehaviorSubject<any[]>([]);
+  selectedSolvents$ = new BehaviorSubject<any[]>([]);
   selectedYield$ = new BehaviorSubject([0, 100]);
 
-  onYieldRangeChange(value: [number, number]) {
-    this.selectedYield$.next(value);
-    if (this.resultsTable) {
-      this.resultsTable.filter(value, "yield", "range");
-    }
-  }
-
-  hasFilters$ = combineLatest([
-    this.selectedArylHalides$,
-    this.selectedBases$,
-    this.selectedCatalysts$,
-    this.selectedAmines$,
-    this.selectedSolvents$,
-  ]).pipe(map((filters) => filters.some((fs) => fs.length > 0)));
-
-  densityPlotData$ = combineLatest([
-    this.hasFilters$,
+  filteredTrainingDataWithoutYieldRange$ = combineLatest([
     this.trainingData$,
-    this.filteredTrainingData$,
+    this.selectedArylHalides$,
+    this.selectedAmines$,
+    this.selectedCatalysts$,
+    this.selectedBases$,
+    this.selectedSolvents$,
   ]).pipe(
-    map(([hasFilters, trainingData, filteredTrainingData]) =>
-      hasFilters ? filteredTrainingData : trainingData,
+    map(
+      ([
+        trainingData,
+        selectedArylHalides,
+        selectedAmines,
+        selectedCatalysts,
+        selectedBases,
+        selectedSolvents,
+      ]) =>
+        trainingData.filter(
+          (data) =>
+            (selectedArylHalides.length
+              ? selectedArylHalides.includes(data["arylHalide"])
+              : true) &&
+            (selectedAmines.length
+              ? selectedAmines.includes(data["amine"])
+              : true) &&
+            (selectedCatalysts.length
+              ? selectedCatalysts.includes(data["catalyst"])
+              : true) &&
+            (selectedBases.length
+              ? selectedBases.includes(data["base"])
+              : true) &&
+            (selectedSolvents.length
+              ? selectedSolvents.includes(data["solvent"])
+              : true),
+        ),
     ),
   );
 
@@ -114,5 +127,12 @@ export class AboutSomnComponent implements OnInit {
     this.selectedCatalysts$.next([]);
     this.selectedSolvents$.next([]);
     this.resultsTable.reset();
+  }
+
+  onYieldRangeChange(value: [number, number]) {
+    this.selectedYield$.next(value);
+    if (this.resultsTable) {
+      this.resultsTable.filter(value, "yield", "range");
+    }
   }
 }
