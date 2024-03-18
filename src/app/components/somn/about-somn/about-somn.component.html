@@ -152,7 +152,6 @@
                                             placeholder="Aryl Halides"
                                             (onChange)="filter($event.value); selectedArylHalides$.next($event.value)"
                                             display="chip"
-                                            [styleClass]="'max-w-[150px]'"
                                         >
                                         </p-multiSelect>
                                     </ng-template>
@@ -176,7 +175,6 @@
                                             [options]="(aminesOptions$ | async) || []"
                                             placeholder="Amines"
                                             (onChange)="filter($event.value); selectedAmines$.next($event.value)"
-                                            [styleClass]="'max-w-[150px]'"
                                             display="chip"
                                         >
                                         </p-multiSelect>
@@ -201,7 +199,6 @@
                                             [options]="(catalystsOptions$ | async) || []"
                                             placeholder="Catalysts"
                                             (onChange)="filter($event.value); selectedCatalysts$.next($event.value)"
-                                            [styleClass]="'max-w-[150px]'"
                                             display="chip"
                                         >
                                         </p-multiSelect>
@@ -226,7 +223,6 @@
                                             [options]="(solventsOptions$ | async) || []"
                                             placeholder="Solvent"
                                             (onChange)="filter($event.value); selectedSolvents$.next($event.value)"
-                                            [styleClass]="'max-w-[150px]'"
                                             display="chip"
                                         >
                                         </p-multiSelect>
