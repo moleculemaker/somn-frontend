@@ -278,6 +278,11 @@
 
                             <hr class="-mx-4 mt-2" />
                             <div class="-mx-4 -mb-4 bg-white py-4">
+                                <div
+                                    class="px-8 text-lg font-semibold underline decoration-dotted"
+                                >
+                                    Yield %
+                                </div>
                                 <app-density-plot
                                     styleClass="h-[220px]"
                                     [data]="(filteredTrainingDataWithoutYieldRange$ | async) || []"

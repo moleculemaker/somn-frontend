@@ -10,16 +10,8 @@ import {
   EventEmitter,
 } from "@angular/core";
 import * as d3 from "d3";
-import { Line } from "d3";
 import { Slider } from "primeng/slider";
-import {
-  BehaviorSubject,
-  combineLatest,
-  filter,
-  map,
-  Observable,
-  tap,
-} from "rxjs";
+import { BehaviorSubject, combineLatest, tap } from "rxjs";
 import { Products } from "~/app/services/somn.service";
 
 @Component({
@@ -236,7 +228,7 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
         .append("text")
         .style("text-anchor", "end")
         .attr("fill", "black")
-        .attr("font-weight", "400")
+        .attr("font-weight", "600")
         .attr("transform", "translate(-20, 70) rotate(-90)")
         .text("Density");
     });

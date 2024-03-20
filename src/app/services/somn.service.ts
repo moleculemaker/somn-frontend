@@ -1,4 +1,6 @@
 import { Injectable } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { JobCreate } from "../api/mmli-backend/v1";
 
 export type Products = Array<{
   arylHalide:
@@ -22,953 +24,195 @@ export type Products = Array<{
   catalyst:
     | "Platinum"
     | "Palladium"
-    | "Nickel"
-    | "Ruthenium"
     | "Rhodium"
-    | "Iron"
+    | "Ruthenium"
+    | "Iridium"
+    | "Nickel"
     | "Copper"
-    | "Zinc";
-  solvent:
-    | "Water"
-    | "Ethanol"
-    | "Acetone"
-    | "Diethyl ether"
-    | "Benzene"
-    | "Toluene"
-    | "Hexane"
-    | "Chloroform";
-  base:
-    | "Sodium hydroxide"
-    | "Potassium hydroxide"
-    | "Calcium hydroxide"
-    | "Ammonium hydroxide"
-    | "Sodium carbonate"
-    | "Potassium carbonate"
-    | "Sodium bicarbonate"
-    | "Magnesium hydroxide";
+    | "Silver"
+    | "Gold"
+    | "Cobalt"
+    | "Iron"
+    | "Molybdenum"
+    | "Vanadium"
+    | "Zinc"
+    | "Titanium"
+    | "Aluminum"
+    | "Chromium"
+    | "Tungsten"
+    | "Cerium"
+    | "Bismuth";
+  solvent: "Dioxane" | "Toulene" | "tAmOH";
+  base: "Sodium tert-butoxide" | "Potassium carbonate" | "DBU";
   yield: number;
 }>;
+
+function generateData(): Products {
+  const solvents: Products[0]["solvent"][] = ["Dioxane", "Toulene", "tAmOH"];
+  const bases: Products[0]["base"][] = [
+    "Sodium tert-butoxide",
+    "Potassium carbonate",
+    "DBU",
+  ];
+  const catalysts: Products[0]["catalyst"][] = [
+    "Platinum",
+    "Palladium",
+    "Rhodium",
+    "Ruthenium",
+    "Iridium",
+    "Nickel",
+    "Copper",
+    "Silver",
+    "Gold",
+    "Cobalt",
+    "Iron",
+    "Molybdenum",
+    "Vanadium",
+    "Zinc",
+    "Titanium",
+    "Aluminum",
+    "Chromium",
+    "Tungsten",
+    "Cerium",
+    "Bismuth",
+  ];
+  const arylHalides: Products[0]["arylHalide"][] = [
+    "Chlorobenzene",
+    "Bromobenzene",
+    "Iodobenzene",
+    "Fluorobenzene",
+    "2-Chlorotoluene",
+    "4-Bromoanisole",
+    "1-Iodonaphthalene",
+    "2-Fluoropyridine",
+  ];
+  const amines: Products[0]["amine"][] = [
+    "Methylamine",
+    "Ethylamine",
+    "Propylamine",
+    "Aniline",
+    "Dimethylamine",
+    "Trimethylamine",
+    "Ethanolamine",
+    "Diphenylamine",
+  ];
+
+  const data: Products = [];
+
+  // Generating a record for each (solvent x base, catalyst) pair
+  solvents.forEach((solvent) => {
+    bases.forEach((base) => {
+      catalysts.forEach((catalyst) => {
+        // Generating a random yield between 0 and 1
+        const yieldValue = Math.random();
+
+        // Selecting random arylHalide and amine
+        const randomArylHalide =
+          arylHalides[Math.floor(Math.random() * arylHalides.length)];
+        const randomAmine = amines[Math.floor(Math.random() * amines.length)];
+
+        data.push({
+          arylHalide: randomArylHalide,
+          amine: randomAmine,
+          catalyst,
+          solvent,
+          base,
+          yield: yieldValue,
+        });
+      });
+    });
+  });
+
+  return data.sort((a, b) => a.base.localeCompare(b.base));
+}
+
+class SomnRequest {
+  form = new FormGroup({
+    reactantPairName: new FormControl("", [Validators.required]),
+
+    arylHalideName: new FormControl("", [Validators.required]),
+    arylHalideSmiles: new FormControl("", [Validators.required]),
+    arylHalideReactionSite: new FormControl(0, [Validators.required]),
+
+    amineName: new FormControl("", [Validators.required]),
+    amineSmiles: new FormControl("", [Validators.required]),
+    amineReactionSite: new FormControl(0, [Validators.required]),
+
+    agreeToSubscription: new FormControl(false),
+    subscriberEmail: new FormControl("", [Validators.email]),
+  });
+
+  toJobCreate(): JobCreate {
+    return {
+      job_info: JSON.stringify({
+        reactantPairName: this.form.controls["reactantPairName"].value,
+
+        arylHalideName: this.form.controls["arylHalideName"].value,
+        arylHalideSmiles: this.form.controls["arylHalideSmiles"].value,
+        arylHalideReactionSite:
+          this.form.controls["arylHalideReactionSite"].value,
+
+        amineName: this.form.controls["amineName"].value,
+        amineSmiles: this.form.controls["amineSmiles"].value,
+        amineReactionSite: this.form.controls["amineReactionSite"].value,
+      }),
+      email: this.form.controls["subscriberEmail"].value || "",
+      job_id: undefined,
+      run_id: 0,
+    };
+  }
+}
 
 @Injectable({
   providedIn: "root",
 })
 export class SomnService {
+  data = generateData();
+
   constructor() {}
 
-  getData(): Products {
-    return [
-      {
-        arylHalide: "4-Bromoanisole",
-        amine: "Dimethylamine",
-        catalyst: "Palladium",
-        solvent: "Benzene",
-        base: "Sodium hydroxide",
-        yield: 0.09,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Iron",
-        solvent: "Ethanol",
-        base: "Sodium hydroxide",
-        yield: 0.1,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Platinum",
-        solvent: "Toluene",
-        base: "Sodium hydroxide",
-        yield: 0.12,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Rhodium",
-        solvent: "Ethanol",
-        base: "Calcium hydroxide",
-        yield: 0.23,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Palladium",
-        solvent: "Chloroform",
-        base: "Magnesium hydroxide",
-        yield: 0.14,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Propylamine",
-        catalyst: "Iron",
-        solvent: "Diethyl ether",
-        base: "Magnesium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Nickel",
-        solvent: "Toluene",
-        base: "Magnesium hydroxide",
-        yield: 0.19,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Nickel",
-        solvent: "Chloroform",
-        base: "Potassium carbonate",
-        yield: 0.3,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Propylamine",
-        catalyst: "Iron",
-        solvent: "Chloroform",
-        base: "Calcium hydroxide",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Methylamine",
-        catalyst: "Copper",
-        solvent: "Acetone",
-        base: "Potassium hydroxide",
-        yield: 0.21,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Propylamine",
-        catalyst: "Nickel",
-        solvent: "Acetone",
-        base: "Sodium hydroxide",
-        yield: 0.07,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Diphenylamine",
-        catalyst: "Nickel",
-        solvent: "Chloroform",
-        base: "Sodium carbonate",
-        yield: 0.11,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Aniline",
-        catalyst: "Platinum",
-        solvent: "Toluene",
-        base: "Magnesium hydroxide",
-        yield: 0.22,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Ruthenium",
-        solvent: "Toluene",
-        base: "Calcium hydroxide",
-        yield: 0.12,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Copper",
-        solvent: "Ethanol",
-        base: "Potassium carbonate",
-        yield: 0.14,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Methylamine",
-        catalyst: "Platinum",
-        solvent: "Acetone",
-        base: "Sodium bicarbonate",
-        yield: 0.43,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Zinc",
-        solvent: "Acetone",
-        base: "Sodium carbonate",
-        yield: 0.25,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Diphenylamine",
-        catalyst: "Rhodium",
-        solvent: "Toluene",
-        base: "Magnesium hydroxide",
-        yield: 0.33,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Propylamine",
-        catalyst: "Nickel",
-        solvent: "Hexane",
-        base: "Sodium bicarbonate",
-        yield: 0.46,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Palladium",
-        solvent: "Diethyl ether",
-        base: "Sodium hydroxide",
-        yield: 0.19,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Aniline",
-        catalyst: "Nickel",
-        solvent: "Water",
-        base: "Ammonium hydroxide",
-        yield: 0.2,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Aniline",
-        catalyst: "Copper",
-        solvent: "Hexane",
-        base: "Magnesium hydroxide",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Nickel",
-        solvent: "Ethanol",
-        base: "Sodium bicarbonate",
-        yield: 0.06,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Methylamine",
-        catalyst: "Nickel",
-        solvent: "Acetone",
-        base: "Magnesium hydroxide",
-        yield: 0.07,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Aniline",
-        catalyst: "Rhodium",
-        solvent: "Toluene",
-        base: "Magnesium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Nickel",
-        solvent: "Benzene",
-        base: "Potassium hydroxide",
-        yield: 0.25,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Rhodium",
-        solvent: "Acetone",
-        base: "Sodium hydroxide",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Diphenylamine",
-        catalyst: "Palladium",
-        solvent: "Toluene",
-        base: "Potassium carbonate",
-        yield: 0.2,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Dimethylamine",
-        catalyst: "Copper",
-        solvent: "Benzene",
-        base: "Magnesium hydroxide",
-        yield: 0.15,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Ethanolamine",
-        catalyst: "Iron",
-        solvent: "Chloroform",
-        base: "Potassium carbonate",
-        yield: 0.09,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Methylamine",
-        catalyst: "Palladium",
-        solvent: "Water",
-        base: "Sodium hydroxide",
-        yield: 0.11,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Propylamine",
-        catalyst: "Ruthenium",
-        solvent: "Diethyl ether",
-        base: "Potassium carbonate",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Iron",
-        solvent: "Chloroform",
-        base: "Potassium carbonate",
-        yield: 0.11,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Methylamine",
-        catalyst: "Ruthenium",
-        solvent: "Water",
-        base: "Sodium bicarbonate",
-        yield: 0.06,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Propylamine",
-        catalyst: "Copper",
-        solvent: "Water",
-        base: "Sodium carbonate",
-        yield: 0.14,
-      },
-      {
-        arylHalide: "4-Bromoanisole",
-        amine: "Aniline",
-        catalyst: "Iron",
-        solvent: "Water",
-        base: "Sodium carbonate",
-        yield: 0.3,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Methylamine",
-        catalyst: "Platinum",
-        solvent: "Chloroform",
-        base: "Sodium bicarbonate",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Propylamine",
-        catalyst: "Copper",
-        solvent: "Ethanol",
-        base: "Sodium carbonate",
-        yield: 0.29,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Aniline",
-        catalyst: "Copper",
-        solvent: "Acetone",
-        base: "Potassium carbonate",
-        yield: 0.11,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Dimethylamine",
-        catalyst: "Zinc",
-        solvent: "Water",
-        base: "Potassium carbonate",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Platinum",
-        solvent: "Diethyl ether",
-        base: "Magnesium hydroxide",
-        yield: 0.36,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Methylamine",
-        catalyst: "Copper",
-        solvent: "Hexane",
-        base: "Potassium hydroxide",
-        yield: 0.48,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Aniline",
-        catalyst: "Palladium",
-        solvent: "Benzene",
-        base: "Ammonium hydroxide",
-        yield: 0.16,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Diphenylamine",
-        catalyst: "Iron",
-        solvent: "Ethanol",
-        base: "Magnesium hydroxide",
-        yield: 0.06,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Rhodium",
-        solvent: "Ethanol",
-        base: "Potassium carbonate",
-        yield: 0.07,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Ethanolamine",
-        catalyst: "Palladium",
-        solvent: "Acetone",
-        base: "Sodium carbonate",
-        yield: 0.14,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Nickel",
-        solvent: "Acetone",
-        base: "Potassium carbonate",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Aniline",
-        catalyst: "Ruthenium",
-        solvent: "Diethyl ether",
-        base: "Ammonium hydroxide",
-        yield: 0.12,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Propylamine",
-        catalyst: "Copper",
-        solvent: "Water",
-        base: "Ammonium hydroxide",
-        yield: 0.15,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Platinum",
-        solvent: "Acetone",
-        base: "Sodium bicarbonate",
-        yield: 0.27,
-      },
-      {
-        arylHalide: "4-Bromoanisole",
-        amine: "Ethylamine",
-        catalyst: "Iron",
-        solvent: "Water",
-        base: "Magnesium hydroxide",
-        yield: 0.09,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Methylamine",
-        catalyst: "Rhodium",
-        solvent: "Acetone",
-        base: "Calcium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Palladium",
-        solvent: "Diethyl ether",
-        base: "Magnesium hydroxide",
-        yield: 0.12,
-      },
-      {
-        arylHalide: "4-Bromoanisole",
-        amine: "Diphenylamine",
-        catalyst: "Ruthenium",
-        solvent: "Toluene",
-        base: "Potassium carbonate",
-        yield: 0.06,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Aniline",
-        catalyst: "Zinc",
-        solvent: "Ethanol",
-        base: "Magnesium hydroxide",
-        yield: 0.14,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Trimethylamine",
-        catalyst: "Zinc",
-        solvent: "Diethyl ether",
-        base: "Sodium hydroxide",
-        yield: 0.1,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Methylamine",
-        catalyst: "Palladium",
-        solvent: "Benzene",
-        base: "Potassium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Ethylamine",
-        catalyst: "Copper",
-        solvent: "Toluene",
-        base: "Potassium carbonate",
-        yield: 0.22,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Diphenylamine",
-        catalyst: "Iron",
-        solvent: "Toluene",
-        base: "Sodium hydroxide",
-        yield: 0.48,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Methylamine",
-        catalyst: "Iron",
-        solvent: "Ethanol",
-        base: "Sodium bicarbonate",
-        yield: 0.19,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Platinum",
-        solvent: "Chloroform",
-        base: "Magnesium hydroxide",
-        yield: 0.39,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Copper",
-        solvent: "Chloroform",
-        base: "Sodium hydroxide",
-        yield: 0.12,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Aniline",
-        catalyst: "Palladium",
-        solvent: "Benzene",
-        base: "Sodium carbonate",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Ethylamine",
-        catalyst: "Nickel",
-        solvent: "Ethanol",
-        base: "Sodium hydroxide",
-        yield: 0.2,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Ethylamine",
-        catalyst: "Nickel",
-        solvent: "Chloroform",
-        base: "Potassium carbonate",
-        yield: 0.19,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Methylamine",
-        catalyst: "Copper",
-        solvent: "Hexane",
-        base: "Sodium carbonate",
-        yield: 0.23,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Methylamine",
-        catalyst: "Iron",
-        solvent: "Chloroform",
-        base: "Potassium hydroxide",
-        yield: 0.4,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Ethylamine",
-        catalyst: "Copper",
-        solvent: "Diethyl ether",
-        base: "Magnesium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Palladium",
-        solvent: "Water",
-        base: "Sodium hydroxide",
-        yield: 0.21,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Ethanolamine",
-        catalyst: "Iron",
-        solvent: "Acetone",
-        base: "Magnesium hydroxide",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Ethylamine",
-        catalyst: "Nickel",
-        solvent: "Ethanol",
-        base: "Ammonium hydroxide",
-        yield: 0.22,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Methylamine",
-        catalyst: "Ruthenium",
-        solvent: "Ethanol",
-        base: "Sodium carbonate",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Trimethylamine",
-        catalyst: "Copper",
-        solvent: "Water",
-        base: "Potassium hydroxide",
-        yield: 0.25,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Propylamine",
-        catalyst: "Ruthenium",
-        solvent: "Ethanol",
-        base: "Potassium hydroxide",
-        yield: 0.2,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Nickel",
-        solvent: "Benzene",
-        base: "Sodium hydroxide",
-        yield: 0.39,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Methylamine",
-        catalyst: "Copper",
-        solvent: "Water",
-        base: "Sodium hydroxide",
-        yield: 0.44,
-      },
-      {
-        arylHalide: "4-Bromoanisole",
-        amine: "Dimethylamine",
-        catalyst: "Platinum",
-        solvent: "Acetone",
-        base: "Potassium carbonate",
-        yield: 0.39,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Dimethylamine",
-        catalyst: "Platinum",
-        solvent: "Toluene",
-        base: "Sodium bicarbonate",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Methylamine",
-        catalyst: "Zinc",
-        solvent: "Acetone",
-        base: "Magnesium hydroxide",
-        yield: 0.29,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Ethylamine",
-        catalyst: "Palladium",
-        solvent: "Toluene",
-        base: "Calcium hydroxide",
-        yield: 0.1,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Nickel",
-        solvent: "Diethyl ether",
-        base: "Calcium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Nickel",
-        solvent: "Ethanol",
-        base: "Calcium hydroxide",
-        yield: 0.09,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Zinc",
-        solvent: "Diethyl ether",
-        base: "Ammonium hydroxide",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Ethylamine",
-        catalyst: "Rhodium",
-        solvent: "Toluene",
-        base: "Calcium hydroxide",
-        yield: 0.15,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Propylamine",
-        catalyst: "Zinc",
-        solvent: "Acetone",
-        base: "Ammonium hydroxide",
-        yield: 0.12,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Trimethylamine",
-        catalyst: "Nickel",
-        solvent: "Diethyl ether",
-        base: "Potassium carbonate",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Dimethylamine",
-        catalyst: "Platinum",
-        solvent: "Diethyl ether",
-        base: "Magnesium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Aniline",
-        catalyst: "Zinc",
-        solvent: "Ethanol",
-        base: "Calcium hydroxide",
-        yield: 0.15,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Dimethylamine",
-        catalyst: "Platinum",
-        solvent: "Hexane",
-        base: "Ammonium hydroxide",
-        yield: 0.34,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Diphenylamine",
-        catalyst: "Palladium",
-        solvent: "Acetone",
-        base: "Sodium carbonate",
-        yield: 0.3,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Ethylamine",
-        catalyst: "Nickel",
-        solvent: "Diethyl ether",
-        base: "Calcium hydroxide",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Aniline",
-        catalyst: "Iron",
-        solvent: "Benzene",
-        base: "Sodium hydroxide",
-        yield: 0.25,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Dimethylamine",
-        catalyst: "Palladium",
-        solvent: "Chloroform",
-        base: "Potassium carbonate",
-        yield: 0.24,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Propylamine",
-        catalyst: "Rhodium",
-        solvent: "Toluene",
-        base: "Calcium hydroxide",
-        yield: 0.08,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Ethanolamine",
-        catalyst: "Iron",
-        solvent: "Diethyl ether",
-        base: "Potassium carbonate",
-        yield: 0.11,
-      },
-      {
-        arylHalide: "Bromobenzene",
-        amine: "Diphenylamine",
-        catalyst: "Iron",
-        solvent: "Hexane",
-        base: "Magnesium hydroxide",
-        yield: 0.31,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Rhodium",
-        solvent: "Benzene",
-        base: "Potassium hydroxide",
-        yield: 0.06,
-      },
-      {
-        arylHalide: "1-Iodonaphthalene",
-        amine: "Ethanolamine",
-        catalyst: "Rhodium",
-        solvent: "Hexane",
-        base: "Magnesium hydroxide",
-        yield: 0.22,
-      },
-      {
-        arylHalide: "4-Bromoanisole",
-        amine: "Ethylamine",
-        catalyst: "Nickel",
-        solvent: "Acetone",
-        base: "Calcium hydroxide",
-        yield: 0.3,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Ethanolamine",
-        catalyst: "Platinum",
-        solvent: "Toluene",
-        base: "Potassium carbonate",
-        yield: 0.36,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Copper",
-        solvent: "Acetone",
-        base: "Calcium hydroxide",
-        yield: 0.21,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Methylamine",
-        catalyst: "Copper",
-        solvent: "Toluene",
-        base: "Sodium bicarbonate",
-        yield: 0.1,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Propylamine",
-        catalyst: "Iron",
-        solvent: "Water",
-        base: "Calcium hydroxide",
-        yield: 0.24,
-      },
-      {
-        arylHalide: "4-Bromoanisole",
-        amine: "Propylamine",
-        catalyst: "Nickel",
-        solvent: "Hexane",
-        base: "Sodium hydroxide",
-        yield: 0.11,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Dimethylamine",
-        catalyst: "Zinc",
-        solvent: "Toluene",
-        base: "Potassium hydroxide",
-        yield: 0.13,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Aniline",
-        catalyst: "Copper",
-        solvent: "Ethanol",
-        base: "Potassium hydroxide",
-        yield: 0.2,
-      },
-      {
-        arylHalide: "Chlorobenzene",
-        amine: "Diphenylamine",
-        catalyst: "Palladium",
-        solvent: "Water",
-        base: "Potassium carbonate",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "2-Chlorotoluene",
-        amine: "Propylamine",
-        catalyst: "Palladium",
-        solvent: "Acetone",
-        base: "Potassium hydroxide",
-        yield: 0.27,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Trimethylamine",
-        catalyst: "Platinum",
-        solvent: "Water",
-        base: "Ammonium hydroxide",
-        yield: 0.21,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Ethanolamine",
-        catalyst: "Iron",
-        solvent: "Water",
-        base: "Sodium bicarbonate",
-        yield: 0.19,
-      },
-      {
-        arylHalide: "Fluorobenzene",
-        amine: "Propylamine",
-        catalyst: "Ruthenium",
-        solvent: "Toluene",
-        base: "Potassium carbonate",
-        yield: 0.05,
-      },
-      {
-        arylHalide: "2-Fluoropyridine",
-        amine: "Aniline",
-        catalyst: "Zinc",
-        solvent: "Toluene",
-        base: "Sodium bicarbonate",
-        yield: 0.4,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Methylamine",
-        catalyst: "Iron",
-        solvent: "Toluene",
-        base: "Potassium carbonate",
-        yield: 0.19,
-      },
-      {
-        arylHalide: "Iodobenzene",
-        amine: "Propylamine",
-        catalyst: "Palladium",
-        solvent: "Acetone",
-        base: "Sodium hydroxide",
-        yield: 0.35,
-      },
-    ];
+  response = {
+    arylHalides: {
+      commonName: "Aryl Halides",
+      smiles: "Smiles",
+      reactionSite: 1,
+      structures: [],
+    },
+    amine: {
+      commonName: "Amine",
+      smiles: "Smiles",
+      reactionSite: 1,
+      structures: [],
+    },
+    data: this.data,
+  };
+
+  newRequest() {
+    return new SomnRequest();
+  }
+
+  getHeatmapData() {
+    const data = this.data;
+    const map = new Map();
+    const baseAbbreMap = {
+      DBU: "DBU",
+      "Sodium tert-butoxide": "NaOtBu",
+      "Potassium carbonate": "K2CO3",
+    };
+    data.forEach((d) => {
+      const key = `${d.catalyst}-${d.solvent}/${d.base}`;
+      if (map.has(key)) {
+        console.warn("ignore data ", d, " because of key duplication");
+        return;
+      }
+      map.set(key, {
+        catalyst: d.catalyst,
+        solventBase: `${d.solvent} / ${baseAbbreMap[d.base]}`,
+        solvent: `${d.solvent}`,
+        base: `${d.base}`,
+        yield: `${d.yield}`,
+      });
+    });
+    return Array.from(map.values());
   }
 }

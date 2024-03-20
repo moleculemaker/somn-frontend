@@ -1,33 +1,31 @@
-import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { BehaviorSubject, combineLatest, map, of, tap } from "rxjs";
-import { SomnService } from "~/app/services/somn.service";
+import { Component, ViewChild } from "@angular/core";
+import { FilterService, MenuItem } from "primeng/api";
 import { Table } from "primeng/table";
-import { FilterService } from "primeng/api";
-
-enum ActiveAboutPanel {
-  ABOUT,
-  TRAINING_DATA,
-  GITHUB,
-  PUBLICATIONS,
-  GET_INVOLVED,
-}
+import { BehaviorSubject, combineLatest, map, of } from "rxjs";
+import { SomnService } from "~/app/services/somn.service";
 
 @Component({
-  selector: "app-about-somn",
-  templateUrl: "./about-somn.component.html",
-  styleUrls: ["./about-somn.component.scss"],
+  selector: "app-somn",
+  templateUrl: "./somn.component.html",
+  styleUrls: ["./somn.component.scss"],
   host: {
     class: "grow",
   },
 })
-export class AboutSomnComponent implements OnInit {
-  readonly ActiveAboutPanel = ActiveAboutPanel;
-
-  activePanel$ = new BehaviorSubject(ActiveAboutPanel.TRAINING_DATA);
-
+export class SomnComponent {
   @ViewChild("resultsTable") resultsTable: Table;
 
-  trainingData$ = of(this.somnService.data);
+  request = this.somnService.newRequest();
+  response$ = of(this.somnService.response);
+
+  tabs: MenuItem[] = [
+    { label: "Request Configuration" },
+    { label: "Model Results" },
+  ];
+  activeTab$ = new BehaviorSubject(this.tabs[0]);
+  loading$ = new BehaviorSubject(false);
+
+  heatmapData$ = of(this.somnService.getHeatmapData());
   filteredTrainingData$ = new BehaviorSubject([]);
 
   showFilters$ = new BehaviorSubject(false);
@@ -39,8 +37,8 @@ export class AboutSomnComponent implements OnInit {
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
   selectedYield$ = new BehaviorSubject([0, 100]);
 
-  filteredTrainingDataWithoutYieldRange$ = combineLatest([
-    this.trainingData$,
+  filteredDataWithoutYieldRange$ = combineLatest([
+    this.response$,
     this.selectedArylHalides$,
     this.selectedAmines$,
     this.selectedCatalysts$,
@@ -49,14 +47,14 @@ export class AboutSomnComponent implements OnInit {
   ]).pipe(
     map(
       ([
-        trainingData,
+        response,
         selectedArylHalides,
         selectedAmines,
         selectedCatalysts,
         selectedBases,
         selectedSolvents,
       ]) =>
-        trainingData.filter(
+        response.data.filter(
           (data) =>
             (selectedArylHalides.length
               ? selectedArylHalides.includes(data["arylHalide"])
@@ -89,20 +87,20 @@ export class AboutSomnComponent implements OnInit {
     ),
   );
 
-  arylHalidesOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.arylHalide))]),
+  arylHalidesOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.arylHalide))]),
   );
-  aminesOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.amine))]),
+  aminesOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.amine))]),
   );
-  solventsOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.solvent))]),
+  solventsOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
   );
-  basesOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.base))]),
+  basesOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
   );
-  catalystsOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.catalyst))]),
+  catalystsOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.catalyst))]),
   );
 
   constructor(

@@ -28,8 +28,11 @@ import { CheckboxModule } from "primeng/checkbox";
 import { CardModule } from "primeng/card";
 import { ChipModule } from "primeng/chip";
 import { InputNumber, InputNumberModule } from "primeng/inputnumber";
+import { TabViewModule } from "primeng/tabview";
+import { TabMenuModule } from "primeng/tabmenu";
 
 import { LandingPageComponent } from "./components/landing-page/landing-page.component";
+import { LoadingComponent } from "./components/somn/loading/loading.component";
 
 // import { ConfigurationComponent } from "./components/chemscraper/configuration/configuration.component";
 // import { ResultsComponent } from "./components/chemscraper/results/results.component";
@@ -44,7 +47,7 @@ import { NgxMatomoRouterModule } from "@ngx-matomo/router";
 
 import { EnvironmentService } from "@services/environment.service";
 import { MenuModule } from "primeng/menu";
-// import { MarvinJsModule } from "./components/chemscraper/marvinjs/marvinjs.module";
+import { MarvinJsModule } from "./components/somn/marvinjs/marvinjs.module";
 import { DialogModule } from "primeng/dialog";
 import { SliderModule } from "primeng/slider";
 import { MultiSelectModule } from "primeng/multiselect";
@@ -55,6 +58,9 @@ import { ApiModule, Configuration } from "@api/mmli-backend/v1";
 import { SafePipe } from "./pipes/safe.pipe";
 import { AboutSomnComponent } from "./components/somn/about-somn/about-somn.component";
 import { DensityPlotComponent } from "./components/somn/density-plot/density-plot.component";
+import { SomnComponent } from "./components/somn/somn/somn.component";
+import { MarvinjsInputComponent } from "./components/somn/marvinjs-input/marvinjs-input.component";
+import { HeatmapComponent } from './components/somn/heatmap/heatmap.component';
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig("/assets/config/envvars.json");
@@ -68,6 +74,10 @@ const initAppFn = (envService: EnvironmentService) => {
     LandingPageComponent,
     AboutSomnComponent,
     DensityPlotComponent,
+    SomnComponent,
+    MarvinjsInputComponent,
+    LoadingComponent,
+    HeatmapComponent,
     // FileDragNDropDirective,
     // ConfigurationComponent,
     // ResultsComponent,
@@ -101,6 +111,8 @@ const initAppFn = (envService: EnvironmentService) => {
     ListboxModule,
     OverlayPanelModule,
     SidebarModule,
+    TabViewModule,
+    TabMenuModule,
     RadioButtonModule,
     CheckboxModule,
     FileUploadModule,
@@ -116,7 +128,7 @@ const initAppFn = (envService: EnvironmentService) => {
 
     ApiModule.forRoot(() => new Configuration()),
     ReactiveFormsModule,
-    // MarvinJsModule,
+    MarvinJsModule,
     DialogModule,
   ],
   providers: [
