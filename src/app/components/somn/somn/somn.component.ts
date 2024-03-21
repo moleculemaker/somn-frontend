@@ -117,6 +117,10 @@ export class SomnComponent {
     );
   }
 
+  useExample() {
+    this.request = this.somnService.exampleRequest();
+  }
+
   onSubmit(request: SomnRequest) {
     this.activeTab$.next(this.tabs[1]);
   }

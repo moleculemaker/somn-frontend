@@ -176,19 +176,29 @@ export class SomnService {
       commonName: "Aryl Halides",
       smiles: "Smiles",
       reactionSite: 1,
-      structures: [],
+      structures: ["https://fakeimg.pl/640x360"],
     },
     amine: {
       commonName: "Amine",
       smiles: "Smiles",
       reactionSite: 1,
-      structures: [],
+      structures: ["https://fakeimg.pl/640x360"],
     },
     data: this.data,
   };
 
   newRequest() {
     return new SomnRequest();
+  }
+
+  exampleRequest() {
+    const request = new SomnRequest();
+    request.form.controls["reactantPairName"].setValue("Example Reactant Pair");
+    request.form.controls["arylHalideName"].setValue("Chlorobenzene");
+    request.form.controls["arylHalideSmiles"].setValue("C1=CC=C(C=C1)Cl");
+    request.form.controls["amineName"].setValue("Aniline");
+    request.form.controls["amineSmiles"].setValue("c1ccccc1N");
+    return request;
   }
 
   getHeatmapData() {

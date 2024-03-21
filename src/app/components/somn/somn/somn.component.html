@@ -79,6 +79,7 @@
                                     <button
                                         type="button"
                                         class="flex items-center rounded-md border p-2"
+                                        (click)="useExample()"
                                     >
                                         <i class="pi pi-box mr-2"></i>
                                         Use an Example
@@ -141,7 +142,7 @@
                                                     *ngTemplateOutlet="moleculeDiagram; context: {
                                                         options: ['a', 'b'],
                                                         formControlName: 'arylHalideReactionSite',
-                                                        diagram: '',
+                                                        diagram: 'https://fakeimg.pl/640x360',
                                                         isInfo: !request.form.controls['arylHalideReactionSite'].value
                                                     }"
                                                 ></ng-container>
@@ -182,7 +183,7 @@
                                                     *ngTemplateOutlet="moleculeDiagram; context: {
                                                         options: ['a', 'b'],
                                                         formControlName: 'amineReactionSite',
-                                                        diagram: '',
+                                                        diagram: 'https://fakeimg.pl/640x360',
                                                         isInfo: !request.form.controls['amineReactionSite'].value
                                                     }"
                                                 ></ng-container>
@@ -262,7 +263,7 @@
                     <div class="flex items-center justify-center">
                         <img class="h-[180px] w-auto" [src]="diagram" />
                     </div>
-                    <div
+                    <!-- <div
                         class="m-2 flex flex-col gap-2 rounded-md p-2"
                         [class]="isInfo ? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
                     >
@@ -286,7 +287,7 @@
                             [formControlName]="formControlName"
                             placeholder="Select Reaction Site"
                         ></p-dropdown>
-                    </div>
+                    </div> -->
                 </div>
             </ng-template>
         </form>
