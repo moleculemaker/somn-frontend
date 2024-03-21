@@ -57,6 +57,7 @@
         <form
             class="flex h-full flex-col justify-between"
             [formGroup]="request.form"
+            (ngSubmit)="onSubmit(request)"
         >
             <div>
                 <h2 class="mb-2">Input reactant pair for C-N coupling</h2>
@@ -480,10 +481,9 @@
                             [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
                             [maxSelectedLabels]="1"
                             [selectedItemsLabel]="'{0} items'"
-                            [ngModel]="selectedBases$.value"
                             [options]="(basesOptions$ | async) || []"
-                            placeholder="Bases"
-                            (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
+                            placeholder="Yield"
+                            [disabled]="true"
                         >
                         </p-multiSelect>
                     </div>

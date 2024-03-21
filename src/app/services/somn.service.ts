@@ -126,7 +126,7 @@ function generateData(): Products {
   return data.sort((a, b) => a.base.localeCompare(b.base));
 }
 
-class SomnRequest {
+export class SomnRequest {
   form = new FormGroup({
     reactantPairName: new FormControl("", [Validators.required]),
 

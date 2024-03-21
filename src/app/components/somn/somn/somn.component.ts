@@ -2,7 +2,7 @@ import { Component, ViewChild } from "@angular/core";
 import { FilterService, MenuItem } from "primeng/api";
 import { Table } from "primeng/table";
 import { BehaviorSubject, combineLatest, map, of } from "rxjs";
-import { SomnService } from "~/app/services/somn.service";
+import { SomnRequest, SomnService } from "~/app/services/somn.service";
 
 @Component({
   selector: "app-somn",
@@ -115,6 +115,10 @@ export class SomnComponent {
         return value * 100 >= filter[0] && value * 100 <= filter[1];
       },
     );
+  }
+
+  onSubmit(request: SomnRequest) {
+    this.activeTab$.next(this.tabs[1]);
   }
 
   clearAllFilters() {
