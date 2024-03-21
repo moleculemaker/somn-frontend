@@ -21,7 +21,7 @@ COPY package.json package-lock.json ./
 RUN --mount=type=secret,id=NPMRC npm install
 
 # Add the source code to app
-COPY angular.json entrypoint.sh tsconfig*.json package*.json proxy.conf.json .
+COPY angular.json entrypoint.sh tsconfig*.json package*.json proxy.conf.json tailwind.config.js .
 COPY src ./src
 
 # Generate the build of the application
@@ -45,4 +45,3 @@ CMD [ "/entrypoint.sh" ]
 
 # Expose port 80
 EXPOSE 80
-
