@@ -88,8 +88,12 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
       svg.selectAll(".domain").style("opacity", "0");
 
       // Build color scale
-      // TODO: adjust color scale
-      let colorScale = d3.scaleLinear(["#470459", "#2E8C89", "#F5E61D"]);
+      let colorScale = d3
+        .scaleLinear(["#470459", "#2E8C89", "#F5E61D"])
+        .domain([0, 
+          d3.mean(this.data.map((d) => d.yield))!,
+          d3.max(this.data.map((d) => d.yield))!
+        ]);
 
       var tooltip = d3
         .select("#my_dataviz")

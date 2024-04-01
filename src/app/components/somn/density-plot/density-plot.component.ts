@@ -87,13 +87,14 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
 
       let x = d3.scaleLinear().domain([0, 1]).range([0, width]);
       let y = d3.scaleLinear().range([height, 0]).domain([0, 1]);
+      let maxData = Math.ceil(d3.max(data.map((d) => d["yield"]))! * 100) / 100;
 
       let density: [number, number][] = [[0, 0]];
 
       let yields = data.map((d) => d["yield"]);
       let thresholds = [];
 
-      for (let i = 0; i <= 100; i += 1) {
+      for (let i = 0; i <= maxData * 100; i += 1) {
         thresholds.push(i / 100);
       }
 
@@ -109,10 +110,14 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
       }
 
       density.push(
-        ...(kde(epanechnikov(1), thresholds, yields) as [number, number][]),
+        ...(kde(epanechnikov(0.05), thresholds, yields) as [number, number][]),
       );
 
       density.push([density[density.length - 1][0], 0]);
+      
+      // Normalize the density
+      const max = d3.max(density.map((d) => d[1]))!;
+      density = density.map(([x, y]) => [x, y / max]);
 
       let selectedDensity = density.filter(
         ([x, y]) => x >= minVal / 100 && x <= maxVal / 100,
@@ -128,7 +133,7 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
-      selectedDensity.push([1, 0]);
+      selectedDensity.push([maxData, 0]);
 
       let lineGenerator = d3
         .line()
