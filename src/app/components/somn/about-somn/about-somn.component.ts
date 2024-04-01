@@ -50,20 +50,20 @@ export class AboutSomnComponent implements OnInit {
     map(
       ([
         trainingData,
-        selectedArylHalides,
-        selectedAmines,
+        // selectedArylHalides,
+        // selectedAmines,
         selectedCatalysts,
         selectedBases,
         selectedSolvents,
       ]) =>
         trainingData.filter(
           (data) =>
-            (selectedArylHalides.length
-              ? selectedArylHalides.includes(data["arylHalide"])
-              : true) &&
-            (selectedAmines.length
-              ? selectedAmines.includes(data["amine"])
-              : true) &&
+            // (selectedArylHalides.length
+            //   ? selectedArylHalides.includes(data["arylHalide"])
+            //   : true) &&
+            // (selectedAmines.length
+            //   ? selectedAmines.includes(data["amine"])
+            //   : true) &&
             (selectedCatalysts.length
               ? selectedCatalysts.includes(data["catalyst"])
               : true) &&
@@ -90,10 +90,10 @@ export class AboutSomnComponent implements OnInit {
   );
 
   arylHalidesOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.arylHalide))]),
+    map((data) => [...new Set()]),
   );
   aminesOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.amine))]),
+    map((data) => [...new Set()]),
   );
   solventsOptions$ = this.trainingData$.pipe(
     map((data) => [...new Set(data.flatMap((d) => d.solvent))]),

@@ -2,128 +2,39 @@ import { Injectable } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { JobCreate } from "../api/mmli-backend/v1";
 
+import sampleRequest from '../../assets/example_request.json';
+import sampleResponse from '../../assets/example_response.json';
+
 export type Products = Array<{
-  arylHalide:
-    | "Chlorobenzene"
-    | "Bromobenzene"
-    | "Iodobenzene"
-    | "Fluorobenzene"
-    | "2-Chlorotoluene"
-    | "4-Bromoanisole"
-    | "1-Iodonaphthalene"
-    | "2-Fluoropyridine";
-  amine:
-    | "Methylamine"
-    | "Ethylamine"
-    | "Propylamine"
-    | "Aniline"
-    | "Dimethylamine"
-    | "Trimethylamine"
-    | "Ethanolamine"
-    | "Diphenylamine";
   catalyst:
-    | "Platinum"
-    | "Palladium"
-    | "Rhodium"
-    | "Ruthenium"
-    | "Iridium"
-    | "Nickel"
-    | "Copper"
-    | "Silver"
-    | "Gold"
-    | "Cobalt"
-    | "Iron"
-    | "Molybdenum"
-    | "Vanadium"
-    | "Zinc"
-    | "Titanium"
-    | "Aluminum"
-    | "Chromium"
-    | "Tungsten"
-    | "Cerium"
-    | "Bismuth";
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5
+    | 6
+    | 7
+    | 8
+    | 9
+    | 10
+    | 11
+    | 12
+    | 13
+    | 14
+    | 15
+    | 16
+    | 17
+    | 18
+    | 19
+    | 20
+    | 21
   solvent: "Dioxane" | "Toulene" | "tAmOH";
-  base: "Sodium tert-butoxide" | "Potassium carbonate" | "DBU";
+  base: "K2CO3" | "NaOtBu" | "DBU";
   yield: number;
 }>;
 
 function generateData(): Products {
-  const solvents: Products[0]["solvent"][] = ["Dioxane", "Toulene", "tAmOH"];
-  const bases: Products[0]["base"][] = [
-    "Sodium tert-butoxide",
-    "Potassium carbonate",
-    "DBU",
-  ];
-  const catalysts: Products[0]["catalyst"][] = [
-    "Platinum",
-    "Palladium",
-    "Rhodium",
-    "Ruthenium",
-    "Iridium",
-    "Nickel",
-    "Copper",
-    "Silver",
-    "Gold",
-    "Cobalt",
-    "Iron",
-    "Molybdenum",
-    "Vanadium",
-    "Zinc",
-    "Titanium",
-    "Aluminum",
-    "Chromium",
-    "Tungsten",
-    "Cerium",
-    "Bismuth",
-  ];
-  const arylHalides: Products[0]["arylHalide"][] = [
-    "Chlorobenzene",
-    "Bromobenzene",
-    "Iodobenzene",
-    "Fluorobenzene",
-    "2-Chlorotoluene",
-    "4-Bromoanisole",
-    "1-Iodonaphthalene",
-    "2-Fluoropyridine",
-  ];
-  const amines: Products[0]["amine"][] = [
-    "Methylamine",
-    "Ethylamine",
-    "Propylamine",
-    "Aniline",
-    "Dimethylamine",
-    "Trimethylamine",
-    "Ethanolamine",
-    "Diphenylamine",
-  ];
-
-  const data: Products = [];
-
-  // Generating a record for each (solvent x base, catalyst) pair
-  solvents.forEach((solvent) => {
-    bases.forEach((base) => {
-      catalysts.forEach((catalyst) => {
-        // Generating a random yield between 0 and 1
-        const yieldValue = Math.random();
-
-        // Selecting random arylHalide and amine
-        const randomArylHalide =
-          arylHalides[Math.floor(Math.random() * arylHalides.length)];
-        const randomAmine = amines[Math.floor(Math.random() * amines.length)];
-
-        data.push({
-          arylHalide: randomArylHalide,
-          amine: randomAmine,
-          catalyst,
-          solvent,
-          base,
-          yield: yieldValue,
-        });
-      });
-    });
-  });
-
-  return data.sort((a, b) => a.base.localeCompare(b.base));
+  return sampleResponse as Products;
 }
 
 export class SomnRequest {
@@ -184,7 +95,10 @@ export class SomnService {
       reactionSite: 1,
       structures: ["https://fakeimg.pl/640x360"],
     },
-    data: this.data,
+    data: this.data.map((d) => ({
+      ...d,
+      yield: d.yield / 100,
+    }))
   };
 
   newRequest() {
@@ -193,22 +107,13 @@ export class SomnService {
 
   exampleRequest() {
     const request = new SomnRequest();
-    request.form.controls["reactantPairName"].setValue("Example Reactant Pair");
-    request.form.controls["arylHalideName"].setValue("Chlorobenzene");
-    request.form.controls["arylHalideSmiles"].setValue("C1=CC=C(C=C1)Cl");
-    request.form.controls["amineName"].setValue("Aniline");
-    request.form.controls["amineSmiles"].setValue("c1ccccc1N");
+    request.form.setValue(sampleRequest);
     return request;
   }
 
   getHeatmapData() {
     const data = this.data;
     const map = new Map();
-    const baseAbbreMap = {
-      DBU: "DBU",
-      "Sodium tert-butoxide": "NaOtBu",
-      "Potassium carbonate": "K2CO3",
-    };
     data.forEach((d) => {
       const key = `${d.catalyst}-${d.solvent}/${d.base}`;
       if (map.has(key)) {
@@ -217,12 +122,13 @@ export class SomnService {
       }
       map.set(key, {
         catalyst: d.catalyst,
-        solventBase: `${d.solvent} / ${baseAbbreMap[d.base]}`,
+        solventBase: `${d.solvent} / ${d.base}`,
         solvent: `${d.solvent}`,
         base: `${d.base}`,
-        yield: `${d.yield}`,
+        yield: d.yield,
       });
     });
+
     return Array.from(map.values());
   }
 }

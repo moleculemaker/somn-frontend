@@ -1,0 +1,1262 @@
+[
+  {
+    "catalyst": 1,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 18.902537350352304,
+    "stdev": 18.902537350352304
+  },
+  {
+    "catalyst": 1,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 7.111042117552853,
+    "stdev": 7.111042117552853
+  },
+  {
+    "catalyst": 1,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 2.44640089788076,
+    "stdev": 2.44640089788076
+  },
+  {
+    "catalyst": 1,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 19.979183458807587,
+    "stdev": 19.979183458807587
+  },
+  {
+    "catalyst": 1,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 6.664878945203247,
+    "stdev": 6.664878945203247
+  },
+  {
+    "catalyst": 1,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 2.423964503133062,
+    "stdev": 2.423964503133062
+  },
+  {
+    "catalyst": 1,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 21.166771268021677,
+    "stdev": 21.166771268021677
+  },
+  {
+    "catalyst": 1,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 7.092655809810293,
+    "stdev": 7.092655809810293
+  },
+  {
+    "catalyst": 1,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 2.4651573566764227,
+    "stdev": 2.4651573566764227
+  },
+  {
+    "catalyst": 2,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 13.100967065718145,
+    "stdev": 13.100967065718145
+  },
+  {
+    "catalyst": 2,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.199708039214094,
+    "stdev": 8.199708039214094
+  },
+  {
+    "catalyst": 2,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.8456717150569109,
+    "stdev": 0.8456717150569109
+  },
+  {
+    "catalyst": 2,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 14.324643143975608,
+    "stdev": 14.324643143975608
+  },
+  {
+    "catalyst": 2,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 7.947142063577235,
+    "stdev": 7.947142063577235
+  },
+  {
+    "catalyst": 2,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.8646408319428182,
+    "stdev": 0.8646408319428182
+  },
+  {
+    "catalyst": 2,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 15.309001760325225,
+    "stdev": 15.309001760325225
+  },
+  {
+    "catalyst": 2,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 8.34600346800542,
+    "stdev": 8.34600346800542
+  },
+  {
+    "catalyst": 2,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.9021831309214084,
+    "stdev": 0.9021831309214084
+  },
+  {
+    "catalyst": 3,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 19.064489316639566,
+    "stdev": 19.064489316639566
+  },
+  {
+    "catalyst": 3,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 9.592191811246613,
+    "stdev": 9.592191811246613
+  },
+  {
+    "catalyst": 3,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 2.4151885789560787,
+    "stdev": 2.4151885789560787
+  },
+  {
+    "catalyst": 3,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 20.228004594905144,
+    "stdev": 20.228004594905144
+  },
+  {
+    "catalyst": 3,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 9.275606787330629,
+    "stdev": 9.275606787330629
+  },
+  {
+    "catalyst": 3,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 2.4570953805284566,
+    "stdev": 2.4570953805284566
+  },
+  {
+    "catalyst": 3,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 21.458719285365863,
+    "stdev": 21.458719285365863
+  },
+  {
+    "catalyst": 3,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 9.794087286612463,
+    "stdev": 9.794087286612463
+  },
+  {
+    "catalyst": 3,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 2.5456357272536594,
+    "stdev": 2.5456357272536594
+  },
+  {
+    "catalyst": 4,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 13.167946608455278,
+    "stdev": 13.167946608455278
+  },
+  {
+    "catalyst": 4,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.311020645327911,
+    "stdev": 8.311020645327911
+  },
+  {
+    "catalyst": 4,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.6061785355392953,
+    "stdev": 0.6061785355392953
+  },
+  {
+    "catalyst": 4,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 14.521058482113816,
+    "stdev": 14.521058482113816
+  },
+  {
+    "catalyst": 4,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 8.19834108783198,
+    "stdev": 8.19834108783198
+  },
+  {
+    "catalyst": 4,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.6389537673313552,
+    "stdev": 0.6389537673313552
+  },
+  {
+    "catalyst": 4,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 15.443661824010842,
+    "stdev": 15.443661824010842
+  },
+  {
+    "catalyst": 4,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 8.540278856108946,
+    "stdev": 8.540278856108946
+  },
+  {
+    "catalyst": 4,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.6524088396086726,
+    "stdev": 0.6524088396086726
+  },
+  {
+    "catalyst": 5,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 17.783227900948525,
+    "stdev": 17.783227900948525
+  },
+  {
+    "catalyst": 5,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 11.059978878021678,
+    "stdev": 11.059978878021678
+  },
+  {
+    "catalyst": 5,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 1.8904364994257434,
+    "stdev": 1.8904364994257434
+  },
+  {
+    "catalyst": 5,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 19.16119467894309,
+    "stdev": 19.16119467894309
+  },
+  {
+    "catalyst": 5,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 10.612792458780493,
+    "stdev": 10.612792458780493
+  },
+  {
+    "catalyst": 5,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 1.864909678018971,
+    "stdev": 1.864909678018971
+  },
+  {
+    "catalyst": 5,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 20.288674037804885,
+    "stdev": 20.288674037804885
+  },
+  {
+    "catalyst": 5,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 11.004359924634146,
+    "stdev": 11.004359924634146
+  },
+  {
+    "catalyst": 5,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 1.9314617493563693,
+    "stdev": 1.9314617493563693
+  },
+  {
+    "catalyst": 6,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 22.17934217016259,
+    "stdev": 22.17934217016259
+  },
+  {
+    "catalyst": 6,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.638532304715444,
+    "stdev": 8.638532304715444
+  },
+  {
+    "catalyst": 6,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 2.907969659295395,
+    "stdev": 2.907969659295395
+  },
+  {
+    "catalyst": 6,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 23.320624584010833,
+    "stdev": 23.320624584010833
+  },
+  {
+    "catalyst": 6,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 8.240477932710034,
+    "stdev": 8.240477932710034
+  },
+  {
+    "catalyst": 6,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 2.899900169,
+    "stdev": 2.899900169
+  },
+  {
+    "catalyst": 6,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 24.52583389972899,
+    "stdev": 24.52583389972899
+  },
+  {
+    "catalyst": 6,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 8.728059935734416,
+    "stdev": 8.728059935734416
+  },
+  {
+    "catalyst": 6,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 2.9067256035227644,
+    "stdev": 2.9067256035227644
+  },
+  {
+    "catalyst": 7,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 19.735200741978325,
+    "stdev": 19.735200741978325
+  },
+  {
+    "catalyst": 7,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.938779021815721,
+    "stdev": 8.938779021815721
+  },
+  {
+    "catalyst": 7,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 1.3797958597116526,
+    "stdev": 1.3797958597116526
+  },
+  {
+    "catalyst": 7,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 21.202398516666673,
+    "stdev": 21.202398516666673
+  },
+  {
+    "catalyst": 7,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 8.608376119024387,
+    "stdev": 8.608376119024387
+  },
+  {
+    "catalyst": 7,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 1.370406024227642,
+    "stdev": 1.370406024227642
+  },
+  {
+    "catalyst": 7,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 22.372577269918686,
+    "stdev": 22.372577269918686
+  },
+  {
+    "catalyst": 7,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 9.017369666224925,
+    "stdev": 9.017369666224925
+  },
+  {
+    "catalyst": 7,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 1.3869044971951232,
+    "stdev": 1.3869044971951232
+  },
+  {
+    "catalyst": 8,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 23.038266083371266,
+    "stdev": 23.038266083371266
+  },
+  {
+    "catalyst": 8,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 12.266140778672089,
+    "stdev": 12.266140778672089
+  },
+  {
+    "catalyst": 8,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 3.35982563882385,
+    "stdev": 3.35982563882385
+  },
+  {
+    "catalyst": 8,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 24.06464862666665,
+    "stdev": 24.06464862666665
+  },
+  {
+    "catalyst": 8,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 11.798077442546342,
+    "stdev": 11.798077442546342
+  },
+  {
+    "catalyst": 8,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 3.319551400908401,
+    "stdev": 3.319551400908401
+  },
+  {
+    "catalyst": 8,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 25.262694867967532,
+    "stdev": 25.262694867967532
+  },
+  {
+    "catalyst": 8,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 12.333015526113824,
+    "stdev": 12.333015526113824
+  },
+  {
+    "catalyst": 8,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 3.3813619431165316,
+    "stdev": 3.3813619431165316
+  },
+  {
+    "catalyst": 9,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 8.628119109078588,
+    "stdev": 8.628119109078588
+  },
+  {
+    "catalyst": 9,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 9.52645909180217,
+    "stdev": 9.52645909180217
+  },
+  {
+    "catalyst": 9,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.5328395856010842,
+    "stdev": 0.5328395856010842
+  },
+  {
+    "catalyst": 9,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 9.734409170108403,
+    "stdev": 9.734409170108403
+  },
+  {
+    "catalyst": 9,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 9.456955714979406,
+    "stdev": 9.456955714979406
+  },
+  {
+    "catalyst": 9,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.5498771550227646,
+    "stdev": 0.5498771550227646
+  },
+  {
+    "catalyst": 9,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 10.506383653252042,
+    "stdev": 10.506383653252042
+  },
+  {
+    "catalyst": 9,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 9.70970167563415,
+    "stdev": 9.70970167563415
+  },
+  {
+    "catalyst": 9,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.5552474710379409,
+    "stdev": 0.5552474710379409
+  },
+  {
+    "catalyst": 10,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 17.98756010997289,
+    "stdev": 17.98756010997289
+  },
+  {
+    "catalyst": 10,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 11.37997130674797,
+    "stdev": 11.37997130674797
+  },
+  {
+    "catalyst": 10,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.8423068111517613,
+    "stdev": 0.8423068111517613
+  },
+  {
+    "catalyst": 10,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 19.42329499691058,
+    "stdev": 19.42329499691058
+  },
+  {
+    "catalyst": 10,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 11.110304687455288,
+    "stdev": 11.110304687455288
+  },
+  {
+    "catalyst": 10,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.8349952774552845,
+    "stdev": 0.8349952774552845
+  },
+  {
+    "catalyst": 10,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 20.409614233279115,
+    "stdev": 20.409614233279115
+  },
+  {
+    "catalyst": 10,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 11.487868741355019,
+    "stdev": 11.487868741355019
+  },
+  {
+    "catalyst": 10,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.8613277528075886,
+    "stdev": 0.8613277528075886
+  },
+  {
+    "catalyst": 11,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 13.866006955826556,
+    "stdev": 13.866006955826556
+  },
+  {
+    "catalyst": 11,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 5.604456143686987,
+    "stdev": 5.604456143686987
+  },
+  {
+    "catalyst": 11,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.774274621634147,
+    "stdev": 0.774274621634147
+  },
+  {
+    "catalyst": 11,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 15.142161736991861,
+    "stdev": 15.142161736991861
+  },
+  {
+    "catalyst": 11,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 5.297995711127371,
+    "stdev": 5.297995711127371
+  },
+  {
+    "catalyst": 11,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.7813846725636862,
+    "stdev": 0.7813846725636862
+  },
+  {
+    "catalyst": 11,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 16.040614897723575,
+    "stdev": 16.040614897723575
+  },
+  {
+    "catalyst": 11,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 5.5292022903523055,
+    "stdev": 5.5292022903523055
+  },
+  {
+    "catalyst": 11,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.7867827594867755,
+    "stdev": 0.7867827594867755
+  },
+  {
+    "catalyst": 12,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 18.641660146747984,
+    "stdev": 18.641660146747984
+  },
+  {
+    "catalyst": 12,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.26078577837399,
+    "stdev": 8.26078577837399
+  },
+  {
+    "catalyst": 12,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 1.7949202112791343,
+    "stdev": 1.7949202112791343
+  },
+  {
+    "catalyst": 12,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 19.63946771579945,
+    "stdev": 19.63946771579945
+  },
+  {
+    "catalyst": 12,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 7.7802436569593425,
+    "stdev": 7.7802436569593425
+  },
+  {
+    "catalyst": 12,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 1.7544735389705426,
+    "stdev": 1.7544735389705426
+  },
+  {
+    "catalyst": 12,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 20.745037527682932,
+    "stdev": 20.745037527682932
+  },
+  {
+    "catalyst": 12,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 8.1875655722439,
+    "stdev": 8.1875655722439
+  },
+  {
+    "catalyst": 12,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 1.8068235601219513,
+    "stdev": 1.8068235601219513
+  },
+  {
+    "catalyst": 13,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 17.70854494777778,
+    "stdev": 17.70854494777778
+  },
+  {
+    "catalyst": 13,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.29736931261789,
+    "stdev": 8.29736931261789
+  },
+  {
+    "catalyst": 13,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 1.777993050900272,
+    "stdev": 1.777993050900272
+  },
+  {
+    "catalyst": 13,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 19.010058000542013,
+    "stdev": 19.010058000542013
+  },
+  {
+    "catalyst": 13,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 8.010177927086723,
+    "stdev": 8.010177927086723
+  },
+  {
+    "catalyst": 13,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 1.773500307697018,
+    "stdev": 1.773500307697018
+  },
+  {
+    "catalyst": 13,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 20.19704659476963,
+    "stdev": 20.19704659476963
+  },
+  {
+    "catalyst": 13,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 8.490470890506773,
+    "stdev": 8.490470890506773
+  },
+  {
+    "catalyst": 13,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 1.843279320062873,
+    "stdev": 1.843279320062873
+  },
+  {
+    "catalyst": 14,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 15.644285527642257,
+    "stdev": 15.644285527642257
+  },
+  {
+    "catalyst": 14,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 12.300069311184277,
+    "stdev": 12.300069311184277
+  },
+  {
+    "catalyst": 14,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.7200445883360439,
+    "stdev": 0.7200445883360439
+  },
+  {
+    "catalyst": 14,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 17.1987147707317,
+    "stdev": 17.1987147707317
+  },
+  {
+    "catalyst": 14,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 12.155435191585363,
+    "stdev": 12.155435191585363
+  },
+  {
+    "catalyst": 14,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.760947326708672,
+    "stdev": 0.760947326708672
+  },
+  {
+    "catalyst": 14,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 18.333220519512192,
+    "stdev": 18.333220519512192
+  },
+  {
+    "catalyst": 14,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 12.587797148780478,
+    "stdev": 12.587797148780478
+  },
+  {
+    "catalyst": 14,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.8352530847073172,
+    "stdev": 0.8352530847073172
+  },
+  {
+    "catalyst": 16,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 11.10083910891599,
+    "stdev": 11.10083910891599
+  },
+  {
+    "catalyst": 16,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.17630810231436,
+    "stdev": 8.17630810231436
+  },
+  {
+    "catalyst": 16,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.7313547827395668,
+    "stdev": 0.7313547827395668
+  },
+  {
+    "catalyst": 16,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 12.32712880644986,
+    "stdev": 12.32712880644986
+  },
+  {
+    "catalyst": 16,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 7.780064693658537,
+    "stdev": 7.780064693658537
+  },
+  {
+    "catalyst": 16,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.7158062817574525,
+    "stdev": 0.7158062817574525
+  },
+  {
+    "catalyst": 16,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 13.242045031915989,
+    "stdev": 13.242045031915989
+  },
+  {
+    "catalyst": 16,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 8.042825752140923,
+    "stdev": 8.042825752140923
+  },
+  {
+    "catalyst": 16,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.7473884629539298,
+    "stdev": 0.7473884629539298
+  },
+  {
+    "catalyst": 17,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 20.40164655390242,
+    "stdev": 20.40164655390242
+  },
+  {
+    "catalyst": 17,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 9.989105638799462,
+    "stdev": 9.989105638799462
+  },
+  {
+    "catalyst": 17,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 1.3946783893563686,
+    "stdev": 1.3946783893563686
+  },
+  {
+    "catalyst": 17,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 21.926139173712734,
+    "stdev": 21.926139173712734
+  },
+  {
+    "catalyst": 17,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 9.700263212964765,
+    "stdev": 9.700263212964765
+  },
+  {
+    "catalyst": 17,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 1.3941364261951223,
+    "stdev": 1.3941364261951223
+  },
+  {
+    "catalyst": 17,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 23.083014069566392,
+    "stdev": 23.083014069566392
+  },
+  {
+    "catalyst": 17,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 10.152267748419233,
+    "stdev": 10.152267748419233
+  },
+  {
+    "catalyst": 17,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 1.4403334894270987,
+    "stdev": 1.4403334894270987
+  },
+  {
+    "catalyst": 18,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 19.540186851300813,
+    "stdev": 19.540186851300813
+  },
+  {
+    "catalyst": 18,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 10.54254471626288,
+    "stdev": 10.54254471626288
+  },
+  {
+    "catalyst": 18,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 2.8378036317176143,
+    "stdev": 2.8378036317176143
+  },
+  {
+    "catalyst": 18,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 20.745699600108402,
+    "stdev": 20.745699600108402
+  },
+  {
+    "catalyst": 18,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 10.028841302837401,
+    "stdev": 10.028841302837401
+  },
+  {
+    "catalyst": 18,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 2.882912380306234,
+    "stdev": 2.882912380306234
+  },
+  {
+    "catalyst": 18,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 21.840558008401086,
+    "stdev": 21.840558008401086
+  },
+  {
+    "catalyst": 18,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 10.41430949289973,
+    "stdev": 10.41430949289973
+  },
+  {
+    "catalyst": 18,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 2.939030147358538,
+    "stdev": 2.939030147358538
+  },
+  {
+    "catalyst": 19,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 12.725154274254745,
+    "stdev": 12.725154274254745
+  },
+  {
+    "catalyst": 19,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 8.517364757506778,
+    "stdev": 8.517364757506778
+  },
+  {
+    "catalyst": 19,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.5729443338184285,
+    "stdev": 0.5729443338184285
+  },
+  {
+    "catalyst": 19,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 14.06448126382113,
+    "stdev": 14.06448126382113
+  },
+  {
+    "catalyst": 19,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 8.348552422243907,
+    "stdev": 8.348552422243907
+  },
+  {
+    "catalyst": 19,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.590693701840651,
+    "stdev": 0.590693701840651
+  },
+  {
+    "catalyst": 19,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 14.91441933875339,
+    "stdev": 14.91441933875339
+  },
+  {
+    "catalyst": 19,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 8.651658405027101,
+    "stdev": 8.651658405027101
+  },
+  {
+    "catalyst": 19,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.6111250267170739,
+    "stdev": 0.6111250267170739
+  },
+  {
+    "catalyst": 20,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 16.292793970306242,
+    "stdev": 16.292793970306242
+  },
+  {
+    "catalyst": 20,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 9.02387878861789,
+    "stdev": 9.02387878861789
+  },
+  {
+    "catalyst": 20,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.7041048415569104,
+    "stdev": 0.7041048415569104
+  },
+  {
+    "catalyst": 20,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 17.839596507588084,
+    "stdev": 17.839596507588084
+  },
+  {
+    "catalyst": 20,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 9.019974727241198,
+    "stdev": 9.019974727241198
+  },
+  {
+    "catalyst": 20,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.7323225248490524,
+    "stdev": 0.7323225248490524
+  },
+  {
+    "catalyst": 20,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 18.971112532953924,
+    "stdev": 18.971112532953924
+  },
+  {
+    "catalyst": 20,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 9.513923398434688,
+    "stdev": 9.513923398434688
+  },
+  {
+    "catalyst": 20,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.7708139529945802,
+    "stdev": 0.7708139529945802
+  },
+  {
+    "catalyst": 21,
+    "solvent": "Diaxane",
+    "base": "K2CO3",
+    "yield": 15.6624817497832,
+    "stdev": 15.6624817497832
+  },
+  {
+    "catalyst": 21,
+    "solvent": "Diaxane",
+    "base": "NaOtBu",
+    "yield": 9.229032322411928,
+    "stdev": 9.229032322411928
+  },
+  {
+    "catalyst": 21,
+    "solvent": "Diaxane",
+    "base": "DBU",
+    "yield": 0.8590070635474246,
+    "stdev": 0.8590070635474246
+  },
+  {
+    "catalyst": 21,
+    "solvent": "tAmOH",
+    "base": "K2CO3",
+    "yield": 16.986656746829272,
+    "stdev": 16.986656746829272
+  },
+  {
+    "catalyst": 21,
+    "solvent": "tAmOH",
+    "base": "NaOtBu",
+    "yield": 8.987289309631437,
+    "stdev": 8.987289309631437
+  },
+  {
+    "catalyst": 21,
+    "solvent": "tAmOH",
+    "base": "DBU",
+    "yield": 0.8652323284065045,
+    "stdev": 0.8652323284065045
+  },
+  {
+    "catalyst": 21,
+    "solvent": "Toluene",
+    "base": "K2CO3",
+    "yield": 17.955855755284556,
+    "stdev": 17.955855755284556
+  },
+  {
+    "catalyst": 21,
+    "solvent": "Toluene",
+    "base": "NaOtBu",
+    "yield": 9.358140879485097,
+    "stdev": 9.358140879485097
+  },
+  {
+    "catalyst": 21,
+    "solvent": "Toluene",
+    "base": "DBU",
+    "yield": 0.8936080641165306,
+    "stdev": 0.8936080641165306
+  }
+]
