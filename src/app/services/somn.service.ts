@@ -34,7 +34,7 @@ export type Products = Array<{
 }>;
 
 function generateData(): Products {
-  return sampleResponse as Products;
+  return (sampleResponse as Products).sort((a, b) => a.base.localeCompare(b.base));
 }
 
 export class SomnRequest {
@@ -122,7 +122,7 @@ export class SomnService {
       }
       map.set(key, {
         catalyst: d.catalyst,
-        solventBase: `${d.solvent} / ${d.base}`,
+        solventBase: `${d.base} / ${d.solvent}`,
         solvent: `${d.solvent}`,
         base: `${d.base}`,
         yield: d.yield,
