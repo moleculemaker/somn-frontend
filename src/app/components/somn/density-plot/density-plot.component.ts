@@ -40,8 +40,17 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
     }),
   );
 
+  minRange = 0;
+  maxRange = 100;
+
   ngAfterViewInit() {
     this.render();
+
+    this.minRange = parseInt((d3.min(this.data.map((d) => d["yield"]))! * 100).toFixed(2));
+    this.maxRange = parseInt((d3.max(this.data.map((d) => d["yield"]))! * 100 + 1).toFixed(2));
+    this.selectedRegionMin$.next(this.minRange);
+    this.selectedRegionMax$.next(this.maxRange);
+
     setTimeout(() => {
       this.updateRangeDisplay(
         this.selectedRegionMin$.value,
@@ -53,6 +62,10 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["data"] && changes["data"].currentValue && this.container) {
       this.render();
+      this.minRange = parseInt((d3.min(this.data.map((d) => d["yield"]))! * 100).toFixed(2));
+      this.maxRange = parseInt((d3.max(this.data.map((d) => d["yield"]))! * 100 + 1).toFixed(2));
+      this.selectedRegionMin$.next(this.minRange);
+      this.selectedRegionMax$.next(this.maxRange);
     }
   }
 
@@ -87,14 +100,13 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
 
       let x = d3.scaleLinear().domain([0, 1]).range([0, width]);
       let y = d3.scaleLinear().range([height, 0]).domain([0, 1]);
-      let maxData = Math.ceil(d3.max(data.map((d) => d["yield"]))! * 100) / 100;
 
-      let density: [number, number][] = [[0, 0]];
+      let density: [number, number][] = [[this.minRange / 100, 0]];
 
       let yields = data.map((d) => d["yield"]);
       let thresholds = [];
 
-      for (let i = 0; i <= maxData * 100; i += 1) {
+      for (let i = this.minRange; i <= this.maxRange; i += 1) {
         thresholds.push(i / 100);
       }
 
@@ -127,13 +139,13 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
       selectedDensity.unshift([selectedDensity[0][0], 0]);
       selectedDensity.unshift([selectedDensity[0][0], 0]);
       selectedDensity.unshift([selectedDensity[0][0], 0]);
-      selectedDensity.unshift([0, 0]);
+      selectedDensity.unshift([this.minRange / 100, 0]);
 
       selectedDensity.push(selectedDensity[selectedDensity.length - 1]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
-      selectedDensity.push([maxData, 0]);
+      selectedDensity.push([this.maxRange / 100, 0]);
 
       let lineGenerator = d3
         .line()
@@ -243,13 +255,23 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
 
   updateMinRange(value: string) {
     this.selectedRegionMin$.next(
-      Math.max(0, Math.min(parseInt(value) || 0, 100)),
+      Math.max(this.minRange, 
+        Math.min(
+          parseInt(value) || 0, 
+          this.maxRange
+        )
+      ),
     );
   }
 
   updateMaxRange(value: string) {
     this.selectedRegionMax$.next(
-      Math.max(0, Math.min(parseInt(value) || 0, 100)),
+      Math.max(this.minRange, 
+        Math.min(
+          parseInt(value) || 0, 
+          this.maxRange
+        )
+      ),
     );
   }
 

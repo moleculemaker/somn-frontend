@@ -6,8 +6,8 @@
                 #slider
                 [ngModel]="selectedRegion$ | async"
                 (ngModelChange)="
-                    selectedRegionMin$.next($event[0]);
-                    selectedRegionMax$.next($event[1]);
+                    updateMinRange($event[0]);
+                    updateMaxRange($event[1]);
                 "
                 [range]="true"
                 [min]="0"
@@ -20,8 +20,8 @@
                     class="absolute appearance-none rounded-md border border-solid p-2"
                     (blur)="updateMinRange(minRange.value)"
                     (keyup.enter)="updateMinRange(minRange.value)"
-                    min="0"
-                    max="100"
+                    [min]="0"
+                    [max]="100"
                 />
                 <input
                     #maxRange
@@ -29,8 +29,8 @@
                     class="absolute appearance-none rounded-md border border-solid p-2"
                     (blur)="updateMaxRange(maxRange.value)"
                     (keyup.enter)="updateMaxRange(maxRange.value)"
-                    min="0"
-                    max="100"
+                    [min]="0"
+                    [max]="100"
                 />
             </div>
         </div>
