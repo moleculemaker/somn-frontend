@@ -8,10 +8,11 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
+  OnDestroy,
 } from "@angular/core";
 import * as d3 from "d3";
 import { Slider } from "primeng/slider";
-import { BehaviorSubject, combineLatest, tap } from "rxjs";
+import { BehaviorSubject, combineLatest, debounceTime, filter, map, takeLast, tap, throttleTime } from "rxjs";
 import { Products } from "~/app/services/somn.service";
 
 @Component({
@@ -19,60 +20,86 @@ import { Products } from "~/app/services/somn.service";
   templateUrl: "./density-plot.component.html",
   styleUrls: ["./density-plot.component.scss"],
 })
-export class DensityPlotComponent implements AfterViewInit, OnChanges {
+export class DensityPlotComponent implements AfterViewInit, OnDestroy {
   @Input() styleClass: string = "";
-  @Input() data: Products;
+
+  data$ = new BehaviorSubject<Products>([]);
+  @Input() set data(value: Products) {
+    this.data$.next(value);
+  }
+  
+  @Output() selectedRegionChange = new EventEmitter<[number, number]>();
+
   @ViewChild("container") container: ElementRef<HTMLDivElement>;
   @ViewChild("inputContainer") rangeInputContainer: ElementRef<HTMLDivElement>;
   @ViewChild("slider") slider: Slider;
-  @Output() selectedRegionChange = new EventEmitter<[number, number]>();
 
   selectedRegionMin$ = new BehaviorSubject(0);
   selectedRegionMax$ = new BehaviorSubject(100);
+  
   selectedRegion$ = combineLatest([
     this.selectedRegionMin$,
     this.selectedRegionMax$,
   ]).pipe(
     tap(([min, max]) => {
       this.updateRangeDisplay(min, max);
-      this.render();
       this.selectedRegionChange.emit([min, max]);
     }),
   );
+  
+  minRange$ = this.data$.pipe(
+    filter((data) => data.length > 0),
+    map((data) => parseInt((d3.min(data.map((d) => d["yield"]))! * 100).toFixed(2))),
+    tap((min) => { this.selectedRegionMin$.next(min); })
+  );
 
-  minRange = 0;
-  maxRange = 100;
+  maxRange$ = this.data$.pipe(
+    filter((data) => data.length > 0),
+    map((data) => parseInt((d3.max(data.map((d) => d["yield"]))! * 100 + 1).toFixed(2))),
+    tap((max) => { this.selectedRegionMax$.next(max); })
+  );
+
+  subscription = combineLatest([
+    this.data$,
+    this.selectedRegionMin$,
+    this.selectedRegionMax$,
+    this.minRange$,
+    this.maxRange$,
+  ]).pipe(
+    filter(([data]) => data.length > 0),
+    tap(([data, min, max, minRange, maxRange]) => {
+      this.render(data, min, max, minRange, maxRange);
+    }),
+    debounceTime(100),
+    tap(([data, min, max, minRange, maxRange]) => {
+      const regionMin = Math.max(minRange, Math.min(min, maxRange));
+      const regionMax = Math.max(minRange, Math.min(max, maxRange));
+      if (min < minRange || min > maxRange) {
+        this.selectedRegionMin$.next(regionMin);
+      }
+      if (max < minRange || max > maxRange) {
+        this.selectedRegionMax$.next(regionMax);
+      }
+    }),
+  ).subscribe();
 
   ngAfterViewInit() {
-    this.render();
-
-    this.minRange = parseInt((d3.min(this.data.map((d) => d["yield"]))! * 100).toFixed(2));
-    this.maxRange = parseInt((d3.max(this.data.map((d) => d["yield"]))! * 100 + 1).toFixed(2));
-    this.selectedRegionMin$.next(this.minRange);
-    this.selectedRegionMax$.next(this.maxRange);
-
-    setTimeout(() => {
-      this.updateRangeDisplay(
-        this.selectedRegionMin$.value,
-        this.selectedRegionMax$.value,
-      );
-    });
+    this.updateRangeDisplay(
+      this.selectedRegionMin$.value,
+      this.selectedRegionMax$.value,
+    );
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes["data"] && changes["data"].currentValue && this.container) {
-      this.render();
-      this.minRange = parseInt((d3.min(this.data.map((d) => d["yield"]))! * 100).toFixed(2));
-      this.maxRange = parseInt((d3.max(this.data.map((d) => d["yield"]))! * 100 + 1).toFixed(2));
-      this.selectedRegionMin$.next(this.minRange);
-      this.selectedRegionMax$.next(this.maxRange);
-    }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   render(
-    data: Products = this.data,
-    minVal: number = this.selectedRegionMin$.value,
-    maxVal: number = this.selectedRegionMax$.value,
+    data: Products,
+    selectedMinVal: number,
+    selectedMaxVal: number,
+    minRange: number,
+    maxRange: number,
   ) {
     setTimeout(() => {
       if (!this.container) {
@@ -101,12 +128,12 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
       let x = d3.scaleLinear().domain([0, 1]).range([0, width]);
       let y = d3.scaleLinear().range([height, 0]).domain([0, 1]);
 
-      let density: [number, number][] = [[this.minRange / 100, 0]];
+      let density: [number, number][] = [[minRange / 100, 0]];
 
       let yields = data.map((d) => d["yield"]);
       let thresholds = [];
 
-      for (let i = this.minRange; i <= this.maxRange; i += 1) {
+      for (let i = minRange; i <= maxRange; i += 1) {
         thresholds.push(i / 100);
       }
 
@@ -132,20 +159,20 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
       density = density.map(([x, y]) => [x, y / max]);
 
       let selectedDensity = density.filter(
-        ([x, y]) => x >= minVal / 100 && x <= maxVal / 100,
+        ([x, y]) => x >= selectedMinVal / 100 && x <= selectedMaxVal / 100,
       );
 
       selectedDensity.unshift(selectedDensity[0]);
       selectedDensity.unshift([selectedDensity[0][0], 0]);
       selectedDensity.unshift([selectedDensity[0][0], 0]);
       selectedDensity.unshift([selectedDensity[0][0], 0]);
-      selectedDensity.unshift([this.minRange / 100, 0]);
+      selectedDensity.unshift([minRange / 100, 0]);
 
       selectedDensity.push(selectedDensity[selectedDensity.length - 1]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
       selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
-      selectedDensity.push([this.maxRange / 100, 0]);
+      selectedDensity.push([maxRange / 100, 0]);
 
       let lineGenerator = d3
         .line()
@@ -254,25 +281,11 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
   }
 
   updateMinRange(value: string) {
-    this.selectedRegionMin$.next(
-      Math.max(this.minRange, 
-        Math.min(
-          parseInt(value) || 0, 
-          this.maxRange
-        )
-      ),
-    );
+    this.selectedRegionMin$.next(parseInt(value) || 0);
   }
 
   updateMaxRange(value: string) {
-    this.selectedRegionMax$.next(
-      Math.max(this.minRange, 
-        Math.min(
-          parseInt(value) || 0, 
-          this.maxRange
-        )
-      ),
-    );
+    this.selectedRegionMax$.next(parseInt(value) || 0);
   }
 
   updateRangeDisplay(min: number, max: number) {
@@ -280,21 +293,23 @@ export class DensityPlotComponent implements AfterViewInit, OnChanges {
       return;
     }
 
-    const [leftHandler, rightHandler] =
-      this.slider.el.nativeElement.querySelectorAll(".p-slider-handle");
+    setTimeout(() => {
+      const [leftHandler, rightHandler] =
+        this.slider.el.nativeElement.querySelectorAll(".p-slider-handle");
 
-    if (this.rangeInputContainer) {
-      const { x: leftX } = leftHandler.getBoundingClientRect();
-      const { x: rightX } = rightHandler.getBoundingClientRect();
-      const { x: containerX } =
-        this.rangeInputContainer.nativeElement.getBoundingClientRect();
-      const [minRange, maxRange] = Array.from(
-        this.rangeInputContainer.nativeElement.querySelectorAll("input"),
-      );
-      minRange.style.left = `${leftX - containerX - 12}px`;
-      maxRange.style.left = `${rightX - containerX - 12}px`;
-      minRange.value = `${min}`;
-      maxRange.value = `${max}`;
-    }
+      if (this.rangeInputContainer) {
+        const { x: leftX } = leftHandler.getBoundingClientRect();
+        const { x: rightX } = rightHandler.getBoundingClientRect();
+        const { x: containerX } =
+          this.rangeInputContainer.nativeElement.getBoundingClientRect();
+        const [minRange, maxRange] = Array.from(
+          this.rangeInputContainer.nativeElement.querySelectorAll("input"),
+        );
+        minRange.style.left = `${leftX - containerX - 12}px`;
+        maxRange.style.left = `${rightX - containerX - 12}px`;
+        minRange.value = `${min}`;
+        maxRange.value = `${max}`;
+      }
+    });
   }
 }

@@ -7,7 +7,7 @@
                 [ngModel]="selectedRegion$ | async"
                 (ngModelChange)="
                     updateMinRange($event[0]);
-                    updateMaxRange($event[1]);
+                    updateMaxRange($event[1])
                 "
                 [range]="true"
                 [min]="0"
