@@ -23,7 +23,7 @@ export class SomnComponent {
     { label: "Request Configuration" },
     { label: "Model Results" },
   ];
-  activeTab$ = new BehaviorSubject(this.tabs[1]);
+  activeTab$ = new BehaviorSubject(this.tabs[0]);
   loading$ = new BehaviorSubject(false);
 
   heatmapData$ = of(this.somnService.getHeatmapData());
