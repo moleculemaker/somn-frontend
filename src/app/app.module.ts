@@ -61,6 +61,7 @@ import { DensityPlotComponent } from "./components/somn/density-plot/density-plo
 import { SomnComponent } from "./components/somn/somn/somn.component";
 import { MarvinjsInputComponent } from "./components/somn/marvinjs-input/marvinjs-input.component";
 import { HeatmapComponent } from './components/somn/heatmap/heatmap.component';
+import { YieldFilterComponent } from './components/somn/yield-filter/yield-filter.component';
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig("/assets/config/envvars.json");
@@ -78,6 +79,7 @@ const initAppFn = (envService: EnvironmentService) => {
     MarvinjsInputComponent,
     LoadingComponent,
     HeatmapComponent,
+    YieldFilterComponent,
     // FileDragNDropDirective,
     // ConfigurationComponent,
     // ResultsComponent,

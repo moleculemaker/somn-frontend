@@ -5,7 +5,6 @@ import {
   ElementRef,
   Input,
   ViewChild,
-  SimpleChanges,
   Output,
   EventEmitter,
   OnDestroy,
@@ -26,6 +25,11 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
   data$ = new BehaviorSubject<Products>([]);
   @Input() set data(value: Products) {
     this.data$.next(value);
+  }
+
+  @Input() set selectedRegion(value: [number, number]) {
+    this.selectedRegionMin$.next(value[0]);
+    this.selectedRegionMax$.next(value[1]);
   }
   
   @Output() selectedRegionChange = new EventEmitter<[number, number]>();

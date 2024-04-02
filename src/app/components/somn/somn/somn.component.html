@@ -484,17 +484,11 @@
                             (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
                         >
                         </p-multiSelect>
-                        <p-multiSelect
-                            class="w-1/4"
-                            styleClass="w-full"
-                            [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
-                            [options]="(basesOptions$ | async) || []"
-                            placeholder="Yield"
-                            [disabled]="true"
-                        >
-                        </p-multiSelect>
+                        <app-yield-filter class="w-1/4"
+                            [data]="(filteredDataWithoutYieldRange$ | async) || []"
+                            [selectedYield]="(selectedYield$ | async)!"
+                            (selectedYieldChange)="onYieldRangeChange($event)"
+                        ></app-yield-filter>
                     </div>
 
                     <hr />
@@ -507,8 +501,9 @@
                                     Yield %
                                 </div>
                                 <app-density-plot
-                                    styleClass="h-[150px]"
+                                    styleClass="h-[150px] pl-16 pr-6"
                                     [data]="(filteredDataWithoutYieldRange$ | async) || []"
+                                    [selectedRegion]="(selectedYield$ | async)!"
                                     (selectedRegionChange)="onYieldRangeChange($event)"
                                 ></app-density-plot>
                             </div>

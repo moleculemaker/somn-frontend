@@ -34,7 +34,7 @@ export class SomnComponent {
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
-  selectedYield$ = new BehaviorSubject([0, 100]);
+  selectedYield$ = new BehaviorSubject<[number, number]>([0, 100]);
 
   dataWithColor$ = this.response$.pipe(
     map((response) => 
@@ -152,6 +152,11 @@ export class SomnComponent {
   }
 
   onYieldRangeChange(value: [number, number]) {
+    const v = this.selectedYield$.value;
+    if (v[0] === value[0] && v[1] === value[1]) {
+      return;
+    }
+    
     this.selectedYield$.next(value);
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");

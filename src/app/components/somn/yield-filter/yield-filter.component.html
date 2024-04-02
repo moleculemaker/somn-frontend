@@ -1,0 +1,21 @@
+<div class="rounded-md border-[#ced4da] p-3 flex justify-betweeen bg-white border border-solid cursor-pointer hover:border-black"
+    (mousedown)="filter.toggle($event)"
+>
+    <div class="grow">
+        <span class="text-[--text-color-secondary]">Yield</span>
+    </div>
+    <div><i class="pi pi-chevron-down"></i></div>
+    <p-overlayPanel #filter [style]="{width: '360px'}" styleClass="pt-4">
+        <app-density-plot 
+            *ngIf="filter.overlayVisible"
+            [data]="data$.value"
+            [selectedRegion]="selectedYield"
+            (selectedRegionChange)="yield$.next($event)"
+        ></app-density-plot>
+        <hr class="mt-12"/>
+        <div class="flex justify-between p-4">
+            <button class="px-4 py-2 rounded-md border border-solid border-[#224063] text-[#224063] font-semibold" (click)="onClickClear()">Clear</button>
+            <button class="px-4 py-2 rounded-md border border-solid bg-[#224063] text-white font-semibold" (click)="onClickApply()">Apply</button>
+        </div>
+    </p-overlayPanel>
+</div>
