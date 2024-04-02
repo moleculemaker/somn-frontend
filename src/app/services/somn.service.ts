@@ -84,15 +84,15 @@ export class SomnService {
 
   response = {
     arylHalides: {
-      commonName: "Aryl Halides",
-      smiles: "Smiles",
-      reactionSite: 1,
+      name: sampleRequest.arylHalideName,
+      smiles: sampleRequest.arylHalideSmiles,
+      reactionSite: sampleRequest.arylHalideReactionSite,
       structures: ["https://fakeimg.pl/640x360"],
     },
     amine: {
-      commonName: "Amine",
-      smiles: "Smiles",
-      reactionSite: 1,
+      name: sampleRequest.amineName,
+      smiles: sampleRequest.amineSmiles,
+      reactionSite: sampleRequest.amineReactionSite,
       structures: ["https://fakeimg.pl/640x360"],
     },
     data: this.data.map((d) => ({
