@@ -1,8 +1,14 @@
 import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { BehaviorSubject, combineLatest, map, of, tap } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, map, of, tap } from "rxjs";
 import { SomnService } from "~/app/services/somn.service";
 import { Table } from "primeng/table";
 import { FilterService } from "primeng/api";
+import { Products } from "~/app/services/somn.service";
+import amineJson from "./amine_smiles.json";
+import arylHalideJson from "./bromide_smiles.json";
+import baseJson from "./base_map.json";
+import solventJson from "./solvent_map.json";
+import testJson from "./test.json";
 
 enum ActiveAboutPanel {
   ABOUT,
@@ -11,6 +17,11 @@ enum ActiveAboutPanel {
   PUBLICATIONS,
   GET_INVOLVED,
 }
+
+type TrainingData = Products[0] & {
+  arylHalide: string;
+  amine: string;
+};
 
 @Component({
   selector: "app-about-somn",
@@ -23,11 +34,18 @@ enum ActiveAboutPanel {
 export class AboutSomnComponent implements OnInit {
   readonly ActiveAboutPanel = ActiveAboutPanel;
 
-  activePanel$ = new BehaviorSubject(ActiveAboutPanel.TRAINING_DATA);
+  activePanel$ = new BehaviorSubject(ActiveAboutPanel.ABOUT);
 
   @ViewChild("resultsTable") resultsTable: Table;
 
-  trainingData$ = of(this.somnService.data);
+  trainingData$: Observable<Array<TrainingData>> = of(testJson.map((data) => ({
+    arylHalide: arylHalideJson[`${data["arylHalide"]}` as keyof typeof arylHalideJson],
+    amine: amineJson[`${data["amine"]}` as keyof typeof amineJson],
+    base: baseJson[`${data["base"]}` as keyof typeof baseJson],
+    catalyst: data["catalyst"],
+    solvent: solventJson[`${data["solvent"]}` as keyof typeof solventJson],
+    yield: data["yield"] / 100,
+  }) as TrainingData));
   filteredTrainingData$ = new BehaviorSubject([]);
 
   showFilters$ = new BehaviorSubject(false);
@@ -50,20 +68,20 @@ export class AboutSomnComponent implements OnInit {
     map(
       ([
         trainingData,
-        // selectedArylHalides,
-        // selectedAmines,
+        selectedArylHalides,
+        selectedAmines,
         selectedCatalysts,
         selectedBases,
         selectedSolvents,
       ]) =>
         trainingData.filter(
           (data) =>
-            // (selectedArylHalides.length
-            //   ? selectedArylHalides.includes(data["arylHalide"])
-            //   : true) &&
-            // (selectedAmines.length
-            //   ? selectedAmines.includes(data["amine"])
-            //   : true) &&
+            (selectedArylHalides.length
+              ? selectedArylHalides.includes(data["arylHalide"])
+              : true) &&
+            (selectedAmines.length
+              ? selectedAmines.includes(data["amine"])
+              : true) &&
             (selectedCatalysts.length
               ? selectedCatalysts.includes(data["catalyst"])
               : true) &&
@@ -90,10 +108,10 @@ export class AboutSomnComponent implements OnInit {
   );
 
   arylHalidesOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set()]),
+    map((data) => [...new Set(data.flatMap((d) => d.arylHalide))]),
   );
   aminesOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set()]),
+    map((data) => [...new Set(data.flatMap((d) => d.amine))]),
   );
   solventsOptions$ = this.trainingData$.pipe(
     map((data) => [...new Set(data.flatMap((d) => d.solvent))]),
