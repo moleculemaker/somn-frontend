@@ -5,7 +5,7 @@ import { SomnService as SomApiService } from "../api/mmli-backend/v1/api/somn.se
 
 import sampleRequest from '../../assets/example_request.json';
 import sampleResponse from '../../assets/example_response.json';
-import { Observable, switchMap } from "rxjs";
+import { Observable, switchMap, take } from "rxjs";
 import { PostResponse } from "../models";
 
 export type Products = Array<{
