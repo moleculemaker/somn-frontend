@@ -1,9 +1,12 @@
 import { Injectable } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { JobCreate } from "../api/mmli-backend/v1";
+import { FilesService, Job, JobCreate, JobType, JobsService, SomnRequestBody } from "../api/mmli-backend/v1";
+import { SomnService as SomApiService } from "../api/mmli-backend/v1/api/somn.service";
 
 import sampleRequest from '../../assets/example_request.json';
 import sampleResponse from '../../assets/example_response.json';
+import { Observable, switchMap } from "rxjs";
+import { PostResponse } from "../models";
 
 export type Products = Array<{
   catalyst:
@@ -53,23 +56,15 @@ export class SomnRequest {
     subscriberEmail: new FormControl("", [Validators.email]),
   });
 
-  toJobCreate(): JobCreate {
+  toRequestBody(): SomnRequestBody {
     return {
-      job_info: JSON.stringify({
-        reactantPairName: this.form.controls["reactantPairName"].value,
-
-        arylHalideName: this.form.controls["arylHalideName"].value,
-        arylHalideSmiles: this.form.controls["arylHalideSmiles"].value,
-        arylHalideReactionSite:
-          this.form.controls["arylHalideReactionSite"].value,
-
-        amineName: this.form.controls["amineName"].value,
-        amineSmiles: this.form.controls["amineSmiles"].value,
-        amineReactionSite: this.form.controls["amineReactionSite"].value,
-      }),
-      email: this.form.controls["subscriberEmail"].value || "",
-      job_id: undefined,
-      run_id: 0,
+      user_email: this.form.controls["subscriberEmail"].value || "",
+      jobId: '',
+      reactant_pair_name: this.form.controls["reactantPairName"].value || "",
+      amine_name: this.form.controls["amineName"].value || "",
+      amine_smiles: this.form.controls["amineSmiles"].value || "",
+      aryl_halide_name: this.form.controls["arylHalideName"].value || "",
+      aryl_halide_smiles: this.form.controls["arylHalideSmiles"].value || "",
     };
   }
 }
@@ -80,7 +75,11 @@ export class SomnRequest {
 export class SomnService {
   data = generateData();
 
-  constructor() {}
+  constructor(
+    private jobsService: JobsService,
+    private somnService: SomApiService,
+    private filesService: FilesService,
+  ) {}
 
   response = {
     arylHalides: {
@@ -100,6 +99,32 @@ export class SomnService {
       yield: d.yield / 100,
     }))
   };
+
+  createJobAndRunSomn(requestBody: SomnRequestBody): Observable<PostResponse>{
+    const jobCreate: JobCreate = {
+      job_info: JSON.stringify(requestBody),
+      email: requestBody.user_email,
+    }
+
+    return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, jobCreate)
+      .pipe(switchMap((response) => {
+        console.log('Job created', response);
+        requestBody.jobId = response.job_id!;
+        return this.somnService.startSomnSomnRunPost(requestBody)
+      }))
+  }
+
+  getResultStatus(jobID: string): Observable<Job>{
+    return this.jobsService.getJobByTypeAndJobIdAndRunIdJobTypeJobsJobIdRunIdGet(JobType.Somn, jobID, '0');
+  }
+
+  getResult(jobID: string): Observable<any>{
+    return this.filesService.getResultsBucketNameResultsJobIdGet(JobType.Somn, jobID);
+  }
+
+  getError(jobID: string): Observable<string>{
+    return this.filesService.getErrorsBucketNameErrorsJobIdGet(JobType.Somn, jobID);
+  }
 
   newRequest() {
     return new SomnRequest();

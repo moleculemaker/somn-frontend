@@ -1,8 +1,10 @@
 import { Component, ViewChild } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import * as d3 from "d3";
 import { FilterService, MenuItem } from "primeng/api";
 import { Table } from "primeng/table";
-import { BehaviorSubject, combineLatest, map, of } from "rxjs";
+import { BehaviorSubject, combineLatest, filter, map, of, skipUntil, switchMap, takeWhile, tap, timer } from "rxjs";
+import { JobStatus } from "~/app/api/mmli-backend/v1";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 
 @Component({
@@ -16,15 +18,35 @@ import { SomnRequest, SomnService } from "~/app/services/somn.service";
 export class SomnComponent {
   @ViewChild("resultsTable") resultsTable: Table;
 
+  jobId: string = this.route.snapshot.paramMap.get("id") || "";
+
+  statusResponse$ = timer(0, 10000).pipe(
+    switchMap(() => this.somnService.getResultStatus(this.jobId)),
+    takeWhile((data) => 
+      data.phase === JobStatus.Processing 
+      || data.phase === JobStatus.Queued
+    , true),
+    tap((data) => { console.log('job status: ', data) }),
+  );
+
+  isLoading$ = this.statusResponse$.pipe(
+    map((job) => job.phase === JobStatus.Processing || job.phase === JobStatus.Queued),
+  );
+
+  response$ = this.statusResponse$.pipe(
+    skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
+    switchMap(() => this.somnService.getResult(this.jobId)),
+    tap((data) => { console.log('result: ', data) }),
+    switchMap((data) => of(this.somnService.response)), //TODO: replace with actual response
+  );
+
   request = this.somnService.newRequest();
-  response$ = of(this.somnService.response);
 
   tabs: MenuItem[] = [
     { label: "Request Configuration" },
     { label: "Model Results" },
   ];
   activeTab$ = new BehaviorSubject(this.tabs[0]);
-  loading$ = new BehaviorSubject(false);
 
   heatmapData$ = of(this.somnService.getHeatmapData());
   filteredTrainingData$ = new BehaviorSubject([]);
@@ -110,9 +132,14 @@ export class SomnComponent {
   constructor(
     private somnService: SomnService,
     private filterService: FilterService,
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit() {
+    this.route.data.subscribe((d) => {
+      this.activeTab$.next(this.tabs[d['activeTab']]);
+    })
     this.filterService.register(
       "range",
       (value: number, filter: [number, number]) => {
@@ -126,7 +153,15 @@ export class SomnComponent {
   }
 
   onSubmit(request: SomnRequest) {
-    this.activeTab$.next(this.tabs[1]);
+    if (!this.request.form.valid) {
+      return;
+    }
+
+    this.somnService.createJobAndRunSomn(
+      this.request.toRequestBody()
+    ).subscribe((response) => {
+      this.router.navigate(['somn', 'result', response.jobId]);
+    })
   }
 
   clearAllFilters() {

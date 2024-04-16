@@ -6,6 +6,7 @@ api/chemScraper.service.ts
 api/default.service.ts
 api/files.service.ts
 api/jobs.service.ts
+api/somn.service.ts
 configuration.ts
 encoder.ts
 git_push.sh
@@ -22,7 +23,7 @@ model/jobType.ts
 model/jobUpdate.ts
 model/locationInner.ts
 model/models.ts
-model/molecule.ts
+model/somnRequestBody.ts
 model/validationError.ts
 param.ts
 variables.ts

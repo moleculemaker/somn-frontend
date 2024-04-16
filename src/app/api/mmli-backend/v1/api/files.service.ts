@@ -22,8 +22,6 @@ import { Observable }                                        from 'rxjs';
 import { ExportRequestBody } from '../model/exportRequestBody';
 // @ts-ignore
 import { HTTPValidationError } from '../model/hTTPValidationError';
-// @ts-ignore
-import { Molecule } from '../model/molecule';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -311,9 +309,9 @@ export class FilesService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getResultsBucketNameResultsJobIdGet(bucketName: string, jobId: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<Array<Molecule>>;
-    public getResultsBucketNameResultsJobIdGet(bucketName: string, jobId: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<Array<Molecule>>>;
-    public getResultsBucketNameResultsJobIdGet(bucketName: string, jobId: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<Array<Molecule>>>;
+    public getResultsBucketNameResultsJobIdGet(bucketName: string, jobId: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any>;
+    public getResultsBucketNameResultsJobIdGet(bucketName: string, jobId: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<any>>;
+    public getResultsBucketNameResultsJobIdGet(bucketName: string, jobId: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<any>>;
     public getResultsBucketNameResultsJobIdGet(bucketName: string, jobId: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         if (bucketName === null || bucketName === undefined) {
             throw new Error('Required parameter bucketName was null or undefined when calling getResultsBucketNameResultsJobIdGet.');
@@ -354,7 +352,7 @@ export class FilesService {
         }
 
         let localVarPath = `/${this.configuration.encodeParam({name: "bucketName", value: bucketName, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}/results/${this.configuration.encodeParam({name: "jobId", value: jobId, in: "path", style: "simple", explode: false, dataType: "string", dataFormat: undefined})}`;
-        return this.httpClient.request<Array<Molecule>>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<any>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

@@ -295,8 +295,8 @@
 
     <!-- Model Results -->
     <div class="grow" *ngIf="activeTab$.value.label === 'Model Results'">
-        <app-loading *ngIf="loading$.value"></app-loading>
-        <div *ngIf="!loading$.value">
+        <app-loading *ngIf="isLoading$ | async"></app-loading>
+        <div *ngIf="!(isLoading$ | async)">
             <div class="my-4 flex gap-2">
                 <p-panel class="grow">
                     <ng-template pTemplate="header">
@@ -307,7 +307,7 @@
                         </div>
                     </ng-template>
                     <ng-template pTemplate="content">
-                        <div class="flex w-full">
+                        <div class="flex w-full" *ngIf="(response$ | async) as response">
                             <div
                                 class="flex w-1/2 flex-col justify-between p-4"
                             >
@@ -324,11 +324,11 @@
                                     >
                                         <img
                                             class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.arylHalides.structures[0]"
+                                            [src]="response.arylHalides.structures[0]"
                                         />
                                         <img
                                             class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.arylHalides.structures[1]"
+                                            [src]="response.arylHalides.structures[1]"
                                         />
                                     </div>
                                     <div
@@ -336,7 +336,7 @@
                                     >
                                         <ng-container
                                             *ngTemplateOutlet="moleculeInfo; context: {
-                                            $implicit: (response$ | async)!.arylHalides,
+                                            $implicit: response.arylHalides,
                                             showSmiles: true
                                         }"
                                         ></ng-container>
@@ -357,11 +357,11 @@
                                     >
                                         <img
                                             class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.amine.structures[0]"
+                                            [src]="response.amine.structures[0]"
                                         />
                                         <img
                                             class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.amine.structures[1]"
+                                            [src]="response.amine.structures[1]"
                                         />
                                     </div>
                                     <div
@@ -369,7 +369,7 @@
                                     >
                                         <ng-container
                                             *ngTemplateOutlet="moleculeInfo; context: {
-                                            $implicit: (response$ | async)!.amine,
+                                            $implicit: response.amine,
                                             showSmiles: true
                                         }"
                                         ></ng-container>
@@ -381,6 +381,7 @@
                 </p-panel>
                 <div
                     class="flex w-1/4 flex-col rounded-md border border-solid border-[--surface-d]"
+                    *ngIf="(topYieldConditions$ | async) as topYieldConditions"
                 >
                     <div
                         class="flex w-full items-center justify-between rounded-t-md bg-gray-50 p-4"
@@ -396,10 +397,10 @@
                         >
                         <div class="grow text-end">
                             <span class="font-semibold">
-                                <span class="inline-block h-3 w-3" [style]="{ background: (topYieldConditions$ | async)!.conditions[0].color }"></span>
-                                {{ (topYieldConditions$ | async)!.topYield | number: "2.0-0" }}%
+                                <span class="inline-block h-3 w-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
+                                {{ topYieldConditions.topYield | number: "2.0-0" }}%
                             </span>
-                            <br />({{ (topYieldConditions$ | async)!.conditions.length }} Condition)
+                            <br />({{ topYieldConditions.conditions.length }} Condition)
                         </div>
                     </div>
                     <hr />
@@ -410,11 +411,11 @@
                             >Top Reaction Condition</span
                         >
                         <div class="grow text-end font-semibold">
-                            Catalyst {{ (topYieldConditions$ | async)!.conditions[0].catalyst }}
+                            Catalyst {{ topYieldConditions.conditions[0].catalyst }}
                             <br/>
-                            Solvent {{ (topYieldConditions$ | async)!.conditions[0].solvent }}
+                            Solvent {{ topYieldConditions.conditions[0].solvent }}
                             <br/>
-                            Base {{ (topYieldConditions$ | async)!.conditions[0].base }}
+                            Base {{ topYieldConditions.conditions[0].base }}
                         </div>
                     </div>
                 </div>

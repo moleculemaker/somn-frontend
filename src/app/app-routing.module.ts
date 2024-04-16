@@ -9,7 +9,8 @@ const routes: Routes = [
   // { path: "", redirectTo: "", pathMatch: "full" },
   { path: "about", component: AboutSomnComponent },
   { path: "", component: LandingPageComponent },
-  { path: "somn", component: SomnComponent },
+  { path: "somn", component: SomnComponent, data: { activeTab: 0 } },
+  { path: "somn/result/:id", component: SomnComponent, data: { activeTab: 1 } },
 ];
 
 @NgModule({

@@ -37,7 +37,7 @@ import { LoadingComponent } from "./components/somn/loading/loading.component";
 // import { ConfigurationComponent } from "./components/chemscraper/configuration/configuration.component";
 // import { ResultsComponent } from "./components/chemscraper/results/results.component";
 
-import { ChemScraperService } from "./chemscraper.service";
+// import { ChemScraperService } from "./chemscraper.service";
 import { HttpClientModule } from "@angular/common/http";
 import { NgxMatomoTrackerModule } from "@ngx-matomo/tracker";
 import { NgxMatomoRouterModule } from "@ngx-matomo/router";
@@ -134,7 +134,6 @@ const initAppFn = (envService: EnvironmentService) => {
     DialogModule,
   ],
   providers: [
-    ChemScraperService,
     EnvironmentService,
     {
       provide: APP_INITIALIZER,
