@@ -7,13 +7,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-
     "openapi:clean": "rm -rf src/app/api/",
-
     "openapi": "openapi-generator-cli generate --skip-validate-spec -i openapi/mmli-backend.openapi.json -g typescript-angular -o src/app/api/mmli-backend/v1",
     "openapi:sync": "curl https://mmli.fastapi.mmli1.ncsa.illinois.edu/openapi.json > openapi/mmli-backend.openapi.json && cat openapi/mmli-backend.openapi.json",
     "openapi:live": "npm run openapi:sync && npm run openapi",
-
     "openapi:sync:local": "curl http://localhost:8080/openapi.json > openapi/mmli-backend.openapi.json && cat openapi/mmli-backend.openapi.json",
     "openapi:live:local": "npm run openapi:sync:local && npm run openapi"
   },
@@ -30,6 +27,7 @@
     "@chemaxon/marvinjs": "^23.11.0",
     "@ngx-matomo/router": "^4.0.1",
     "@ngx-matomo/tracker": "^4.0.1",
+    "d3": "^7.8.5",
     "pdfjs-dist": "^3.6.172",
     "primeicons": "^6.0.1",
     "primeng": "^15.2.0",
@@ -42,6 +40,7 @@
     "@angular/cli": "~15.1.6",
     "@angular/compiler-cli": "^15.1.0",
     "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@types/d3": "^7.4.3",
     "@types/jasmine": "~4.3.0",
     "@types/node": "^18.15.3",
     "jasmine-core": "~4.5.0",
@@ -50,6 +49,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
+    "tailwindcss": "^3.4.1",
     "typescript": "~4.9.4"
   }
 }

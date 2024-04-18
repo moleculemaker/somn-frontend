@@ -1,0 +1,36 @@
+<div [class]="styleClass" class="px-4">
+    <div #container class="h-[160px] w-full"></div>
+    <div class="ml-11">
+        <p-slider
+            #slider
+            [ngModel]="selectedRegion$ | async"
+            (ngModelChange)="
+                updateMinRange($event[0]);
+                updateMaxRange($event[1])
+            "
+            [range]="true"
+            [min]="0"
+            [max]="100"
+        ></p-slider>
+        <div class="relative -mx-4 pt-4 font-thin" #inputContainer>
+            <input
+                #minRange
+                type="number"
+                class="absolute appearance-none rounded-md border border-solid p-2"
+                (blur)="updateMinRange(minRange.value)"
+                (keyup.enter)="updateMinRange(minRange.value)"
+                [min]="0"
+                [max]="100"
+            />
+            <input
+                #maxRange
+                type="number"
+                class="absolute appearance-none rounded-md border border-solid p-2"
+                (blur)="updateMaxRange(maxRange.value)"
+                (keyup.enter)="updateMaxRange(maxRange.value)"
+                [min]="0"
+                [max]="100"
+            />
+        </div>
+    </div>
+</div>

@@ -245,7 +245,6 @@ header {
 
         .line {
             position: relative;
-
             height: 3px;
 
             background: {
@@ -302,8 +301,8 @@ header {
 
 .content {
     flex-grow: 1;
-
-    padding: $padding;
+    display: flex;
+    justify-content: center;
 }
 
 footer {

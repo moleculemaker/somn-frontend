@@ -1,20 +1,163 @@
-<div class="page_container">
-    <div class="container">
-        <h1>1 Enter your protein sequence here</h1>
-        <h2>2 Enter your protein sequence here</h2>
-        <h3>3 Enter your protein sequence here</h3>
-        <h4>4 Enter your protein sequence here</h4>
-        <h5>5 Enter your protein sequence here</h5>
-<hr />
-        <h1>1 Enter your protein sequence here</h1>
-        <h3>3 nter your protein sequence here</h3>
+<div class="flex h-full flex-col">
+    <div class="mt-16 flex justify-center">
+        <div class="lg:w-screen-lg p-4">
+            <h1 class="font-bold">Welcome to Somn!</h1>
+            <p class="mt-4 max-w-screen-md leading-6">
+                We’re trained a model called Somn for predicting
+                substrate-adaptive conditions for C-N couplings. Somn is your
+                experimental design assistant: you provide reactant pairs and
+                Somn will make yield percent predictions for a variety of
+                reaction conditions (catalysts, solvents, and bases), which you
+                can use to inform your own synthesis planning.
+            </p>
+            <p class="mt-2 max-w-screen-md leading-6">
+                Learn more about how Somn works below and get started using the
+                tool today.
+            </p>
+        </div>
+    </div>
 
-        <h2>2 Enter your protein sequence here</h2>
-        <h4>4 Enter your protein sequence here</h4>
+    <div class="mt-4 flex justify-center">
+        <div class="lg:w-screen-lg p-4">
+            <h2 class="text-bold pb-6">Somn Workflow</h2>
+            <div class="flex gap-2">
+                <!-- TODO: Image gets scaled on small screen -->
+                <p-card
+                    styleClass="rounded-none shadow-none border-2 border-solid border-bluegray-100"
+                >
+                    <ng-template pTemplate="header">
+                        <div class="flex items-center justify-center p-2 pb-0">
+                            <img
+                                class="h-[128px] w-auto"
+                                src="assets/request_configuration.png"
+                                alt="request_configuration"
+                            />
+                        </div>
+                    </ng-template>
 
-        <h3>3 Enter your protein sequence here</h3>
-        <h5>5 Enter your protein sequence here</h5>
+                    <h3 class="-mt-6">Request Configuration</h3>
+                    <ul class="-mb-6 ml-6 list-disc">
+                        <li class="mt-4 pl-2">
+                            Input an aryl halide / amine reactant pair for
+                            reaction condition prediction (catalysts, solvents,
+                            andbases)
+                        </li>
+                    </ul>
+                </p-card>
 
-        <button pButton type="button" label="Start" routerLink="/clean" style="marginTop:2rem;"></button>
+                <div class="flex items-center">
+                    <svg
+                        width="46"
+                        height="8"
+                        viewBox="0 0 46 8"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M6.32324 4L39.4999 4"
+                            stroke="#1F2024"
+                            stroke-linecap="round"
+                        />
+                        <path
+                            d="M41.5475 3.28035L36.5157 0.152562C35.9129 -0.222171 35.1357 0.133851 35.0158 0.780589C34.9947 0.894278 35.0201 1.01018 35.0593 1.11895L36.0979 4.00003L35.0593 6.88111C35.0201 6.98989 34.9947 7.10578 35.0158 7.21947C35.1342 7.85706 35.8925 8.21483 36.4954 7.85977L41.5272 4.89661C42.1487 4.53065 42.1596 3.66082 41.5475 3.28035Z"
+                            fill="#1F2024"
+                        />
+                        <path
+                            d="M0.5 4C0.500001 2.067 2.067 0.499999 4 0.5C5.933 0.5 7.5 2.067 7.5 4C7.5 5.933 5.933 7.5 4 7.5C2.067 7.5 0.5 5.933 0.5 4Z"
+                            fill="white"
+                            stroke="#1F2024"
+                        />
+                    </svg>
+                </div>
+
+                <p-card
+                    styleClass="rounded-none shadow-none border-2 border-solid border-bluegray-100"
+                >
+                    <ng-template pTemplate="header">
+                        <div class="flex items-center justify-center p-2 pb-0">
+                            <img
+                                class="h-[128px] w-auto"
+                                src="assets/analysis.png"
+                                alt="analysis"
+                            />
+                        </div>
+                    </ng-template>
+
+                    <h3 class="-mt-6">Analysis</h3>
+                    <ul class="-mb-6 ml-6 list-disc">
+                        <li class="mt-4 pl-2">
+                            Somn analyzes your reactant pair input to make yield
+                            percentage predictions across a variety of reaction
+                            conditions
+                        </li>
+                        <li class="pl-2 pt-2">
+                            Optionally submit an email address to receive a
+                            notification when your results are ready
+                        </li>
+                    </ul>
+                </p-card>
+
+                <div class="flex items-center">
+                    <svg
+                        width="46"
+                        height="8"
+                        viewBox="0 0 46 8"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M6.32324 4L39.4999 4"
+                            stroke="#1F2024"
+                            stroke-linecap="round"
+                        />
+                        <path
+                            d="M41.5475 3.28035L36.5157 0.152562C35.9129 -0.222171 35.1357 0.133851 35.0158 0.780589C34.9947 0.894278 35.0201 1.01018 35.0593 1.11895L36.0979 4.00003L35.0593 6.88111C35.0201 6.98989 34.9947 7.10578 35.0158 7.21947C35.1342 7.85706 35.8925 8.21483 36.4954 7.85977L41.5272 4.89661C42.1487 4.53065 42.1596 3.66082 41.5475 3.28035Z"
+                            fill="#1F2024"
+                        />
+                        <path
+                            d="M0.5 4C0.500001 2.067 2.067 0.499999 4 0.5C5.933 0.5 7.5 2.067 7.5 4C7.5 5.933 5.933 7.5 4 7.5C2.067 7.5 0.5 5.933 0.5 4Z"
+                            fill="white"
+                            stroke="#1F2024"
+                        />
+                    </svg>
+                </div>
+
+                <p-card
+                    styleClass="rounded-none shadow-none border-2 border-solid border-bluegray-100"
+                >
+                    <ng-template pTemplate="header">
+                        <div class="flex items-center justify-center p-2 pb-0">
+                            <img
+                                class="h-[128px] w-auto"
+                                src="assets/model_results.png"
+                                alt="model_results"
+                            />
+                        </div>
+                    </ng-template>
+
+                    <h3 class="-mt-6">Model Results</h3>
+                    <ul class="-mb-6 ml-6 list-disc">
+                        <li class="mt-4 pl-2">
+                            Access model outputs such as yield percentage
+                            predictions and reaction conditions for your input
+                            reactants
+                        </li>
+                    </ul>
+                </p-card>
+            </div>
+        </div>
+    </div>
+
+    <div class="lg:w-screen-lg mt-6 p-4">
+        <div class="flex justify-end">
+            <a href="/somn">
+                <p-button
+                    label="Start Using Somn"
+                    styleClass="bg-[#224063]"
+                    iconPos="right"
+                    icon="pi pi-arrow-right"
+                ></p-button>
+            </a>
+        </div>
     </div>
 </div>
