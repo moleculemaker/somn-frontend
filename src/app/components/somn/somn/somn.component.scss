@@ -14,3 +14,7 @@
     @apply h-full;
     @apply w-full;
 }
+
+::ng-deep .p-tooltip {
+    @apply min-w-[381px];
+}

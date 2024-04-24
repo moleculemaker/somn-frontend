@@ -63,7 +63,11 @@
                                             <span class="font-light"
                                                 >Example:
                                                 <span
-                                                    class="font-normal underline"
+                                                    class="font-normal underline cursor-pointer"
+                                                    (click)="
+                                                        request.form.controls['arylHalideName'].setValue('Bromobenzene');
+                                                        request.form.controls['arylHalideSmiles'].setValue('c1ccc(cc1)Br');
+                                                    "
                                                     >Bromobenzene</span
                                                 >
                                             </span>
@@ -104,7 +108,11 @@
                                             <span class="font-light"
                                                 >Example:
                                                 <span
-                                                    class="font-normal underline"
+                                                    class="font-normal underline cursor-pointer"
+                                                    (click)="
+                                                        request.form.controls['amineName'].setValue('Bromobenzene');
+                                                        request.form.controls['amineSmiles'].setValue('c1ccc(cc1)Br');
+                                                    "
                                                     >Bromobenzene</span
                                                 >
                                             </span>
@@ -179,7 +187,7 @@
                     <p-checkbox
                         name="subscription"
                         styleClass="subscription-checkbox"
-                        label="Agree to receive email notifications and updates about Novostoic."
+                        label="Agree to receive email notifications and updates about Somn."
                         [binary]="true"
                         [formControl]="request.form.controls['agreeToSubscription']"
                     ></p-checkbox>

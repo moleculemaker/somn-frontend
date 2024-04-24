@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
 import { FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take } from 'rxjs';
+import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
 import { SomnService } from '~/app/services/somn.service';
 
@@ -36,14 +36,15 @@ export class SomnResultComponent {
   response$ = this.statusResponse$.pipe(
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
     switchMap(() => this.somnService.getResult(this.jobId)),
-    // tap((data) => { console.log('result: ', data) }),
+    shareReplay(1),
+    tap((data) => { console.log('result: ', data) }),
     switchMap((data) => of(this.somnService.response)), //TODO: replace with actual response
   );
 
   heatmapData$ = of(this.somnService.getHeatmapData());
   filteredTrainingData$ = new BehaviorSubject([]);
 
-  showFilters$ = new BehaviorSubject(false);
+  showFilters$ = new BehaviorSubject(true);
 
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);

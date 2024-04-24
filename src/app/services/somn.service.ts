@@ -82,6 +82,7 @@ export class SomnService {
   ) {}
 
   response = {
+    reactantPairName: sampleRequest.reactantPairName,
     arylHalides: {
       name: sampleRequest.arylHalideName,
       smiles: sampleRequest.arylHalideSmiles,

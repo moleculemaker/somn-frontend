@@ -48,14 +48,14 @@ export class AboutSomnComponent implements OnInit {
   }) as TrainingData));
   filteredTrainingData$ = new BehaviorSubject([]);
 
-  showFilters$ = new BehaviorSubject(false);
+  showFilters$ = new BehaviorSubject(true);
 
   selectedArylHalides$ = new BehaviorSubject<any[]>([]);
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedAmines$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
-  selectedYield$ = new BehaviorSubject([0, 100]);
+  selectedYield$ = new BehaviorSubject<[number, number]>([0, 100]);
 
   filteredTrainingDataWithoutYieldRange$ = combineLatest([
     this.trainingData$,

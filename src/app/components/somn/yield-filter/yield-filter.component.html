@@ -1,16 +1,19 @@
-<div class="rounded-md border-[#ced4da] p-3 flex justify-betweeen bg-white border border-solid cursor-pointer hover:border-black"
+<div class="rounded-md border-[#ced4da] px-3 py-2 flex justify-betweeen items-center bg-white border border-solid cursor-pointer hover:border-black"
     (mousedown)="filter.toggle($event)"
 >
     <div class="grow">
-        <span class="text-[--text-color-secondary]">Yield</span>
+        <span class="inline-flex items-center gap-1 rounded-md bg-[#EFF6FF] text-[#1D4ED8] px-3 py-1">
+            {{ yield$.value[0] }}%-{{ yield$.value[1] }}%
+            <!-- <i class="pi pi-times-circle" (click)="selectedYield = [0, 100]"></i> -->
+        </span>
     </div>
     <div><i class="pi pi-chevron-down"></i></div>
     <p-overlayPanel #filter [style]="{width: '360px'}" styleClass="pt-4">
         <app-density-plot 
             *ngIf="filter.overlayVisible"
             [data]="data$.value"
-            [selectedRegion]="selectedYield"
-            (selectedRegionChange)="yield$.next($event)"
+            [selectedRegion]="(yield$ | async) || [0, 100]"
+            (selectedRegionChange)="selectedYield = $event"
         ></app-density-plot>
         <hr class="mt-12"/>
         <div class="flex justify-between p-4">

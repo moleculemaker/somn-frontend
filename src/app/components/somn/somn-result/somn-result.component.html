@@ -1,5 +1,23 @@
  <!-- Model Results -->
  <div class="grow">
+    <div *ngIf="(statusResponse$ | async) as status">
+        <h2 class="flex items-center mb-2 gap-2">
+            <!-- TODO: add return button -->
+            <!-- <span>
+                <button
+                    class="inline-flex items-center rounded-lg p-1 border bg-[#F8F9FA]"
+                >
+                    <i class="pi pi-chevron-left text-sm"></i>
+                </button>
+            </span> -->
+            Job ID: {{ status.job_id || 'loading' }} <button type="button" title="copy job id"><i class="pi pi-copy"></i></button>
+        </h2>
+        <p class="leading-6 text-[--text-color-secondary]">
+            Reactant Pair Name: {{ (response$ | async)?.reactantPairName || 'loading...' }}
+            <span class="mx-2">|</span>
+            Submission Time: {{ status.time_created | date: 'short' }}
+        </p>
+    </div>
     <app-loading *ngIf="isLoading$ | async"></app-loading>
     <div *ngIf="!(isLoading$ | async)">
         <div class="my-4 flex gap-2">
@@ -97,9 +115,9 @@
                 <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
                     <span
                         class="w-1/2 underline decoration-dotted"
-                        pTooltip="Top Yield % (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites."
-                        >Top Yield %</span
                     >
+                        <span [tooltipPosition]="'left'" pTooltip="Top Yield % (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites.">Top Yield %</span>
+                    </span>
                     <div class="grow text-end">
                         <span class="font-semibold">
                             <span class="inline-block h-3 w-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
@@ -112,15 +130,17 @@
                 <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
                     <span
                         class="w-1/2 underline decoration-dotted"
-                        pTooltip="Top Reaction Conditions (catalyst, solvent, base) correspond to the highest predicted yield percentage for a given reactant pair/reaction sites."
-                        >Top Reaction Condition</span
                     >
+                        <span [tooltipPosition]="'left'" pTooltip="Top Reaction Conditions correspond to the highest predicted yield percentage for a given reactant pair/reaction sites.">
+                            Top Reaction Conditions
+                        </span>
+                    </span>
                     <div class="grow text-end font-semibold">
                         Catalyst {{ topYieldConditions.conditions[0].catalyst }}
                         <br/>
-                        Solvent {{ topYieldConditions.conditions[0].solvent }}
-                        <br/>
                         Base {{ topYieldConditions.conditions[0].base }}
+                        <br/>
+                        Solvent {{ topYieldConditions.conditions[0].solvent }}
                     </div>
                 </div>
             </div>
@@ -151,7 +171,7 @@
             </ng-template>
 
             <div class="flex flex-col">
-                <div class="flex w-full gap-4 bg-gray-50 p-2 px-4">
+                <div *ngIf="showFilters$.value" class="flex w-full gap-4 bg-gray-50 p-2 px-4">
                     <p-multiSelect
                         class="w-1/4"
                         styleClass="w-full"
@@ -168,6 +188,18 @@
                     <p-multiSelect
                         class="w-1/4"
                         styleClass="w-full"
+                        [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
+                        [maxSelectedLabels]="1"
+                        [selectedItemsLabel]="'{0} items'"
+                        [ngModel]="selectedBases$.value"
+                        [options]="(basesOptions$ | async) || []"
+                        placeholder="Bases"
+                        (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
+                    >
+                    </p-multiSelect>
+                    <p-multiSelect
+                        class="w-1/4"
+                        styleClass="w-full"
                         [display]="selectedSolvents$.value.length > 1 ? 'comma' : 'chip'"
                         [maxSelectedLabels]="1"
                         [selectedItemsLabel]="'{0} items'"
@@ -178,18 +210,6 @@
                         display="chip"
                     >
                     </p-multiSelect>
-                    <p-multiSelect
-                        class="w-1/4"
-                        styleClass="w-full"
-                        [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
-                        [maxSelectedLabels]="1"
-                        [selectedItemsLabel]="'{0} items'"
-                        [ngModel]="selectedBases$.value"
-                        [options]="(basesOptions$ | async) || []"
-                        placeholder="Bases"
-                        (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
-                    >
-                    </p-multiSelect>
                     <app-yield-filter class="w-1/4"
                         [data]="(filteredDataWithoutYieldRange$ | async) || []"
                         [selectedYield]="(selectedYield$ | async)!"
@@ -197,7 +217,8 @@
                     ></app-yield-filter>
                 </div>
 
-                <hr />
+                <hr *ngIf="showFilters$.value" />
+
                 <div class="flex w-full">
                     <div class="w-1/2 bg-gray-50">
                         <div class="pt-6">
@@ -232,11 +253,11 @@
                                 <th pSortableColumn="catalyst">
                                     Catalyst<p-sortIcon field="catalyst" />
                                 </th>
-                                <th pSortableColumn="solvent">
-                                    Solvent<p-sortIcon field="solvent" />
-                                </th>
                                 <th pSortableColumn="base">
                                     Base<p-sortIcon field="base" />
+                                </th>
+                                <th pSortableColumn="solvent">
+                                    Solvent<p-sortIcon field="solvent" />
                                 </th>
                                 <th pSortableColumn="yield">
                                     Yield %<p-sortIcon field="yield" />
@@ -246,8 +267,8 @@
                         <ng-template pTemplate="body" let-row>
                             <tr>
                                 <td>{{ row.catalyst }}</td>
-                                <td>{{ row.solvent }}</td>
                                 <td>{{ row.base }}</td>
+                                <td>{{ row.solvent }}</td>
                                 <td>
                                     <span class="inline-block h-3 w-3" [style]="{ background: row.color }"></span>
                                     {{ row.yield * 100 | number:'1.1-2' }}%

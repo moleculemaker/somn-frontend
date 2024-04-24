@@ -4,47 +4,52 @@
             <a class="font-bold" href="/">
                 <h6>
                     <i class="pi pi-chevron-left text-xs"></i>
-                    <span class="ml-4">Back to Home page</span>
+                    <span class="ml-4 text-[#224063]">Back to Home page</span>
                 </h6>
             </a>
         </div>
         <div class="lg:w-screen-lg flex w-full grow p-4 pb-0">
-            <nav class="flex max-w-[300px] flex-col">
+            <nav class="flex w-[200px] flex-col">
                 <button
-                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057] text-nowrap"
                     [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.ABOUT"
+                    [class.text-[#224063]]="activePanel$.value === ActiveAboutPanel.ABOUT"
                     (click)="activePanel$.next(ActiveAboutPanel.ABOUT)"
                 >
                     <i class="pi pi-info-circle"></i
                     ><a class="ml-2 font-bold">About</a>
                 </button>
                 <button
-                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057] text-nowrap"
                     [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.TRAINING_DATA"
+                    [class.text-[#224063]]="activePanel$.value === ActiveAboutPanel.TRAINING_DATA"
                     (click)="activePanel$.next(ActiveAboutPanel.TRAINING_DATA)"
                 >
                     <i class="pi pi-table"></i
                     ><a class="ml-2 font-bold">Training Data</a>
                 </button>
                 <button
-                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057] text-nowrap"
                     [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.GITHUB"
+                    [class.text-[#224063]]="activePanel$.value === ActiveAboutPanel.GITHUB"
                     (click)="activePanel$.next(ActiveAboutPanel.GITHUB)"
                 >
                     <i class="pi pi-github"></i
                     ><a class="ml-2 font-bold">Github</a>
                 </button>
                 <button
-                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057] text-nowrap"
                     [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.PUBLICATIONS"
+                    [class.text-[#224063]]="activePanel$.value === ActiveAboutPanel.PUBLICATIONS"
                     (click)="activePanel$.next(ActiveAboutPanel.PUBLICATIONS)"
                 >
                     <i class="pi pi-book"></i
                     ><a class="ml-2 font-bold">Publication</a>
                 </button>
                 <button
-                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057]"
+                    class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057] text-nowrap"
                     [class.border-[#495057]]="activePanel$.value === ActiveAboutPanel.GET_INVOLVED"
+                    [class.text-[#224063]]="activePanel$.value === ActiveAboutPanel.GET_INVOLVED"
                     (click)="activePanel$.next(ActiveAboutPanel.GET_INVOLVED)"
                 >
                     <i class="pi pi-comment"></i
@@ -86,18 +91,18 @@
                 class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
             >
                 <div class="flex items-center justify-between">
-                    <h1 class="mb-4 font-bold">Training Data</h1>
+                    <h1 class="font-bold">Training Data</h1>
                     <p-button
                         label="Export"
                         styleClass="bg-[#224063]"
                         icon="pi pi-download"
                     ></p-button>
                 </div>
-                <p class="max-w-screen-md leading-6">
+                <p class="mt-3 mb-4 max-w-screen-md leading-6">
                     Browse Somn’s training dataset and view overall model
                     performance plots (training, validation, and test).
                 </p>
-                <div class="my-4">
+                <div>
                     <p-table
                         #resultsTable
                         [value]="(trainingData$ | async) || []"
@@ -112,7 +117,7 @@
                                 Training Data
                                 <div class="flex items-center gap-2">
                                     <button
-                                        class="border-green rounded-lg border p-2"
+                                        class="border-green rounded-lg border p-2 font-normal"
                                         (click)="showFilters$.next(!showFilters$.value)"
                                     >
                                         <i class="pi pi-filter"></i>
@@ -122,7 +127,7 @@
                                         >
                                     </button>
                                     <button
-                                        class="border-green rounded-lg border p-2"
+                                        class="border-green rounded-lg border p-2 font-normal"
                                         (click)="clearAllFilters()"
                                     >
                                         Clear All
@@ -256,30 +261,11 @@
                                         </p-multiSelect>
                                     </ng-template>
                                 </p-columnFilter>
-                                <p-columnFilter
-                                    class="w-1/5"
-                                    field="yield"
-                                    matchMode="in"
-                                    [showMenu]="false"
-                                    [showClearButton]="false"
-                                >
-                                    <ng-template
-                                        pTemplate="filter"
-                                        let-value
-                                        let-filter="filterCallback"
-                                    >
-                                        <!-- TODO: customize multi-select -->
-                                        <!-- <p-multiSelect
-                                            [maxSelectedLabels]="1"
-                                            [selectedItemsLabel]="'{0} items'"
-                                            [ngModel]="selectedBases$.value"
-                                            [options]="(basesOptions$ | async) || []"
-                                            placeholder="Bases"
-                                            (ngModelChange)="filter($event); selectedYield$.next($event)"
-                                        >
-                                        </p-multiSelect> -->
-                                    </ng-template>
-                                </p-columnFilter>
+                                <app-yield-filter class="w-1/4 font-normal"
+                                    [data]="(filteredTrainingDataWithoutYieldRange$ | async) || []"
+                                    [selectedYield]="(selectedYield$ | async)!"
+                                    (selectedYieldChange)="onYieldRangeChange($event)"
+                                ></app-yield-filter>
                             </div>
 
                             <hr class="-mx-4 mt-2" />
@@ -292,6 +278,7 @@
                                 <app-density-plot
                                     styleClass="h-[220px]"
                                     [data]="(filteredTrainingDataWithoutYieldRange$ | async) || []"
+                                    [selectedRegion]="(selectedYield$ | async)!"
                                     (selectedRegionChange)="onYieldRangeChange($event)"
                                 ></app-density-plot>
                             </div>
@@ -400,11 +387,11 @@
                 <h1 class="mb-4 font-bold">Get involved</h1>
                 <p class="max-w-screen-md leading-6">
                     We welcome you questions, suggestions, and feedback! Get in
-                    touch with us via
+                    touch with us via email: 
                     <a
                         class="font-semibold text-[#0080FF] underline"
                         href="mailto:somn-feedback@moleculemaker.org"
-                        >email: somn-feedback@moleculemaker.org</a
+                        >somn-feedback@moleculemaker.org</a
                     >
                 </p>
             </main>
