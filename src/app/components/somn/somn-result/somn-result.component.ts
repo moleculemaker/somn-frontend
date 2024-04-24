@@ -26,6 +26,7 @@ export class SomnResultComponent {
       data.phase === JobStatus.Processing 
       || data.phase === JobStatus.Queued
     , true),
+    shareReplay(1),
     tap((data) => { console.log('job status: ', data.phase) }),
   );
 
@@ -36,8 +37,8 @@ export class SomnResultComponent {
   response$ = this.statusResponse$.pipe(
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
     switchMap(() => this.somnService.getResult(this.jobId)),
-    shareReplay(1),
     tap((data) => { console.log('result: ', data) }),
+    shareReplay(1),
     switchMap((data) => of(this.somnService.response)), //TODO: replace with actual response
   );
 
@@ -60,7 +61,7 @@ export class SomnResultComponent {
           d3.min(response.data, d => d["yield"])!, 
           d3.max(response.data, d => d["yield"])!
         )
-      }))
+      })).sort((a, b) => b["yield"] - a["yield"])
     ),
   );
 
