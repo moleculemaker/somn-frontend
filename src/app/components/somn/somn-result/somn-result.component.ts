@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
 import { FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay } from 'rxjs';
+import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
 import { SomnService } from '~/app/services/somn.service';
 
@@ -39,18 +39,44 @@ export class SomnResultComponent {
     switchMap(() => this.somnService.getResult(this.jobId)),
     tap((data) => { console.log('result: ', data) }),
     shareReplay(1),
-    switchMap((data) => of(this.somnService.response)), //TODO: replace with actual response
+    switchMap((data) => of(this.somnService.response)), 
+    map((resp) => ({
+      ...resp,
+      data: resp.data.map((d, i) => ({
+        ...d,
+        rowId: i,
+      })),
+    }))//TODO: replace with actual response
   );
 
-  heatmapData$ = of(this.somnService.getHeatmapData());
-  filteredTrainingData$ = new BehaviorSubject([]);
-
   showFilters$ = new BehaviorSubject(true);
+
+  selectedCell$ = new BehaviorSubject<number | null>(null);
+  selectedRow$ = new BehaviorSubject<any | null>(null);
 
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
   selectedYield$ = new BehaviorSubject<[number, number]>([0, 100]);
+  numFilters$ = combineLatest([
+    this.selectedBases$,
+    this.selectedCatalysts$,
+    this.selectedSolvents$,
+  ]).pipe(
+    map((filters) =>
+      filters.reduce((p, filter) => (filter.length ? 1 : 0) + p, 0),
+    ),
+  );
+
+  solventsOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
+  );
+  basesOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
+  );
+  catalystsOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.catalyst))]),
+  );
 
   dataWithColor$ = this.response$.pipe(
     map((response) => 
@@ -103,31 +129,75 @@ export class SomnResultComponent {
     ),
   );
 
-  numFilters$ = combineLatest([
+  heatmapData$ = combineLatest(([
+    this.response$,
+    this.selectedYield$,
     this.selectedBases$,
     this.selectedCatalysts$,
     this.selectedSolvents$,
-  ]).pipe(
-    map((filters) =>
-      filters.reduce((p, filter) => (filter.length ? 1 : 0) + p, 0),
-    ),
+  ])).pipe(
+    map(([response, yieldRange, bases, catalysts, solvents]) => {
+      const data = response.data;
+      const map = new Map();
+      const isHighlighted = (d: any) => {
+        return (
+          (bases.length ? bases.includes(d.base) : true) &&
+          (catalysts.length ? catalysts.includes(d.catalyst) : true) &&
+          (solvents.length ? solvents.includes(d.solvent) : true) &&
+          d.yield >= yieldRange[0] / 100 &&
+          d.yield <= yieldRange[1] / 100
+        );
+      }
+      data.forEach((d) => {
+        const key = `${d.catalyst}-${d.solvent}/${d.base}`;
+        if (map.has(key)) {
+          console.warn("ignore data ", d, " because of key duplication");
+          return;
+        }
+        map.set(key, {
+          catalyst: d.catalyst,
+          solventBase: `${d.base} / ${d.solvent}`,
+          solvent: `${d.solvent}`,
+          base: `${d.base}`,
+          yield: d.yield,
+          rowId: d.rowId,
+          isHighlighted: isHighlighted(d),
+        });
+      });
+      return Array.from(map.values());
+    }),
   );
 
-  solventsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
-  );
-  basesOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
-  );
-  catalystsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.catalyst))]),
-  );
+  subscriptions: Subscription[] = [];
 
   constructor(
     private somnService: SomnService,
     private filterService: FilterService,
     private route: ActivatedRoute,
-  ) {}
+  ) {
+    const sub1 = combineLatest([
+      this.selectedCell$,
+      this.response$,
+    ]).pipe(tap(([cell, response]) => {
+      if (cell === null
+        || this.selectedRow$.value?.rowId === cell
+      ) {
+        return;
+      }
+      this.selectedRow$.next(response.data.find((d) => d.rowId === cell));
+    })).subscribe();
+
+    const sub2 = this.selectedRow$.subscribe((row) => {
+      if (row === null
+        || this.selectedCell$.value === row.rowId
+      ) {
+        return;
+      }
+      this.selectedCell$.next(row.rowId);
+    });
+
+    this.subscriptions.push(sub1, sub2);
+  }
 
   ngOnInit() {
     this.filterService.register(
@@ -136,6 +206,10 @@ export class SomnResultComponent {
         return value * 100 >= filter[0] && value * 100 <= filter[1];
       },
     );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   clearAllFilters() {

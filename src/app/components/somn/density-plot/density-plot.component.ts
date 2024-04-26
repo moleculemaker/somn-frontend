@@ -22,6 +22,11 @@ import { Products } from "~/app/services/somn.service";
 export class DensityPlotComponent implements AfterViewInit, OnDestroy {
   @Input() styleClass: string = "";
 
+  originalData$ = new BehaviorSubject<Products>([]);
+  @Input() set originalData(value: Products) {
+    this.originalData$.next(value);
+  }
+
   data$ = new BehaviorSubject<Products>([]);
   @Input() set data(value: Products) {
     this.data$.next(value);
@@ -65,17 +70,18 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
 
   subscription = combineLatest([
     this.data$,
+    this.originalData$,
     this.selectedRegionMin$,
     this.selectedRegionMax$,
     this.minRange$,
     this.maxRange$,
   ]).pipe(
     filter(([data]) => data.length > 0),
-    tap(([data, min, max, minRange, maxRange]) => {
-      this.render(data, min, max, minRange, maxRange);
+    tap(([data, originalData, min, max, minRange, maxRange]) => {
+      this.render(data, originalData, min, max, minRange, maxRange);
     }),
     debounceTime(100),
-    tap(([data, min, max, minRange, maxRange]) => {
+    tap(([data, originalData, min, max, minRange, maxRange]) => {
       const regionMin = Math.max(minRange, Math.min(min, maxRange));
       const regionMax = Math.max(minRange, Math.min(max, maxRange));
       if (min < minRange || min > maxRange) {
@@ -100,6 +106,7 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
 
   render(
     data: Products,
+    originalData: Products,
     selectedMinVal: number,
     selectedMaxVal: number,
     minRange: number,
@@ -132,35 +139,44 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
       let x = d3.scaleLinear().domain([0, 1]).range([0, width]);
       let y = d3.scaleLinear().range([height, 0]).domain([0, 1]);
 
-      let density: [number, number][] = [[minRange / 100, 0]];
+      function createDensity(data: Products, minRange: number, maxRange: number) {
+        let yields = data.map((d) => d["yield"]);
+        let thresholds = [];
+        let density: [number, number][] = [[minRange / 100, 0]];
 
-      let yields = data.map((d) => d["yield"]);
-      let thresholds = [];
+        for (let i = minRange; i <= maxRange; i += 1) {
+          thresholds.push(i / 100);
+        }
 
-      for (let i = minRange; i <= maxRange; i += 1) {
-        thresholds.push(i / 100);
+        function kde(kernel: Function, thresholds: number[], data: number[]) {
+          return thresholds.map((t) => [t, d3.mean(data, (d) => kernel(t - d))]);
+        }
+
+        function epanechnikov(bandwidth: number) {
+          return (x: number) =>
+            Math.abs((x /= bandwidth)) <= 1
+              ? (0.75 * (1 - x * x)) / bandwidth
+              : 0;
+        }
+
+        density.push(
+          ...(kde(epanechnikov(0.05), thresholds, yields) as [number, number][]),
+        );
+
+        density.push([density[density.length - 1][0], 0]);
+
+        // Normalize the density
+        const max = d3.max(density.map((d) => d[1]))!;
+
+        return density.map(([x, y]) => [x, y / max]) as [number, number][];
       }
 
-      function kde(kernel: Function, thresholds: number[], data: number[]) {
-        return thresholds.map((t) => [t, d3.mean(data, (d) => kernel(t - d))]);
-      }
-
-      function epanechnikov(bandwidth: number) {
-        return (x: number) =>
-          Math.abs((x /= bandwidth)) <= 1
-            ? (0.75 * (1 - x * x)) / bandwidth
-            : 0;
-      }
-
-      density.push(
-        ...(kde(epanechnikov(0.05), thresholds, yields) as [number, number][]),
+      let density: [number, number][] = createDensity(data, minRange, maxRange);
+      let originalDensity: [number, number][] = createDensity(
+        originalData, 
+        d3.min(originalData.map((d) => d["yield"]))! * 100,
+        d3.max(originalData.map((d) => d["yield"]))! * 100,
       );
-
-      density.push([density[density.length - 1][0], 0]);
-      
-      // Normalize the density
-      const max = d3.max(density.map((d) => d[1]))!;
-      density = density.map(([x, y]) => [x, y / max]);
 
       let selectedDensity = density.filter(
         ([x, y]) => x >= selectedMinVal / 100 && x <= selectedMaxVal / 100,
@@ -211,16 +227,26 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
       // Plot the area
       svg
         .append("path")
+        .attr("fill", "#DEE2E6")
+        .attr("opacity", ".65")
+        .attr("transform", "scale(1, 0.8) translate(0, 40)")
+        .attr("d", lineGenerator(originalDensity));
+
+      svg
+        .append("path")
         .attr("fill", "url(#gradient)")
         .attr("opacity", ".4")
+        .attr("transform", "scale(1, 0.8) translate(0, 40)")
         .attr("d", lineGenerator(density));
 
       svg
         .append("path")
         .attr("fill", "url(#gradient)")
         .attr("opacity", "1")
+        .attr("transform", "scale(1, 0.8) translate(0, 40)")
         .attr("d", lineGenerator(selectedDensity));
 
+      const maxYield = Math.ceil(d3.max(originalData.map((d) => d['yield']))! * 100) / 100;
       // add the x Axis
       svg
         .append("g")
@@ -231,11 +257,12 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
             .axisBottom(x)
             .tickFormat(d3.format(".0%"))
             .tickSize(-150)
-            .tickValues([0.0, 0.25, 0.5, 0.75, 1.0]),
+            .tickValues([0.0, maxYield, 0.25, 0.5, 0.75, 1.0])
         );
       svg
         .selectAll("#x-axis .tick line")
         .attr("stroke", "#DEE2E6")
+        .attr('transform', 'scale(1, 0.9)')
         .attr("stroke-dasharray", "5")
         .attr("stroke-width", "2");
       svg.select("#x-axis .domain").attr("stroke", "transparent");
@@ -243,19 +270,27 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
         .selectAll("#x-axis .tick text")
         .attr("fill", "#495057")
         .attr("font-weight", "300")
-        .attr("transform", `translate(0, ${-height})`);
+        .attr("transform", `translate(0, ${-height + 20})`);
       svg
         .selectAll("#x-axis .tick:first-of-type text")
-        .attr("transform", `translate(18, ${-height})`);
+        .attr("transform", `translate(18, ${-height + 20})`);
       svg
         .selectAll("#x-axis .tick:last-of-type text")
-        .attr("transform", `translate(-20, ${-height})`);
+        .attr("transform", `translate(-20, ${-height + 20})`);
       svg
         .selectAll("#x-axis .tick:first-of-type")
         .attr("transform", `translate(1, 0)`);
       svg
         .selectAll("#x-axis .tick:last-of-type")
         .attr("transform", `translate(${width - 1}, 0)`);
+
+      svg
+        .selectAll("#x-axis .tick")
+        .filter((d) => d === maxYield)
+        .each(function (d: any, i, g) {
+          d3.select(g[0]).select("text").attr("transform", `translate(0, ${-height})`);
+          d3.select(g[0]).select("line").attr('transform', 'scale(1, 1)')
+        });
 
       // add the y Axis
       svg

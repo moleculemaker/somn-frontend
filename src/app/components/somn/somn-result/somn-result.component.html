@@ -116,7 +116,7 @@
                     <span
                         class="w-1/2 underline decoration-dotted"
                     >
-                        <span [tooltipPosition]="'left'" pTooltip="Top Yield % (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites.">Top Yield %</span>
+                        <span [tooltipPosition]="'left'" [escape]="false"  pTooltip="<span class='font-bold'>Top Yield %</span> (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites.">Top Yield %</span>
                     </span>
                     <div class="grow text-end">
                         <span class="font-semibold">
@@ -131,7 +131,7 @@
                     <span
                         class="w-1/2 underline decoration-dotted"
                     >
-                        <span [tooltipPosition]="'left'" pTooltip="Top Reaction Conditions correspond to the highest predicted yield percentage for a given reactant pair/reaction sites.">
+                        <span [tooltipPosition]="'left'" [escape]="false" pTooltip="<span class='font-bold'>Top Reaction Conditions</span> correspond to the highest predicted yield percentage for a given reactant pair/reaction sites.">
                             Top Reaction Conditions
                         </span>
                     </span>
@@ -229,6 +229,7 @@
                             </div>
                             <app-density-plot
                                 styleClass="h-[150px] pl-16 pr-6"
+                                [originalData]="(response$ | async)?.data || []"
                                 [data]="(filteredDataWithoutYieldRange$ | async) || []"
                                 [selectedRegion]="(selectedYield$ | async)!"
                                 (selectedRegionChange)="onYieldRangeChange($event)"
@@ -236,12 +237,18 @@
                         </div>
                         <app-heatmap
                             [data]="(heatmapData$ | async) || []"
+                            [selectedCell]="selectedCell$.value"
+                            (selectedCellChange)="selectedCell$.next($event)"
                         ></app-heatmap>
                     </div>
                     <p-table
                         #resultsTable
                         [value]="(dataWithColor$ | async) || []"
                         [paginator]="true"
+                        selectionMode="single"
+                        [selection]="selectedRow$ | async"
+                        (selectionChange)="selectedRow$.next($event)"
+                        dataKey="rowId"
                         [rows]="10"
                         [rowsPerPageOptions]="[10, 20, 50]"
                         class="h-full w-1/2"
@@ -265,7 +272,7 @@
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-row>
-                            <tr>
+                            <tr [pSelectableRow]="row">
                                 <td>{{ row.catalyst }}</td>
                                 <td>{{ row.base }}</td>
                                 <td>{{ row.solvent }}</td>
