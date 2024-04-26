@@ -171,29 +171,6 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
         return density.map(([x, y]) => [x, y / max]) as [number, number][];
       }
 
-      let density: [number, number][] = createDensity(data, minRange, maxRange);
-      let originalDensity: [number, number][] = createDensity(
-        originalData, 
-        d3.min(originalData.map((d) => d["yield"]))! * 100,
-        d3.max(originalData.map((d) => d["yield"]))! * 100,
-      );
-
-      let selectedDensity = density.filter(
-        ([x, y]) => x >= selectedMinVal / 100 && x <= selectedMaxVal / 100,
-      );
-
-      selectedDensity.unshift(selectedDensity[0]);
-      selectedDensity.unshift([selectedDensity[0][0], 0]);
-      selectedDensity.unshift([selectedDensity[0][0], 0]);
-      selectedDensity.unshift([selectedDensity[0][0], 0]);
-      selectedDensity.unshift([minRange / 100, 0]);
-
-      selectedDensity.push(selectedDensity[selectedDensity.length - 1]);
-      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
-      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
-      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
-      selectedDensity.push([maxRange / 100, 0]);
-
       let lineGenerator = d3
         .line()
         .curve(d3.curveBasis)
@@ -225,13 +202,21 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
         .attr("stop-color", "#F5E61D");
 
       // Plot the area
-      svg
-        .append("path")
-        .attr("fill", "#DEE2E6")
-        .attr("opacity", ".65")
-        .attr("transform", "scale(1, 0.8) translate(0, 40)")
-        .attr("d", lineGenerator(originalDensity));
+      if (originalData.length) {
+        let originalDensity: [number, number][] = createDensity(
+          originalData, 
+          d3.min(originalData.map((d) => d["yield"]))! * 100,
+          d3.max(originalData.map((d) => d["yield"]))! * 100,
+        );
+        svg
+          .append("path")
+          .attr("fill", "#DEE2E6")
+          .attr("opacity", ".65")
+          .attr("transform", "scale(1, 0.8) translate(0, 40)")
+          .attr("d", lineGenerator(originalDensity));
+      }
 
+      let density: [number, number][] = createDensity(data, minRange, maxRange);        
       svg
         .append("path")
         .attr("fill", "url(#gradient)")
@@ -239,6 +224,22 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
         .attr("transform", "scale(1, 0.8) translate(0, 40)")
         .attr("d", lineGenerator(density));
 
+
+      let selectedDensity = density.filter(
+        ([x, y]) => x >= selectedMinVal / 100 && x <= selectedMaxVal / 100,
+      );
+
+      selectedDensity.unshift(selectedDensity[0]);
+      selectedDensity.unshift([selectedDensity[0][0], 0]);
+      selectedDensity.unshift([selectedDensity[0][0], 0]);
+      selectedDensity.unshift([selectedDensity[0][0], 0]);
+      selectedDensity.unshift([minRange / 100, 0]);
+
+      selectedDensity.push(selectedDensity[selectedDensity.length - 1]);
+      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
+      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
+      selectedDensity.push([selectedDensity[selectedDensity.length - 1][0], 0]);
+      selectedDensity.push([maxRange / 100, 0]);
       svg
         .append("path")
         .attr("fill", "url(#gradient)")
@@ -246,7 +247,9 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
         .attr("transform", "scale(1, 0.8) translate(0, 40)")
         .attr("d", lineGenerator(selectedDensity));
 
-      const maxYield = Math.ceil(d3.max(originalData.map((d) => d['yield']))! * 100) / 100;
+      const maxYield = originalData.length
+        ? Math.ceil(d3.max(originalData.map((d) => d['yield']))! * 100) / 100
+        : Math.ceil(d3.max(data.map((d) => d['yield']))! * 100) / 100;
       // add the x Axis
       svg
         .append("g")
