@@ -111,7 +111,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .append("div")
         .attr("class", "tooltip")
         .style("opacity", 0)
-        .style("position", "absolute")
+        .style("position", "fixed")
         .style("background-color", "white")
         .style("border", "solid")
         .style("border-width", "2px")
@@ -123,14 +123,11 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         tooltip.style("opacity", 1);
         tooltip
           .html((d.yield.toFixed(4) * 100).toFixed(2) + "%")
-          .style("left", event.x + "px")
-          .style("top", (event.y - 10) + "px");
-      };
-      let mousemove = (event: MouseEvent, d: any) => {
-        tooltip
-          .html((d.yield.toFixed(4) * 100).toFixed(2) + "%")
-          .style("left", event.x + "px")
-          .style("top", (event.y - 10) + "px");
+          .style("left", (event.x - 20) + "px")
+          .style("top", (event.y - 40) + "px")
+          .style("pointer-events", "none");
+
+        console.log(event)
       };
       let mousedown = (event: MouseEvent, d: any) => {
         if (!d.isHighlighted) {
@@ -156,7 +153,6 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .attr("height", y.bandwidth())
         .attr("fill", (d) => d.isHighlighted ? colorScale(d.yield) : "#DEE2E6")
         .on("mouseover", mouseover)
-        .on("mousemove", mousemove)
         .on("mousedown", mousedown)
         .on("mouseleave", mouseleave);
 
@@ -174,7 +170,6 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .attr("stroke-width", 3)
         .attr("fill", (d) => colorScale(d.yield))
         .on("mouseover", mouseover)
-        .on("mousemove", mousemove)
         .on("mousedown", mousedown)
         .on("mouseleave", mouseleave);
 
