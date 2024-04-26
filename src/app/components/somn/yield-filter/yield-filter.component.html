@@ -11,7 +11,7 @@
         <app-density-plot 
             *ngIf="filter.overlayVisible"
             [data]="data$.value"
-            [originalData]="[]"
+            [originalData]="originalData"
             [selectedRegion]="(yield$ | async) || [0, 100]"
             (selectedRegionChange)="selectedYield = $event"
         ></app-density-plot>

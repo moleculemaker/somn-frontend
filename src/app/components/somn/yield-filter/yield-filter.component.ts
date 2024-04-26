@@ -9,6 +9,8 @@ import { Products } from '~/app/services/somn.service';
   styleUrls: ['./yield-filter.component.scss']
 })
 export class YieldFilterComponent {
+  @Input() originalData: Products = [];
+  
   data$ = new BehaviorSubject<Products>([]);
   @Input() set data(value: Products) {
     this.data$.next(value);

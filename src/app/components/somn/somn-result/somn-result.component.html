@@ -223,6 +223,7 @@
                     >
                     </p-multiSelect>
                     <app-yield-filter class="w-1/4"
+                        [originalData]="(response$ | async)?.data || []"
                         [data]="(filteredDataWithoutYieldRange$ | async) || []"
                         [selectedYield]="(selectedYield$ | async)!"
                         (selectedYieldChange)="onYieldRangeChange($event)"
