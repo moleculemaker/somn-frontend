@@ -44,6 +44,10 @@ export class SomnResultComponent {
       ...resp,
       data: resp.data.map((d, i) => ({
         ...d,
+        amineName: resp.amine.name,
+        arylHalideName: resp.arylHalides.name,
+        amineSmiles: resp.amine.smiles,
+        arylHalideSmiles: resp.arylHalides.smiles,
         rowId: i,
       })),
     }))//TODO: replace with actual response
@@ -170,6 +174,31 @@ export class SomnResultComponent {
 
   subscriptions: Subscription[] = [];
 
+  columns = [
+    { field: "amineName", header: "Amine" },
+    { field: "arylHalideName", header: "Aryl Halide" },
+    { field: "amineSmiles", header: "Amine SMILES" },
+    { field: "arylHalideSmiles", header: "Aryl Halide SMILES" },
+    { field: "catalyst", header: "Catalyst" },
+    { field: "solvent", header: "Solvent" },
+    { field: "base", header: "Base" },
+    { field: "yield", header: "Yield" },
+  ]
+
+  requestOptions = [
+    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", disabled: true },
+    { label: "Run a New Request", icon: "pi pi-plus", url: "/somn", target: "_blank" },
+  ]
+
+  exportFileName$ = combineLatest([
+    this.statusResponse$,
+    this.response$,
+  ]).pipe(
+    map(([status, response]) => {
+      return `${response.reactantPairName}-${status.job_id}`;
+    }),
+  );
+
   constructor(
     private somnService: SomnService,
     private filterService: FilterService,
@@ -244,5 +273,11 @@ export class SomnResultComponent {
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");
     }
+  }
+
+  onExportResults() {
+    this.resultsTable.exportCSV({
+
+    });
   }
 }
