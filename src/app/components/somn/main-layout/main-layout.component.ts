@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { BehaviorSubject } from 'rxjs';
 
@@ -31,6 +31,18 @@ export class MainLayoutComponent implements OnInit {
     if (this.router.url.includes('/somn/result')) {
       this.updateTab(this.tabs[1]);
     }
+    this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) {
+        this.jobId = this.router.url.split('somn/result/').length > 1 
+          ? this.router.url.split('somn/result/')[this.router.url.split('somn/result/').length - 1]
+          : null;
+        if (this.router.url.includes('/somn/result')) {
+          this.updateTab(this.tabs[1]);
+        } else {
+          this.updateTab(this.tabs[0]);
+        }
+      }
+    });
   }
 
   onActiveTabChange(tab: MenuItem) {
@@ -38,7 +50,6 @@ export class MainLayoutComponent implements OnInit {
       if (this.jobId) {
         window.open(this.router.url.replace(/result\/.*/g, ''), '_blank');
         // TODO: update tab display, primeNG bug
-        // this.updateTab(this.tabs[1]);
       }
     } else if (tab.label === this.tabs[1].label) {
       if (this.jobId) {
