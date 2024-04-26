@@ -1,0 +1,277 @@
+ <!-- Model Results -->
+ <div class="grow">
+    <app-loading *ngIf="isLoading$ | async"></app-loading>
+    <div *ngIf="!(isLoading$ | async)">
+        <div class="my-4 flex gap-2">
+            <p-panel class="grow">
+                <ng-template pTemplate="header">
+                    <div
+                        class="flex w-full items-center justify-between p-4"
+                    >
+                        <span class="font-semibold">Reactants</span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="content">
+                    <div class="flex w-full" *ngIf="(response$ | async) as response">
+                        <div
+                            class="flex w-1/2 flex-col justify-between p-4"
+                        >
+                            <div class="mb-2 flex items-center">
+                                <span class="ml-2 text-base"
+                                    >Aryl Halides</span
+                                >
+                            </div>
+                            <div
+                                class="flex items-stretch justify-between gap-4 px-2"
+                            >
+                                <div
+                                    class="rounded-md border border-solid border-[--surface-d] p-2"
+                                >
+                                    <img
+                                        class="h-auto w-[100px]"
+                                        [src]="response.arylHalides.structures[0]"
+                                    />
+                                    <img
+                                        class="h-auto w-[100px]"
+                                        [src]="response.arylHalides.structures[1]"
+                                    />
+                                </div>
+                                <div
+                                    class="flex grow flex-col justify-between"
+                                >
+                                    <ng-container
+                                        *ngTemplateOutlet="moleculeInfo; context: {
+                                        $implicit: response.arylHalides,
+                                        showSmiles: true
+                                    }"
+                                    ></ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4"
+                        >
+                            <div class="flex items-center">
+                                <span class="ml-2 text-base">Amine</span>
+                            </div>
+                            <div
+                                class="flex items-stretch justify-between gap-4 px-2"
+                            >
+                                <div
+                                    class="rounded-md border border-solid border-[--surface-d] p-2"
+                                >
+                                    <img
+                                        class="h-auto w-[100px]"
+                                        [src]="response.amine.structures[0]"
+                                    />
+                                    <img
+                                        class="h-auto w-[100px]"
+                                        [src]="response.amine.structures[1]"
+                                    />
+                                </div>
+                                <div
+                                    class="flex grow flex-col justify-between"
+                                >
+                                    <ng-container
+                                        *ngTemplateOutlet="moleculeInfo; context: {
+                                        $implicit: response.amine,
+                                        showSmiles: true
+                                    }"
+                                    ></ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-panel>
+            <div
+                class="flex w-1/4 flex-col rounded-md border border-solid border-[--surface-d]"
+                *ngIf="(topYieldConditions$ | async) as topYieldConditions"
+            >
+                <div
+                    class="flex w-full items-center justify-between rounded-t-md bg-gray-50 p-4"
+                >
+                    <span class="font-semibold">Top Predictions</span>
+                </div>
+                <hr />
+                <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
+                    <span
+                        class="w-1/2 underline decoration-dotted"
+                        pTooltip="Top Yield % (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites."
+                        >Top Yield %</span
+                    >
+                    <div class="grow text-end">
+                        <span class="font-semibold">
+                            <span class="inline-block h-3 w-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
+                            {{ topYieldConditions.topYield | number: "2.0-0" }}%
+                        </span>
+                        <br />({{ topYieldConditions.conditions.length }} Condition)
+                    </div>
+                </div>
+                <hr />
+                <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
+                    <span
+                        class="w-1/2 underline decoration-dotted"
+                        pTooltip="Top Reaction Conditions (catalyst, solvent, base) correspond to the highest predicted yield percentage for a given reactant pair/reaction sites."
+                        >Top Reaction Condition</span
+                    >
+                    <div class="grow text-end font-semibold">
+                        Catalyst {{ topYieldConditions.conditions[0].catalyst }}
+                        <br/>
+                        Solvent {{ topYieldConditions.conditions[0].solvent }}
+                        <br/>
+                        Base {{ topYieldConditions.conditions[0].base }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p-panel styleClass="my-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex w-full items-center justify-between p-2 px-4"
+                >
+                    <span class="font-semibold">Predicted Conditions</span>
+                    <div class="flex items-center gap-2">
+                        <button
+                            class="border-green rounded-lg border p-2"
+                            (click)="showFilters$.next(!showFilters$.value)"
+                        >
+                            <i class="pi pi-filter"></i>
+                            Filter
+                            <p-chip>{{ numFilters$ | async }}</p-chip>
+                        </button>
+                        <button
+                            class="border-green rounded-lg border p-2"
+                            (click)="clearAllFilters()"
+                        >
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <div class="flex flex-col">
+                <div class="flex w-full gap-4 bg-gray-50 p-2 px-4">
+                    <p-multiSelect
+                        class="w-1/4"
+                        styleClass="w-full"
+                        [display]="selectedCatalysts$.value.length > 1 ? 'comma' : 'chip'"
+                        [maxSelectedLabels]="1"
+                        [selectedItemsLabel]="'{0} items'"
+                        [ngModel]="selectedCatalysts$ | async"
+                        [options]="(catalystsOptions$ | async) || []"
+                        placeholder="Catalysts"
+                        (onChange)="resultsTable.filter($event.value, 'catalyst', 'in'); selectedCatalysts$.next($event.value)"
+                        display="chip"
+                    >
+                    </p-multiSelect>
+                    <p-multiSelect
+                        class="w-1/4"
+                        styleClass="w-full"
+                        [display]="selectedSolvents$.value.length > 1 ? 'comma' : 'chip'"
+                        [maxSelectedLabels]="1"
+                        [selectedItemsLabel]="'{0} items'"
+                        [ngModel]="selectedSolvents$ | async"
+                        [options]="(solventsOptions$ | async) || []"
+                        placeholder="Solvent"
+                        (onChange)="resultsTable.filter($event.value, 'solvent', 'in'); selectedSolvents$.next($event.value)"
+                        display="chip"
+                    >
+                    </p-multiSelect>
+                    <p-multiSelect
+                        class="w-1/4"
+                        styleClass="w-full"
+                        [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
+                        [maxSelectedLabels]="1"
+                        [selectedItemsLabel]="'{0} items'"
+                        [ngModel]="selectedBases$.value"
+                        [options]="(basesOptions$ | async) || []"
+                        placeholder="Bases"
+                        (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
+                    >
+                    </p-multiSelect>
+                    <app-yield-filter class="w-1/4"
+                        [data]="(filteredDataWithoutYieldRange$ | async) || []"
+                        [selectedYield]="(selectedYield$ | async)!"
+                        (selectedYieldChange)="onYieldRangeChange($event)"
+                    ></app-yield-filter>
+                </div>
+
+                <hr />
+                <div class="flex w-full">
+                    <div class="w-1/2 bg-gray-50">
+                        <div class="pt-6">
+                            <div
+                                class="text-md px-8 font-bold underline decoration-dotted"
+                            >
+                                Yield %
+                            </div>
+                            <app-density-plot
+                                styleClass="h-[150px] pl-16 pr-6"
+                                [data]="(filteredDataWithoutYieldRange$ | async) || []"
+                                [selectedRegion]="(selectedYield$ | async)!"
+                                (selectedRegionChange)="onYieldRangeChange($event)"
+                            ></app-density-plot>
+                        </div>
+                        <app-heatmap
+                            [data]="(heatmapData$ | async) || []"
+                        ></app-heatmap>
+                    </div>
+                    <p-table
+                        #resultsTable
+                        [value]="(dataWithColor$ | async) || []"
+                        [paginator]="true"
+                        [rows]="10"
+                        [rowsPerPageOptions]="[10, 20, 50]"
+                        class="h-full w-1/2"
+                        tableStyleClass="w-1/2"
+                        styleClass="w-full border-l border-solid border-[--surface-d]"
+                    >
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="catalyst">
+                                    Catalyst<p-sortIcon field="catalyst" />
+                                </th>
+                                <th pSortableColumn="solvent">
+                                    Solvent<p-sortIcon field="solvent" />
+                                </th>
+                                <th pSortableColumn="base">
+                                    Base<p-sortIcon field="base" />
+                                </th>
+                                <th pSortableColumn="yield">
+                                    Yield %<p-sortIcon field="yield" />
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-row>
+                            <tr>
+                                <td>{{ row.catalyst }}</td>
+                                <td>{{ row.solvent }}</td>
+                                <td>{{ row.base }}</td>
+                                <td>
+                                    <span class="inline-block h-3 w-3" [style]="{ background: row.color }"></span>
+                                    {{ row.yield * 100 | number:'1.1-2' }}%
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </p-panel>
+    </div>
+</div>
+
+<ng-template #moleculeInfo let-molecule let-showSmiles="showSmiles">
+    <div class="mt-2 flex justify-between">
+        <span class="font-light">Name</span>
+        <span class="text-end font-semibold">{{ molecule.name }}</span>
+    </div>
+    <div *ngIf="showSmiles" class="mt-2 flex justify-between">
+        <span class="font-light">SMILES</span>
+        <span class="text-end font-semibold">{{ molecule.smiles }}</span>
+    </div>
+    <div class="mt-2 flex justify-between">
+        <span class="font-light">Reaction Site</span>
+        <span class="text-end font-semibold">{{ molecule.reactionSite }}</span>
+    </div>
+</ng-template>

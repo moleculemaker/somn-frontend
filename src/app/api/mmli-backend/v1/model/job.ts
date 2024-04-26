@@ -17,7 +17,7 @@ export interface Job {
     job_info?: string;
     email?: string;
     job_id?: string;
-    run_id?: number;
+    run_id?: string;
     phase?: JobStatus;
     type?: JobType;
     image?: string;

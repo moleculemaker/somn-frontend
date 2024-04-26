@@ -11,10 +11,13 @@
  */
 
 
-export interface JobCreate { 
-    job_info?: string;
-    email?: string;
-    job_id?: string;
-    run_id?: string;
+export interface SomnRequestBody { 
+    jobId: string;
+    user_email: string;
+    reactant_pair_name: string;
+    aryl_halide_name: string;
+    aryl_halide_smiles: string;
+    amine_name: string;
+    amine_smiles: string;
 }
 

@@ -14,11 +14,12 @@
 /**
  * An enumeration.
  */
-export type JobType = 'clean' | 'chemscraper' | 'molli';
+export type JobType = 'clean' | 'chemscraper' | 'molli' | 'somn';
 
 export const JobType = {
     Clean: 'clean' as JobType,
     Chemscraper: 'chemscraper' as JobType,
-    Molli: 'molli' as JobType
+    Molli: 'molli' as JobType,
+    Somn: 'somn' as JobType
 };
 

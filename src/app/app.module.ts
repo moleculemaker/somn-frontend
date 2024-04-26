@@ -37,7 +37,7 @@ import { LoadingComponent } from "./components/somn/loading/loading.component";
 // import { ConfigurationComponent } from "./components/chemscraper/configuration/configuration.component";
 // import { ResultsComponent } from "./components/chemscraper/results/results.component";
 
-import { ChemScraperService } from "./chemscraper.service";
+// import { ChemScraperService } from "./chemscraper.service";
 import { HttpClientModule } from "@angular/common/http";
 import { NgxMatomoTrackerModule } from "@ngx-matomo/tracker";
 import { NgxMatomoRouterModule } from "@ngx-matomo/router";
@@ -62,6 +62,8 @@ import { SomnComponent } from "./components/somn/somn/somn.component";
 import { MarvinjsInputComponent } from "./components/somn/marvinjs-input/marvinjs-input.component";
 import { HeatmapComponent } from './components/somn/heatmap/heatmap.component';
 import { YieldFilterComponent } from './components/somn/yield-filter/yield-filter.component';
+import { SomnResultComponent } from './components/somn/somn-result/somn-result.component';
+import { MainLayoutComponent } from './components/somn/main-layout/main-layout.component';
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig("/assets/config/envvars.json");
@@ -80,6 +82,8 @@ const initAppFn = (envService: EnvironmentService) => {
     LoadingComponent,
     HeatmapComponent,
     YieldFilterComponent,
+    SomnResultComponent,
+    MainLayoutComponent,
     // FileDragNDropDirective,
     // ConfigurationComponent,
     // ResultsComponent,
@@ -134,7 +138,6 @@ const initAppFn = (envService: EnvironmentService) => {
     DialogModule,
   ],
   providers: [
-    ChemScraperService,
     EnvironmentService,
     {
       provide: APP_INITIALIZER,

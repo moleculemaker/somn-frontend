@@ -9,5 +9,5 @@ export * from './jobStatus';
 export * from './jobType';
 export * from './jobUpdate';
 export * from './locationInner';
-export * from './molecule';
+export * from './somnRequestBody';
 export * from './validationError';

@@ -1,572 +1,240 @@
-<div class="m-auto flex h-full max-w-screen-lg flex-col px-8">
-    <p-tabMenu
-        [model]="tabs"
-        [activeItem]="activeTab$.value"
-        (activeItemChange)="activeTab$.next($event || '')"
+<!-- Request Configuration -->
+<div class="grow">
+    <form
+        class="flex h-full flex-col justify-between"
+        [formGroup]="request.form"
+        (ngSubmit)="onSubmit(request)"
     >
-        <ng-template pTemplate="item" let-item let-i="index">
-            <!-- Icon for request configuration -->
-            <svg
-                *ngIf="i === 0"
-                width="11"
-                height="12"
-                viewBox="0 0 11 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    d="M0.942119 2.33715C1.18454 1.89796 1.76068 1.64924 2.28921 1.97155C2.41818 2.05021 2.5639 2.09731 2.71451 2.10901C2.86512 2.12071 3.01637 2.09669 3.15594 2.03889C3.29551 1.98109 3.41946 1.89115 3.5177 1.77639C3.61594 1.66163 3.6857 1.5253 3.7213 1.37849C3.9586 0.40133 5.34898 0.400937 5.58667 1.37849C5.62231 1.52518 5.69206 1.6614 5.79025 1.77607C5.88844 1.89073 6.0123 1.98061 6.15176 2.0384C6.29122 2.09618 6.44235 2.12025 6.59287 2.10863C6.74338 2.09702 6.88903 2.05005 7.01798 1.97155C7.87668 1.44815 8.85974 2.43121 8.33634 3.28991C8.25767 3.41888 8.21058 3.5646 8.19888 3.71521C8.18718 3.86582 8.2112 4.01707 8.269 4.15664C8.3268 4.29621 8.41674 4.42016 8.5315 4.51841C8.64626 4.61665 8.78259 4.68641 8.9294 4.722C9.90656 4.95931 9.90695 6.34968 8.9294 6.58738C8.29659 6.74165 7.99828 7.4634 8.33634 8.01868C8.85974 8.87739 7.87668 9.86045 7.01798 9.33704C6.88901 9.25838 6.74329 9.21128 6.59268 9.19958C6.44206 9.18788 6.29082 9.21191 6.15125 9.26971C6.01168 9.32751 5.88773 9.41745 5.78948 9.5322C5.69124 9.64696 5.62148 9.78329 5.58589 9.9301C5.34858 10.9073 3.95821 10.9077 3.72051 9.9301C3.68487 9.78341 3.61512 9.64719 3.51694 9.53253C3.41875 9.41786 3.29489 9.32798 3.15542 9.2702C3.01596 9.21241 2.86483 9.18835 2.71432 9.19996C2.5638 9.21158 2.41815 9.25854 2.28921 9.33704C1.76422 9.65738 1.1928 9.41339 0.947236 8.98049"
-                    stroke="#224063"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                />
-            </svg>
+        <div>
+            <h2 class="mb-2">Input reactant pair for C-N coupling</h2>
+            <p class="leading-6">
+                Please input one aryl halide / amine reactant pair to
+                analyze for reaction condition predictions (catalyst, base,
+                solvent).
+            </p>
 
-            <!-- Icon for model results -->
-            <svg
-                *ngIf="i === 1"
-                width="15"
-                height="14"
-                viewBox="0 0 15 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    d="M8.90604 7.97017C8.52004 8.41017 8.05004 8.77017 7.52104 9.03117V10.5312C7.52104 10.6638 7.46836 10.791 7.37459 10.8847C7.28083 10.9785 7.15365 11.0312 7.02104 11.0312H4.02104C3.88843 11.0312 3.76125 10.9785 3.66749 10.8847C3.57372 10.791 3.52104 10.6638 3.52104 10.5312V9.03117C2.46739 8.50524 1.66188 7.58723 1.27738 6.47415C0.892885 5.36107 0.960035 4.14162 1.46442 3.07749C1.96881 2.01335 2.87024 1.18934 3.97527 0.782274C5.0803 0.375211 6.30087 0.417539 7.37504 0.900173M3.52104 13.5002H7.52104"
-                    stroke="#6C757D"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                />
-                <path
-                    d="M7.89509 3.9344C7.54409 3.8734 7.54409 3.3694 7.89509 3.3084C8.51657 3.20024 9.09176 2.90945 9.54734 2.47311C10.0029 2.03677 10.3182 1.47464 10.4531 0.858402L10.4741 0.760402C10.5501 0.413402 11.0441 0.411402 11.1231 0.757402L11.1491 0.870402C11.2891 1.48385 11.6073 2.04225 12.0637 2.47548C12.52 2.9087 13.0942 3.19743 13.7141 3.3054C14.0671 3.3674 14.0671 3.8734 13.7141 3.9354C13.0944 4.04356 12.5204 4.33237 12.0642 4.76557C11.6081 5.19878 11.2901 5.75709 11.1501 6.3704L11.1241 6.4834C11.0451 6.8294 10.5511 6.8274 10.4751 6.4804L10.4551 6.3834C10.3201 5.76689 10.0045 5.20457 9.54852 4.7682C9.09256 4.33183 8.51693 4.04221 7.89509 3.9344Z"
-                    stroke="#6C757D"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                />
-            </svg>
-
-            <span class="ml-2">{{item.label}}</span>
-        </ng-template>
-    </p-tabMenu>
-
-    <!-- Request Configuration -->
-    <div
-        class="grow"
-        *ngIf="activeTab$.value.label === 'Request Configuration'"
-    >
-        <form
-            class="flex h-full flex-col justify-between"
-            [formGroup]="request.form"
-            (ngSubmit)="onSubmit(request)"
-        >
-            <div>
-                <h2 class="mb-2">Input reactant pair for C-N coupling</h2>
-                <p class="leading-6">
-                    Please input one aryl halide / amine reactant pair to
-                    analyze for reaction condition predictions (catalyst, base,
-                    solvent).
-                </p>
-
-                <!-- Pathway Search -->
-                <div class="mt-2 flex flex-col gap-6">
-                    <p-panel class="my-6">
-                        <ng-template pTemplate="header">
-                            <div
-                                class="flex w-full items-center justify-between p-2 px-4"
-                            >
-                                <span class="text-lg">Reactant Pair</span>
-                                <div class="flex gap-2">
-                                    <button
-                                        type="button"
-                                        class="flex items-center rounded-md border p-2"
-                                        (click)="useExample()"
-                                    >
-                                        <i class="pi pi-box mr-2"></i>
-                                        Use an Example
-                                    </button>
-                                </div>
-                            </div>
-                        </ng-template>
-                        <ng-template pTemplate="content">
-                            <div class="p-4">
-                                <section>
-                                    <h3>Name your reactant pair</h3>
-                                    <input
-                                        pInputText
-                                        class="mt-2 w-full"
-                                        placeholder="Enter reactant pair name..."
-                                        formControlName="reactantPairName"
-                                    />
-                                </section>
-                                <section class="mt-2">
-                                    <h3>
-                                        Enter your reactants<i
-                                            class="pi pi-info-circle ml-2"
-                                            pTooltip="Somn has been trained on reactants with only one reaction site; thus, it is encouraged to input reactants with one reaction site for analysis. If you enter a reactant with multiple reaction sites, you will be required to specify the intended reaction site."
-                                        ></i>
-                                    </h3>
-                                    <div class="flex w-full gap-2">
-                                        <div class="flex w-1/2 flex-col">
-                                            <div
-                                                class="mt-2 flex justify-between text-sm"
-                                            >
-                                                <span class="font-semibold"
-                                                    >Aryl Halide
-                                                    (bromide/chloride)</span
-                                                >
-                                                <span class="font-light"
-                                                    >Example:
-                                                    <span
-                                                        class="font-normal underline"
-                                                        >Bromobenzene</span
-                                                    >
-                                                </span>
-                                            </div>
-                                            <input
-                                                pInputText
-                                                class="mt-2 w-full"
-                                                placeholder="Enter aryl halide name..."
-                                                formControlName="arylHalideName"
-                                            />
-                                            <app-marvinjs-input
-                                                class="mt-2"
-                                                placeholder="Enter aryl halide SMILES..."
-                                                [smiles]="request.form.controls['arylHalideSmiles'].value || ''"
-                                                (smilesChange)="request.form.controls['arylHalideSmiles'].setValue($event)"
-                                            >
-                                            </app-marvinjs-input>
-                                            <ng-container
-                                                *ngIf="request.form.controls['arylHalideSmiles'].value"
-                                            >
-                                                <ng-container
-                                                    *ngTemplateOutlet="moleculeDiagram; context: {
-                                                        options: ['a', 'b'],
-                                                        formControlName: 'arylHalideReactionSite',
-                                                        diagram: 'https://fakeimg.pl/640x360',
-                                                        isInfo: !request.form.controls['arylHalideReactionSite'].value
-                                                    }"
-                                                ></ng-container>
-                                            </ng-container>
-                                        </div>
-                                        <div class="flex w-1/2 flex-col">
-                                            <div
-                                                class="mt-2 flex justify-between text-sm"
-                                            >
-                                                <span class="font-semibold"
-                                                    >Amine</span
-                                                >
-                                                <span class="font-light"
-                                                    >Example:
-                                                    <span
-                                                        class="font-normal underline"
-                                                        >Bromobenzene</span
-                                                    >
-                                                </span>
-                                            </div>
-                                            <input
-                                                pInputText
-                                                class="mt-2 w-full"
-                                                placeholder="Enter amine name..."
-                                                formControlName="amineName"
-                                            />
-                                            <app-marvinjs-input
-                                                class="mt-2"
-                                                placeholder="Enter amine SMILES..."
-                                                [smiles]="request.form.controls['amineSmiles'].value || ''"
-                                                (smilesChange)="request.form.controls['amineSmiles'].setValue($event)"
-                                            >
-                                            </app-marvinjs-input>
-                                            <ng-container
-                                                *ngIf="request.form.controls['amineSmiles'].value"
-                                            >
-                                                <ng-container
-                                                    *ngTemplateOutlet="moleculeDiagram; context: {
-                                                        options: ['a', 'b'],
-                                                        formControlName: 'amineReactionSite',
-                                                        diagram: 'https://fakeimg.pl/640x360',
-                                                        isInfo: !request.form.controls['amineReactionSite'].value
-                                                    }"
-                                                ></ng-container>
-                                            </ng-container>
-                                        </div>
-                                    </div>
-                                </section>
-                            </div>
-                        </ng-template>
-                    </p-panel>
-                </div>
-            </div>
-
-            <!-- Subscription Email Input -->
-            <div
-                class="flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
-            >
-                <div class="flex flex-col">
-                    <div class="mb-2 flex items-end justify-center">
-                        <span class="mb-1 pr-12">
-                            <h2 class="m-0 mr-2 inline">Email</h2>
-                            Leave an email to get an notification when your
-                            results are ready.
-                        </span>
-                    </div>
-                    <div class="w-full">
-                        <input
-                            id="subscriber-email"
-                            type="email"
-                            aria-describedby="subscriber-email-help"
-                            [class]="'h-12 w-full'
-                            + ((request.form.controls['subscriberEmail'].invalid
-                                && request.form.controls['subscriberEmail'].dirty) ? ' ng-invalid ng-dirty' : '')"
-                            pInputText
-                            placeholder="Enter email here"
-                            formControlName="subscriberEmail"
-                        />
-                        <small
-                            *ngIf="request.form.controls['subscriberEmail'].invalid
-                                && request.form.controls['subscriberEmail'].dirty"
-                            id="subscriber-email-help"
-                            class="p-error mt-2 block"
-                            >Email is invalid.</small
-                        >
-                    </div>
-                    <div class="py-4">
-                        <p-checkbox
-                            name="subscription"
-                            styleClass="subscription-checkbox"
-                            label="Agree to receive email notifications and updates about Novostoic."
-                            [binary]="true"
-                            [formControl]="request.form.controls['agreeToSubscription']"
-                        ></p-checkbox>
-                    </div>
-                </div>
-                <p-button
-                    label="Analyze Using Somn"
-                    type="submit"
-                    styleClass="bg-[#224063]"
-                    [disabled]="request.form.invalid"
-                    iconPos="right"
-                    icon="pi pi-arrow-right"
-                ></p-button>
-            </div>
-
-            <ng-template
-                #moleculeDiagram
-                let-options="options"
-                let-diagram="diagram"
-                let-formControlName="formControlName"
-                let-isInfo="isInfo"
-            >
-                <div
-                    class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
-                >
-                    <i class="pi pi-check-circle absolute left-3 top-3"></i>
-                    <div class="flex items-center justify-center">
-                        <img class="h-[180px] w-auto" [src]="diagram" />
-                    </div>
-                    <!-- <div
-                        class="m-2 flex flex-col gap-2 rounded-md p-2"
-                        [class]="isInfo ? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
-                    >
-                        <div
-                            class="flex items-center gap-2"
-                            [class]="isInfo ? 'text-[#696CFF]' : 'text-[#1EA97C]'"
-                        >
-                            <i
-                                class="pi"
-                                [class]="isInfo ? 'pi-info-circle' : 'pi-check-circle'"
-                            ></i>
-                            <div>
-                                More than one reaction site has been detected in
-                                your input; please specify the intended site to
-                                continue.
-                            </div>
-                        </div>
-                        <p-dropdown
-                            styleClass="w-full"
-                            [options]="options"
-                            [formControlName]="formControlName"
-                            placeholder="Select Reaction Site"
-                        ></p-dropdown>
-                    </div> -->
-                </div>
-            </ng-template>
-        </form>
-    </div>
-
-    <!-- Model Results -->
-    <div class="grow" *ngIf="activeTab$.value.label === 'Model Results'">
-        <app-loading *ngIf="loading$.value"></app-loading>
-        <div *ngIf="!loading$.value">
-            <div class="my-4 flex gap-2">
-                <p-panel class="grow">
+            <!-- Pathway Search -->
+            <div class="mt-2 flex flex-col gap-6">
+                <p-panel class="my-6">
                     <ng-template pTemplate="header">
                         <div
-                            class="flex w-full items-center justify-between p-4"
+                            class="flex w-full items-center justify-between p-2 px-4"
                         >
-                            <span class="font-semibold">Reactants</span>
+                            <span class="text-lg">Reactant Pair</span>
+                            <div class="flex gap-2">
+                                <button
+                                    type="button"
+                                    class="flex items-center rounded-md border p-2"
+                                    (click)="useExample()"
+                                >
+                                    <i class="pi pi-box mr-2"></i>
+                                    Use an Example
+                                </button>
+                            </div>
                         </div>
                     </ng-template>
                     <ng-template pTemplate="content">
-                        <div class="flex w-full">
-                            <div
-                                class="flex w-1/2 flex-col justify-between p-4"
-                            >
-                                <div class="mb-2 flex items-center">
-                                    <span class="ml-2 text-base"
-                                        >Aryl Halides</span
-                                    >
-                                </div>
-                                <div
-                                    class="flex items-stretch justify-between gap-4 px-2"
-                                >
-                                    <div
-                                        class="rounded-md border border-solid border-[--surface-d] p-2"
-                                    >
-                                        <img
-                                            class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.arylHalides.structures[0]"
+                        <div class="p-4">
+                            <section>
+                                <h3>Name your reactant pair</h3>
+                                <input
+                                    pInputText
+                                    class="mt-2 w-full"
+                                    placeholder="Enter reactant pair name..."
+                                    formControlName="reactantPairName"
+                                />
+                            </section>
+                            <section class="mt-2">
+                                <h3>
+                                    Enter your reactants<i
+                                        class="pi pi-info-circle ml-2"
+                                        pTooltip="Somn has been trained on reactants with only one reaction site; thus, it is encouraged to input reactants with one reaction site for analysis. If you enter a reactant with multiple reaction sites, you will be required to specify the intended reaction site."
+                                    ></i>
+                                </h3>
+                                <div class="flex w-full gap-2">
+                                    <div class="flex w-1/2 flex-col">
+                                        <div
+                                            class="mt-2 flex justify-between text-sm"
+                                        >
+                                            <span class="font-semibold"
+                                                >Aryl Halide
+                                                (bromide/chloride)</span
+                                            >
+                                            <span class="font-light"
+                                                >Example:
+                                                <span
+                                                    class="font-normal underline"
+                                                    >Bromobenzene</span
+                                                >
+                                            </span>
+                                        </div>
+                                        <input
+                                            pInputText
+                                            class="mt-2 w-full"
+                                            placeholder="Enter aryl halide name..."
+                                            formControlName="arylHalideName"
                                         />
-                                        <img
-                                            class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.arylHalides.structures[1]"
-                                        />
-                                    </div>
-                                    <div
-                                        class="flex grow flex-col justify-between"
-                                    >
+                                        <app-marvinjs-input
+                                            class="mt-2"
+                                            placeholder="Enter aryl halide SMILES..."
+                                            [smiles]="request.form.controls['arylHalideSmiles'].value || ''"
+                                            (smilesChange)="request.form.controls['arylHalideSmiles'].setValue($event)"
+                                        >
+                                        </app-marvinjs-input>
                                         <ng-container
-                                            *ngTemplateOutlet="moleculeInfo; context: {
-                                            $implicit: (response$ | async)!.arylHalides,
-                                            showSmiles: true
-                                        }"
-                                        ></ng-container>
+                                            *ngIf="request.form.controls['arylHalideSmiles'].value"
+                                        >
+                                            <ng-container
+                                                *ngTemplateOutlet="moleculeDiagram; context: {
+                                                    options: ['a', 'b'],
+                                                    formControlName: 'arylHalideReactionSite',
+                                                    diagram: 'https://fakeimg.pl/640x360',
+                                                    isInfo: !request.form.controls['arylHalideReactionSite'].value
+                                                }"
+                                            ></ng-container>
+                                        </ng-container>
                                     </div>
-                                </div>
-                            </div>
-                            <div
-                                class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4"
-                            >
-                                <div class="flex items-center">
-                                    <span class="ml-2 text-base">Amine</span>
-                                </div>
-                                <div
-                                    class="flex items-stretch justify-between gap-4 px-2"
-                                >
-                                    <div
-                                        class="rounded-md border border-solid border-[--surface-d] p-2"
-                                    >
-                                        <img
-                                            class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.amine.structures[0]"
+                                    <div class="flex w-1/2 flex-col">
+                                        <div
+                                            class="mt-2 flex justify-between text-sm"
+                                        >
+                                            <span class="font-semibold"
+                                                >Amine</span
+                                            >
+                                            <span class="font-light"
+                                                >Example:
+                                                <span
+                                                    class="font-normal underline"
+                                                    >Bromobenzene</span
+                                                >
+                                            </span>
+                                        </div>
+                                        <input
+                                            pInputText
+                                            class="mt-2 w-full"
+                                            placeholder="Enter amine name..."
+                                            formControlName="amineName"
                                         />
-                                        <img
-                                            class="h-auto w-[100px]"
-                                            [src]="(response$ | async)!.amine.structures[1]"
-                                        />
-                                    </div>
-                                    <div
-                                        class="flex grow flex-col justify-between"
-                                    >
+                                        <app-marvinjs-input
+                                            class="mt-2"
+                                            placeholder="Enter amine SMILES..."
+                                            [smiles]="request.form.controls['amineSmiles'].value || ''"
+                                            (smilesChange)="request.form.controls['amineSmiles'].setValue($event)"
+                                        >
+                                        </app-marvinjs-input>
                                         <ng-container
-                                            *ngTemplateOutlet="moleculeInfo; context: {
-                                            $implicit: (response$ | async)!.amine,
-                                            showSmiles: true
-                                        }"
-                                        ></ng-container>
+                                            *ngIf="request.form.controls['amineSmiles'].value"
+                                        >
+                                            <ng-container
+                                                *ngTemplateOutlet="moleculeDiagram; context: {
+                                                    options: ['a', 'b'],
+                                                    formControlName: 'amineReactionSite',
+                                                    diagram: 'https://fakeimg.pl/640x360',
+                                                    isInfo: !request.form.controls['amineReactionSite'].value
+                                                }"
+                                            ></ng-container>
+                                        </ng-container>
                                     </div>
                                 </div>
-                            </div>
+                            </section>
                         </div>
                     </ng-template>
                 </p-panel>
-                <div
-                    class="flex w-1/4 flex-col rounded-md border border-solid border-[--surface-d]"
-                >
-                    <div
-                        class="flex w-full items-center justify-between rounded-t-md bg-gray-50 p-4"
+            </div>
+        </div>
+
+        <!-- Subscription Email Input -->
+        <div
+            class="flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
+        >
+            <div class="flex flex-col">
+                <div class="mb-2 flex items-end justify-center">
+                    <span class="mb-1 pr-12">
+                        <h2 class="m-0 mr-2 inline">Email</h2>
+                        Leave an email to get an notification when your
+                        results are ready.
+                    </span>
+                </div>
+                <div class="w-full">
+                    <input
+                        id="subscriber-email"
+                        type="email"
+                        aria-describedby="subscriber-email-help"
+                        [class]="'h-12 w-full'
+                        + ((request.form.controls['subscriberEmail'].invalid
+                            && request.form.controls['subscriberEmail'].dirty) ? ' ng-invalid ng-dirty' : '')"
+                        pInputText
+                        placeholder="Enter email here"
+                        formControlName="subscriberEmail"
+                    />
+                    <small
+                        *ngIf="request.form.controls['subscriberEmail'].invalid
+                            && request.form.controls['subscriberEmail'].dirty"
+                        id="subscriber-email-help"
+                        class="p-error mt-2 block"
+                        >Email is invalid.</small
                     >
-                        <span class="font-semibold">Top Predictions</span>
-                    </div>
-                    <hr />
-                    <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
-                        <span
-                            class="w-1/2 underline decoration-dotted"
-                            pTooltip="Top Yield % (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites."
-                            >Top Yield %</span
-                        >
-                        <div class="grow text-end">
-                            <span class="font-semibold">
-                                <span class="inline-block h-3 w-3" [style]="{ background: (topYieldConditions$ | async)!.conditions[0].color }"></span>
-                                {{ (topYieldConditions$ | async)!.topYield | number: "2.0-0" }}%
-                            </span>
-                            <br />({{ (topYieldConditions$ | async)!.conditions.length }} Condition)
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
-                        <span
-                            class="w-1/2 underline decoration-dotted"
-                            pTooltip="Top Reaction Conditions (catalyst, solvent, base) correspond to the highest predicted yield percentage for a given reactant pair/reaction sites."
-                            >Top Reaction Condition</span
-                        >
-                        <div class="grow text-end font-semibold">
-                            Catalyst {{ (topYieldConditions$ | async)!.conditions[0].catalyst }}
-                            <br/>
-                            Solvent {{ (topYieldConditions$ | async)!.conditions[0].solvent }}
-                            <br/>
-                            Base {{ (topYieldConditions$ | async)!.conditions[0].base }}
-                        </div>
-                    </div>
+                </div>
+                <div class="py-4">
+                    <p-checkbox
+                        name="subscription"
+                        styleClass="subscription-checkbox"
+                        label="Agree to receive email notifications and updates about Novostoic."
+                        [binary]="true"
+                        [formControl]="request.form.controls['agreeToSubscription']"
+                    ></p-checkbox>
                 </div>
             </div>
-            <p-panel styleClass="my-4">
-                <ng-template pTemplate="header">
-                    <div
-                        class="flex w-full items-center justify-between p-2 px-4"
-                    >
-                        <span class="font-semibold">Predicted Conditions</span>
-                        <div class="flex items-center gap-2">
-                            <button
-                                class="border-green rounded-lg border p-2"
-                                (click)="showFilters$.next(!showFilters$.value)"
-                            >
-                                <i class="pi pi-filter"></i>
-                                Filter
-                                <p-chip>{{ numFilters$ | async }}</p-chip>
-                            </button>
-                            <button
-                                class="border-green rounded-lg border p-2"
-                                (click)="clearAllFilters()"
-                            >
-                                Clear All
-                            </button>
-                        </div>
-                    </div>
-                </ng-template>
-
-                <div class="flex flex-col">
-                    <div class="flex w-full gap-4 bg-gray-50 p-2 px-4">
-                        <p-multiSelect
-                            class="w-1/4"
-                            styleClass="w-full"
-                            [display]="selectedCatalysts$.value.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
-                            [ngModel]="selectedCatalysts$ | async"
-                            [options]="(catalystsOptions$ | async) || []"
-                            placeholder="Catalysts"
-                            (onChange)="resultsTable.filter($event.value, 'catalyst', 'in'); selectedCatalysts$.next($event.value)"
-                            display="chip"
-                        >
-                        </p-multiSelect>
-                        <p-multiSelect
-                            class="w-1/4"
-                            styleClass="w-full"
-                            [display]="selectedSolvents$.value.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
-                            [ngModel]="selectedSolvents$ | async"
-                            [options]="(solventsOptions$ | async) || []"
-                            placeholder="Solvent"
-                            (onChange)="resultsTable.filter($event.value, 'solvent', 'in'); selectedSolvents$.next($event.value)"
-                            display="chip"
-                        >
-                        </p-multiSelect>
-                        <p-multiSelect
-                            class="w-1/4"
-                            styleClass="w-full"
-                            [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
-                            [ngModel]="selectedBases$.value"
-                            [options]="(basesOptions$ | async) || []"
-                            placeholder="Bases"
-                            (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
-                        >
-                        </p-multiSelect>
-                        <app-yield-filter class="w-1/4"
-                            [data]="(filteredDataWithoutYieldRange$ | async) || []"
-                            [selectedYield]="(selectedYield$ | async)!"
-                            (selectedYieldChange)="onYieldRangeChange($event)"
-                        ></app-yield-filter>
-                    </div>
-
-                    <hr />
-                    <div class="flex w-full">
-                        <div class="w-1/2 bg-gray-50">
-                            <div class="pt-6">
-                                <div
-                                    class="text-md px-8 font-bold underline decoration-dotted"
-                                >
-                                    Yield %
-                                </div>
-                                <app-density-plot
-                                    styleClass="h-[150px] pl-16 pr-6"
-                                    [data]="(filteredDataWithoutYieldRange$ | async) || []"
-                                    [selectedRegion]="(selectedYield$ | async)!"
-                                    (selectedRegionChange)="onYieldRangeChange($event)"
-                                ></app-density-plot>
-                            </div>
-                            <app-heatmap
-                                [data]="(heatmapData$ | async) || []"
-                            ></app-heatmap>
-                        </div>
-                        <p-table
-                            #resultsTable
-                            [value]="(dataWithColor$ | async) || []"
-                            [paginator]="true"
-                            [rows]="10"
-                            [rowsPerPageOptions]="[10, 20, 50]"
-                            class="h-full w-1/2"
-                            tableStyleClass="w-1/2"
-                            styleClass="w-full border-l border-solid border-[--surface-d]"
-                        >
-                            <ng-template pTemplate="header">
-                                <tr>
-                                    <th pSortableColumn="catalyst">
-                                        Catalyst<p-sortIcon field="catalyst" />
-                                    </th>
-                                    <th pSortableColumn="solvent">
-                                        Solvent<p-sortIcon field="solvent" />
-                                    </th>
-                                    <th pSortableColumn="base">
-                                        Base<p-sortIcon field="base" />
-                                    </th>
-                                    <th pSortableColumn="yield">
-                                        Yield %<p-sortIcon field="yield" />
-                                    </th>
-                                </tr>
-                            </ng-template>
-                            <ng-template pTemplate="body" let-row>
-                                <tr>
-                                    <td>{{ row.catalyst }}</td>
-                                    <td>{{ row.solvent }}</td>
-                                    <td>{{ row.base }}</td>
-                                    <td>
-                                        <span class="inline-block h-3 w-3" [style]="{ background: row.color }"></span>
-                                        {{ row.yield * 100 | number:'1.1-2' }}%
-                                    </td>
-                                </tr>
-                            </ng-template>
-                        </p-table>
-                    </div>
-                </div>
-            </p-panel>
+            <p-button
+                label="Analyze Using Somn"
+                type="submit"
+                styleClass="bg-[#224063]"
+                [disabled]="request.form.invalid"
+                iconPos="right"
+                icon="pi pi-arrow-right"
+            ></p-button>
         </div>
-    </div>
-</div>
 
-<ng-template #moleculeInfo let-molecule let-showSmiles="showSmiles">
-    <div class="mt-2 flex justify-between">
-        <span class="font-light">Name</span>
-        <span class="text-end font-semibold">{{ molecule.name }}</span>
-    </div>
-    <div *ngIf="showSmiles" class="mt-2 flex justify-between">
-        <span class="font-light">SMILES</span>
-        <span class="text-end font-semibold">{{ molecule.smiles }}</span>
-    </div>
-    <div class="mt-2 flex justify-between">
-        <span class="font-light">Reaction Site</span>
-        <span class="text-end font-semibold">{{ molecule.reactionSite }}</span>
-    </div>
-</ng-template>
+        <ng-template
+            #moleculeDiagram
+            let-options="options"
+            let-diagram="diagram"
+            let-formControlName="formControlName"
+            let-isInfo="isInfo"
+        >
+            <div
+                class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
+            >
+                <i class="pi pi-check-circle absolute left-3 top-3"></i>
+                <div class="flex items-center justify-center">
+                    <img class="h-[180px] w-auto" [src]="diagram" />
+                </div>
+                <!-- <div
+                    class="m-2 flex flex-col gap-2 rounded-md p-2"
+                    [class]="isInfo ? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
+                >
+                    <div
+                        class="flex items-center gap-2"
+                        [class]="isInfo ? 'text-[#696CFF]' : 'text-[#1EA97C]'"
+                    >
+                        <i
+                            class="pi"
+                            [class]="isInfo ? 'pi-info-circle' : 'pi-check-circle'"
+                        ></i>
+                        <div>
+                            More than one reaction site has been detected in
+                            your input; please specify the intended site to
+                            continue.
+                        </div>
+                    </div>
+                    <p-dropdown
+                        styleClass="w-full"
+                        [options]="options"
+                        [formControlName]="formControlName"
+                        placeholder="Select Reaction Site"
+                    ></p-dropdown>
+                </div> -->
+            </div>
+        </ng-template>
+    </form>
+</div>
