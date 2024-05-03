@@ -30,6 +30,7 @@ import { ChipModule } from "primeng/chip";
 import { InputNumber, InputNumberModule } from "primeng/inputnumber";
 import { TabViewModule } from "primeng/tabview";
 import { TabMenuModule } from "primeng/tabmenu";
+import { SplitButtonModule } from "primeng/splitbutton";
 
 import { LandingPageComponent } from "./components/landing-page/landing-page.component";
 import { LoadingComponent } from "./components/somn/loading/loading.component";
@@ -122,6 +123,7 @@ const initAppFn = (envService: EnvironmentService) => {
     RadioButtonModule,
     CheckboxModule,
     FileUploadModule,
+    SplitButtonModule,
     PanelModule,
     BrowserAnimationsModule,
     HttpClientModule,

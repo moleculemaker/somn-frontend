@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
 import { FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take } from 'rxjs';
+import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
 import { SomnService } from '~/app/services/somn.service';
 
@@ -26,6 +26,7 @@ export class SomnResultComponent {
       data.phase === JobStatus.Processing 
       || data.phase === JobStatus.Queued
     , true),
+    shareReplay(1),
     tap((data) => { console.log('job status: ', data.phase) }),
   );
 
@@ -36,19 +37,50 @@ export class SomnResultComponent {
   response$ = this.statusResponse$.pipe(
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
     switchMap(() => this.somnService.getResult(this.jobId)),
-    // tap((data) => { console.log('result: ', data) }),
-    switchMap((data) => of(this.somnService.response)), //TODO: replace with actual response
+    tap((data) => { console.log('result: ', data) }),
+    shareReplay(1),
+    switchMap((data) => of(this.somnService.response)), 
+    map((resp) => ({
+      ...resp,
+      data: resp.data.map((d, i) => ({
+        ...d,
+        amineName: resp.amine.name,
+        arylHalideName: resp.arylHalides.name,
+        amineSmiles: resp.amine.smiles,
+        arylHalideSmiles: resp.arylHalides.smiles,
+        rowId: i,
+      })),
+    }))//TODO: replace with actual response
   );
 
-  heatmapData$ = of(this.somnService.getHeatmapData());
-  filteredTrainingData$ = new BehaviorSubject([]);
+  showFilters$ = new BehaviorSubject(true);
 
-  showFilters$ = new BehaviorSubject(false);
+  selectedCell$ = new BehaviorSubject<number | null>(null);
+  selectedRow$ = new BehaviorSubject<any | null>(null);
 
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
   selectedYield$ = new BehaviorSubject<[number, number]>([0, 100]);
+  numFilters$ = combineLatest([
+    this.selectedBases$,
+    this.selectedCatalysts$,
+    this.selectedSolvents$,
+  ]).pipe(
+    map((filters) =>
+      filters.reduce((p, filter) => (filter.length ? 1 : 0) + p, 0),
+    ),
+  );
+
+  solventsOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
+  );
+  basesOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
+  );
+  catalystsOptions$ = this.response$.pipe(
+    map((response) => [...new Set(response.data.flatMap((d) => d.catalyst))]),
+  );
 
   dataWithColor$ = this.response$.pipe(
     map((response) => 
@@ -59,7 +91,7 @@ export class SomnResultComponent {
           d3.min(response.data, d => d["yield"])!, 
           d3.max(response.data, d => d["yield"])!
         )
-      }))
+      })).sort((a, b) => b["yield"] - a["yield"])
     ),
   );
 
@@ -101,31 +133,100 @@ export class SomnResultComponent {
     ),
   );
 
-  numFilters$ = combineLatest([
+  heatmapData$ = combineLatest(([
+    this.response$,
+    this.selectedYield$,
     this.selectedBases$,
     this.selectedCatalysts$,
     this.selectedSolvents$,
-  ]).pipe(
-    map((filters) =>
-      filters.reduce((p, filter) => (filter.length ? 1 : 0) + p, 0),
-    ),
+  ])).pipe(
+    map(([response, yieldRange, bases, catalysts, solvents]) => {
+      const data = response.data;
+      const map = new Map();
+      const isHighlighted = (d: any) => {
+        return (
+          (bases.length ? bases.includes(d.base) : true) &&
+          (catalysts.length ? catalysts.includes(d.catalyst) : true) &&
+          (solvents.length ? solvents.includes(d.solvent) : true) &&
+          d.yield >= yieldRange[0] / 100 &&
+          d.yield <= yieldRange[1] / 100
+        );
+      }
+      data.forEach((d) => {
+        const key = `${d.catalyst}-${d.solvent}/${d.base}`;
+        if (map.has(key)) {
+          console.warn("ignore data ", d, " because of key duplication");
+          return;
+        }
+        map.set(key, {
+          catalyst: d.catalyst,
+          solventBase: `${d.base} / ${d.solvent}`,
+          solvent: `${d.solvent}`,
+          base: `${d.base}`,
+          yield: d.yield,
+          rowId: d.rowId,
+          isHighlighted: isHighlighted(d),
+        });
+      });
+      return Array.from(map.values());
+    }),
   );
 
-  solventsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
-  );
-  basesOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
-  );
-  catalystsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.catalyst))]),
+  subscriptions: Subscription[] = [];
+
+  columns = [
+    { field: "amineName", header: "Amine" },
+    { field: "arylHalideName", header: "Aryl Halide" },
+    { field: "amineSmiles", header: "Amine SMILES" },
+    { field: "arylHalideSmiles", header: "Aryl Halide SMILES" },
+    { field: "catalyst", header: "Catalyst" },
+    { field: "solvent", header: "Solvent" },
+    { field: "base", header: "Base" },
+    { field: "yield", header: "Yield" },
+  ]
+
+  requestOptions = [
+    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", disabled: true },
+    { label: "Run a New Request", icon: "pi pi-plus", url: "/somn", target: "_blank" },
+  ]
+
+  exportFileName$ = combineLatest([
+    this.statusResponse$,
+    this.response$,
+  ]).pipe(
+    map(([status, response]) => {
+      return `${response.reactantPairName}-${status.job_id}`;
+    }),
   );
 
   constructor(
     private somnService: SomnService,
     private filterService: FilterService,
     private route: ActivatedRoute,
-  ) {}
+  ) {
+    const sub1 = combineLatest([
+      this.selectedCell$,
+      this.response$,
+    ]).pipe(tap(([cell, response]) => {
+      if (cell === null
+        || this.selectedRow$.value?.rowId === cell
+      ) {
+        return;
+      }
+      this.selectedRow$.next(response.data.find((d) => d.rowId === cell));
+    })).subscribe();
+
+    const sub2 = this.selectedRow$.subscribe((row) => {
+      if (row === null
+        || this.selectedCell$.value === row.rowId
+      ) {
+        return;
+      }
+      this.selectedCell$.next(row.rowId);
+    });
+
+    this.subscriptions.push(sub1, sub2);
+  }
 
   ngOnInit() {
     this.filterService.register(
@@ -134,6 +235,10 @@ export class SomnResultComponent {
         return value * 100 >= filter[0] && value * 100 <= filter[1];
       },
     );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   clearAllFilters() {
@@ -168,5 +273,11 @@ export class SomnResultComponent {
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");
     }
+  }
+
+  onExportResults() {
+    this.resultsTable.exportCSV({
+
+    });
   }
 }

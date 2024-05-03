@@ -82,6 +82,7 @@ export class SomnService {
   ) {}
 
   response = {
+    reactantPairName: sampleRequest.reactantPairName,
     arylHalides: {
       name: sampleRequest.arylHalideName,
       smiles: sampleRequest.arylHalideSmiles,
@@ -136,24 +137,24 @@ export class SomnService {
     return request;
   }
 
-  getHeatmapData() {
-    const data = this.data;
-    const map = new Map();
-    data.forEach((d) => {
-      const key = `${d.catalyst}-${d.solvent}/${d.base}`;
-      if (map.has(key)) {
-        console.warn("ignore data ", d, " because of key duplication");
-        return;
-      }
-      map.set(key, {
-        catalyst: d.catalyst,
-        solventBase: `${d.base} / ${d.solvent}`,
-        solvent: `${d.solvent}`,
-        base: `${d.base}`,
-        yield: d.yield,
-      });
-    });
+  // getHeatmapData() {
+  //   const data = this.data;
+  //   const map = new Map();
+  //   data.forEach((d) => {
+  //     const key = `${d.catalyst}-${d.solvent}/${d.base}`;
+  //     if (map.has(key)) {
+  //       console.warn("ignore data ", d, " because of key duplication");
+  //       return;
+  //     }
+  //     map.set(key, {
+  //       catalyst: d.catalyst,
+  //       solventBase: `${d.base} / ${d.solvent}`,
+  //       solvent: `${d.solvent}`,
+  //       base: `${d.base}`,
+  //       yield: d.yield,
+  //     });
+  //   });
 
-    return Array.from(map.values());
-  }
+  //   return Array.from(map.values());
+  // }
 }

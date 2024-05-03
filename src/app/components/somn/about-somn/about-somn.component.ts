@@ -9,6 +9,7 @@ import arylHalideJson from "./bromide_smiles.json";
 import baseJson from "./base_map.json";
 import solventJson from "./solvent_map.json";
 import testJson from "./test.json";
+import * as d3 from "d3";
 
 enum ActiveAboutPanel {
   ABOUT,
@@ -48,14 +49,14 @@ export class AboutSomnComponent implements OnInit {
   }) as TrainingData));
   filteredTrainingData$ = new BehaviorSubject([]);
 
-  showFilters$ = new BehaviorSubject(false);
+  showFilters$ = new BehaviorSubject(true);
 
   selectedArylHalides$ = new BehaviorSubject<any[]>([]);
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedAmines$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
-  selectedYield$ = new BehaviorSubject([0, 100]);
+  selectedYield$ = new BehaviorSubject<[number, number]>([0, 100]);
 
   filteredTrainingDataWithoutYieldRange$ = combineLatest([
     this.trainingData$,
@@ -95,6 +96,34 @@ export class AboutSomnComponent implements OnInit {
     ),
   );
 
+  dataWithColor$ = this.trainingData$.pipe(
+    map((response) => 
+      response.map((d) => ({ 
+        ...d, 
+        color: this.getColorAtPercentage(
+          d["yield"], 
+          d3.min(response, d => d["yield"])!, 
+          d3.max(response, d => d["yield"])!
+        )
+      })).sort((a, b) => b["yield"] - a["yield"])
+    ),
+  );
+
+  getColorAtPercentage(percentage: number, min: number, max: number) {
+    percentage = percentage > 1 ? percentage / 100 : percentage;
+    const colorStops = [
+      { offset: "0%", color: "#470459" },
+      { offset: "50%", color: "#2E8C89" },
+      { offset: "100%", color: "#F5E61D" }
+    ];
+
+    // Create a scale to map the percentage to the corresponding color stop
+    const scale = d3.scaleLinear(colorStops.map(stop => stop.color))
+      .domain(colorStops.map(stop => parseFloat(stop.offset)));
+
+    return scale((percentage - min) / (max - min) * 100);
+  }
+
   numFilters$ = combineLatest([
     this.selectedBases$,
     this.selectedArylHalides$,
@@ -123,6 +152,15 @@ export class AboutSomnComponent implements OnInit {
     map((data) => [...new Set(data.flatMap((d) => d.catalyst))]),
   );
 
+  columns = [
+    { field: "arylHalide", header: "Aryl Halide" },
+    { field: "amine", header: "Amine" },
+    { field: "base", header: "Base" },
+    { field: "catalyst", header: "Catalyst" },
+    { field: "solvent", header: "Solvent" },
+    { field: "yield", header: "Yield" },
+  ]
+
   constructor(
     private somnService: SomnService,
     private filterService: FilterService,
@@ -147,6 +185,11 @@ export class AboutSomnComponent implements OnInit {
   }
 
   onYieldRangeChange(value: [number, number]) {
+    if (value[0] === this.selectedYield$.value[0] 
+      && value[1] === this.selectedYield$.value[1]) {
+      return;
+    }
+
     this.selectedYield$.next(value);
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");

@@ -9,15 +9,22 @@ import { Products } from '~/app/services/somn.service';
   styleUrls: ['./yield-filter.component.scss']
 })
 export class YieldFilterComponent {
+  @Input() originalData: Products = [];
+  
   data$ = new BehaviorSubject<Products>([]);
   @Input() set data(value: Products) {
     this.data$.next(value);
   }
-  @Input() selectedYield: [number, number] = [0, 100];
-  @Output() selectedYieldChange = new EventEmitter<[number, number]>();
-  @ViewChild('filter') filter: OverlayPanel;
 
   yield$ = new BehaviorSubject<[number, number]>([0, 100]);
+  @Input() set selectedYield(value: [number, number]) {
+    if (value[0] !== this.yield$.value[0] || value[1] !== this.yield$.value[1]) {
+      this.yield$.next(value);
+    }
+  }
+
+  @Output() selectedYieldChange = new EventEmitter<[number, number]>();
+  @ViewChild('filter') filter: OverlayPanel;
 
   onClickClear() {
     this.filter.hide();
