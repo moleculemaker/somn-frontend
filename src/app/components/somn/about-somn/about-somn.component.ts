@@ -10,6 +10,7 @@ import baseJson from "./base_map.json";
 import solventJson from "./solvent_map.json";
 import testJson from "./test.json";
 import * as d3 from "d3";
+import catalystJson from "~/assets/catalyst_image_name_data.json";
 
 enum ActiveAboutPanel {
   ABOUT,
@@ -43,7 +44,7 @@ export class AboutSomnComponent implements OnInit {
     arylHalide: arylHalideJson[`${data["arylHalide"]}` as keyof typeof arylHalideJson],
     amine: amineJson[`${data["amine"]}` as keyof typeof amineJson],
     base: baseJson[`${data["base"]}` as keyof typeof baseJson],
-    catalyst: data["catalyst"],
+    catalyst: catalystJson[`${data["catalyst"]}` as keyof typeof catalystJson][0],
     solvent: solventJson[`${data["solvent"]}` as keyof typeof solventJson],
     yield: data["yield"] / 100,
   }) as TrainingData));

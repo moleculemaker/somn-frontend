@@ -1,11 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import * as d3 from 'd3';
 import { FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
 import { SomnService } from '~/app/services/somn.service';
+import catalystJson from '~/assets/catalyst_image_name_data.json';
 
 @Component({
   selector: 'app-somn-result',
@@ -44,6 +45,7 @@ export class SomnResultComponent {
       ...resp,
       data: resp.data.map((d, i) => ({
         ...d,
+        catalyst: catalystJson[`${d.catalyst}` as keyof typeof catalystJson][0],
         amineName: resp.amine.name,
         arylHalideName: resp.arylHalides.name,
         amineSmiles: resp.amine.smiles,
