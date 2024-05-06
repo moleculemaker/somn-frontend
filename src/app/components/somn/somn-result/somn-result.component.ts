@@ -36,7 +36,6 @@ export class SomnResultComponent {
   response$ = this.statusResponse$.pipe(
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
     switchMap(() => this.somnService.getResult(this.jobId)),
-    // tap((data) => { console.log('result: ', data) }),
     switchMap((data) => of(this.somnService.response)), //TODO: replace with actual response
   );
 

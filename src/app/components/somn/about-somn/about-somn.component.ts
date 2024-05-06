@@ -152,4 +152,16 @@ export class AboutSomnComponent implements OnInit {
       this.resultsTable.filter(value, "yield", "range");
     }
   }
+
+  onReactionSiteChecked(reactionSites: any, type: string) {
+    // if (type === "amine") {
+    //   this.somnService.request.form.controls["amineReactionSite"].setValue(
+    //     reactionSites[0],
+    //   );
+    // } else {
+    //   this.somnService.request.form.controls["arylHalideReactionSite"].setValue(
+    //     reactionSites[0],
+    //   );
+    // }
+  }
 }

@@ -1,12 +1,15 @@
-<div class="marvin-filter-container">
+<div class="marvin-filter-container"
+    [class.invalid]="errors && dirty"
+>
     <div class="p-inputgroup">
         <input
+            title="Input your molecule"
             pInputText
             type="text"
             class="border-0"
             [placeholder]="placeholder"
-            [ngModel]="smiles"
-            (ngModelChange)="smilesChange.emit($event)"
+            [(ngModel)]="value"
+            (blur)="onTouched()"
         />
         <button
             pButton
@@ -20,6 +23,65 @@
     </div>
 </div>
 
+<div class="text-[--status-error-color] text-xs my-1" *ngIf="errors && dirty">
+    <div *ngIf="errors['required']">This field is required</div>
+    <div *ngIf="errors['chemicalNotSupported']">Chemical not supported</div>
+</div>
+
+<div
+    *ngIf="svg$.value"
+    class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
+>
+    <i class="pi pi-check-circle absolute left-3 top-3"></i>
+    <div class="flex items-center justify-center">
+        <div #svgContainer [innerHTML]="svg$.value | safe:'html'"></div>
+    </div>
+    <div
+        *ngIf="reactionSitesOptions$.value.length > 1"
+        class="m-2 flex flex-col gap-2 rounded-md p-2"
+        [class]="isInfo ? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
+    >
+        <div
+            class="flex items-center gap-2"
+            [class]="isInfo ? 'text-[#696CFF]' : 'text-[#1EA97C]'"
+        >
+            <i
+                class="pi"
+                [class]="isInfo ? 'pi-info-circle' : 'pi-check-circle'"
+            ></i>
+            <div>
+                More than one reaction site has been detected in
+                your input; please specify the intended site to
+                continue.
+            </div>
+        </div>
+
+
+        <!-- <p-dropdown
+            styleClass="w-full"
+            placeholder="Select Reaction Site"
+            [options]="reactionSitesOptions$.value"
+            [ngModel]="selectedReactionSite$.value"
+            (ngModelChange)="selectedReactionSite$.next($event)"
+        ></p-dropdown> -->
+        <button (click)="op.toggle($event)">Click to select reaction site</button>
+    </div>
+</div>
+
+<p-overlayPanel #op [style]="{'width': '510px'}">
+    <ng-template pTemplate="content">
+        <ng-container *ngIf="(reactionSiteSvgs$ | async) as svgs">
+            <div class="p-4 flex gap-4 flex-wrap justify-stretch cursor-pointer">
+                <span *ngFor="let svg of svgs; let i = index" 
+                    class="inline-block rounded-md border-solid border-[#DEE2E6] border p-2 bg-white">
+                    <div class="mb-2 ml-2 flex items-center gap-2"><div class="dot" [style]="{ background: colors[i] }"></div> Reaction Site {{ i + 1 }}</div>
+                    <div [innerHTML]="svg.svg | safe:'html'" class="inline-block rounded-md border-solid border-[#DEE2E6] border p-2 bg-white"></div>
+                </span>
+            </div>
+        </ng-container>
+    </ng-template>
+</p-overlayPanel>
+
 <p-dialog
     *ngIf="showDialog$.value"
     class="marvin-editor-container"
@@ -31,8 +93,7 @@
 >
     <app-marvin-js-editor
         class="marvin-editor"
-        [smiles]="smiles"
-        (smilesChange)="smilesChange.emit($event)"
+        [(smiles)]="smiles"
     ></app-marvin-js-editor>
     <ng-template pTemplate="footer">
         <p-button

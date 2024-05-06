@@ -19,6 +19,8 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
+import { CheckReactionSiteResponse } from '../model/checkReactionSiteResponse';
+// @ts-ignore
 import { HTTPValidationError } from '../model/hTTPValidationError';
 // @ts-ignore
 import { SomnRequestBody } from '../model/somnRequestBody';
@@ -100,9 +102,9 @@ export class SomnService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any>;
-    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<any>>;
-    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<any>>;
+    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<CheckReactionSiteResponse>;
+    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<CheckReactionSiteResponse>>;
+    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<CheckReactionSiteResponse>>;
     public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         if (smiles === null || smiles === undefined) {
             throw new Error('Required parameter smiles was null or undefined when calling checkReactionSitesSomnAllReactionSitesGet.');
@@ -153,7 +155,7 @@ export class SomnService {
         }
 
         let localVarPath = `/somn/all-reaction-sites`;
-        return this.httpClient.request<any>('get', `${this.configuration.basePath}${localVarPath}`,
+        return this.httpClient.request<CheckReactionSiteResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,

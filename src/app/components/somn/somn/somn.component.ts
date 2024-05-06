@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { Router } from "@angular/router";
+import { CheckReactionSiteResponse } from "~/app/api/mmli-backend/v1";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 
 @Component({

@@ -13,6 +13,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/analyzeRequestBody.ts
+model/checkReactionSiteResponse.ts
 model/chemicalAutoCompleteResponse.ts
 model/dgPredictorRequestBody.ts
 model/enzRankRequestBody.ts
