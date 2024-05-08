@@ -17,7 +17,9 @@ export interface SomnRequestBody {
     reactant_pair_name: string;
     aryl_halide_name: string;
     aryl_halide_smiles: string;
+    aryl_halide_reaction_site?: number;
     amine_name: string;
     amine_smiles: string;
+    amine_reaction_site?: number;
 }
 

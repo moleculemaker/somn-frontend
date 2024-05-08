@@ -34,4 +34,17 @@ export class SomnComponent {
       this.router.navigate(['somn', 'result', response.jobId]);
     })
   }
+
+  onValueChange(
+    controlName: keyof typeof this.request.form.controls, 
+    value: any
+  ) {
+    const thisValue = this.request.form.controls[controlName].value;
+
+    if (JSON.stringify(thisValue) === JSON.stringify(value)) {
+      return;
+    }
+
+    this.request.form.controls[controlName].setValue(value as never);
+  }
 }

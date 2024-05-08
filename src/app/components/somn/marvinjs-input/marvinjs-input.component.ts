@@ -1,8 +1,7 @@
-import { Component, ElementRef, Input, ViewChild, forwardRef } from "@angular/core";
-import { AbstractControl, AsyncValidator, ControlValueAccessor, NG_ASYNC_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors } from "@angular/forms";
-import { SafeHtml } from "@angular/platform-browser";
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef } from "@angular/core";
+import { AbstractControl, AsyncValidator, ControlValueAccessor, FormControl, FormGroup, NG_ASYNC_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validators } from "@angular/forms";
 import { BehaviorSubject, Observable, catchError, combineLatest, debounceTime, filter, interval, map, of, skipUntil, switchMap, take, takeUntil, tap, timer } from "rxjs";
-import { SomnService } from "~/app/services/somn.service";
+import { SomnService, ReactionSiteInput, ReactionSiteInputFormControls } from "~/app/services/somn.service";
 
 import * as d3 from "d3";
 
@@ -23,43 +22,42 @@ import * as d3 from "d3";
     }
   ]
 })
-export class MarvinjsInputComponent implements ControlValueAccessor, AsyncValidator {
+export class MarvinjsInputComponent {
   @Input() placeholder: string = "";
   @Input() type: string = '';
-  @Input() errors: ValidationErrors | null;
-  @Input() dirty: boolean = false;
+  @Input() set value(v: Partial<ReactionSiteInput>) {
+    if (this.doNotSyncValue) {
+      this.doNotSyncValue = false;
+      return;
+    }
+    this.formGroup.setValue({
+      smiles: v.smiles || "",
+      reactionSite: v.reactionSite || null,
+    });
+  };
+
+  @Output() valueChange = new EventEmitter<ReactionSiteInput>();
   @ViewChild('svgContainer') svgContainer: ElementRef<HTMLDivElement>;
 
-  _value = "";
-  get value() {
-    return this._value;
-  }
-  set value(value: string) {
-    this._value = value;
-    this.onChange(value);
-    this.onTouched();
-  }
+  formGroup = new FormGroup<ReactionSiteInputFormControls>({
+    smiles: new FormControl("", [Validators.required], [this.validate.bind(this)]),
+    reactionSite: new FormControl<number|null>(null, [Validators.required]),
+  });
 
-  _smiles = "";
-  get smiles() {
-    return this._smiles;
-  }
-
-  set smiles(value: string) {
-    this._smiles = value;
-    if (this.value !== value) {
-      this.value = value;
-    }
-  }
-
-  isInfo = false;
   colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280']
+  doNotSyncValue = false;
 
   showDialog$ = new BehaviorSubject(false);
   svg$ = new BehaviorSubject<string>("");
   reactionSitesOptions$ = new BehaviorSubject<any[]>([]);
-  selectedReactionSite$ = new BehaviorSubject<number>(0);
   svgSetupNeeded$ = new BehaviorSubject<boolean>(true);
+
+  selectedReactionSiteIndex$ = combineLatest([
+    this.reactionSitesOptions$,
+    this.formGroup.controls['reactionSite'].valueChanges,
+  ]).pipe(
+    map(([options, v]) => options.findIndex((option) => option.value === v))
+  )
 
   reactionSiteSvgs$ = combineLatest([
     this.svg$,
@@ -81,8 +79,6 @@ export class MarvinjsInputComponent implements ControlValueAccessor, AsyncValida
       });
 
       const theHighlight = newElement.querySelector(`ellipse.atom-${option.value}`);
-      theHighlight?.setAttribute('rx', '20');
-      theHighlight?.setAttribute('ry', '20');
       theHighlight?.setAttribute('fill', this.colors[i % this.colors.length]);
 
       return {
@@ -107,26 +103,27 @@ export class MarvinjsInputComponent implements ControlValueAccessor, AsyncValida
             return;
           }
 
+          d3.select(svg).select('rect').style('fill', '#ffffff00');
+
           ellipses.each((d, i, nodes) => {
             const node = d3.select(nodes[i]);
             node
               .attr('style', 'cursor: pointer;')
-              .attr('rx', 12)
-              .attr('ry', 12)
               .attr('fill', colors[i % colors.length]);
           });
 
           ellipses.on('click', (e, d) => {
             const className = e.target.getAttribute('class');
             const data = className.split('atom-')[1];
-            this.selectedReactionSite$.next(parseInt(data));
+            this.formGroup.controls['reactionSite'].setValue(parseInt(data));
+            this.formGroup.controls['reactionSite'].markAsDirty();
           });
           
           this.svgSetupNeeded$.next(false);
         }
       });
 
-    this.selectedReactionSite$.subscribe((idx) => {
+    this.formGroup.controls['reactionSite'].valueChanges.subscribe((v) => {
       if (this.svgContainer && this.svgContainer.nativeElement.innerHTML !== "") {
         const svg = this.svgContainer.nativeElement.querySelector('svg');
         const ellipses = d3.select(svg).selectAll('ellipse');
@@ -143,48 +140,31 @@ export class MarvinjsInputComponent implements ControlValueAccessor, AsyncValida
           node
             .attr('data-idx', data)
             .attr('style', 'cursor: pointer;')
-            .attr('rx', 12)
-            .attr('ry', 12)
-            .attr('fill', idx === data ? this.colors[i % this.colors.length] : '#5F6C8D40');
+            .attr('fill', v === data ? this.colors[i % this.colors.length] : '#5F6C8D40');
         });
 
         ellipses.on('click', (e) => {
           const data = e.target.getAttribute('data-idx');
-          this.selectedReactionSite$.next(parseInt(data));
+          this.formGroup.controls['reactionSite'].setValue(parseInt(data));
+          this.formGroup.controls['reactionSite'].markAsDirty();
         });
         
         this.svgSetupNeeded$.next(false);
       }
     });
-  }
-  
-  /* -------------------------------------------------------------------------- */
-  /*                      Control Value Accessor Interface                      */
-  /* -------------------------------------------------------------------------- */
-  disabled = false;
-  onChange = (value: string) => {};
-  onTouched = () => {};
 
-  writeValue(obj: string): void {
-    this.value = obj;
-  }
+    this.formGroup.statusChanges.subscribe((v) => {
+      if (v === 'VALID') {
+        this.valueChange.emit(this.formGroup.value as ReactionSiteInput); 
+      } 
 
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
+      else if (v === 'INVALID') {
+        this.valueChange.emit({ smiles: "", reactionSite: 0 });
+      }
 
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
+      this.doNotSyncValue = true;
+    });
   }
-
-  setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-  }
-
-  /* -------------------------------------------------------------------------- */
-  /*                          Async Validator Interface                         */
-  /* -------------------------------------------------------------------------- */
-  onValidatorChange = () => {};
 
   validate(control: AbstractControl<any, any>): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
     return control.valueChanges.pipe(
@@ -198,19 +178,38 @@ export class MarvinjsInputComponent implements ControlValueAccessor, AsyncValida
             value: atomIdx
           });
         });
-        console.log(resp.svg);
+        
+        if (resp.reaction_site_idxes.length == 1) {
+          this.formGroup.controls['reactionSite'].setValue(resp.reaction_site_idxes[0]);
+        }
+
         this.svgSetupNeeded$.next(true);
         this.reactionSitesOptions$.next(reactionSitesOptions);
         this.svg$.next(resp.svg);
       }),
-      catchError((e) => {
-        return of({ chemicalNotSupported: true });
+      map((resp) => {
+        // I have no idea why return of(null) does not work here,
+        // however putting everything in catchError works
+        if (!resp.reaction_site_idxes.length) {
+          throw new Error('No reaction sites found');;
+        }
+        throw new Error('good');
       }),
-      take(1),
-    );
-  }
+      catchError((e) => {
+        switch (e.message) {
+          case 'No reaction sites found':
+            return of({ noReactionSitesFound: true });
 
-  registerOnValidatorChange?(fn: () => void): void {
-    this.onValidatorChange = fn;
+          case 'Chemical not supported':
+            return of({ chemicalNotSupported: true });
+
+          case 'good':
+            return of(null);
+
+          default:
+            return of({ invalidUserInput: true })
+        }
+      }),
+    );
   }
 }

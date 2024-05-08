@@ -77,7 +77,8 @@
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter aryl halide SMILES..."
-                                            formControlName="arylHalideSmiles"
+                                            [value]="request.form.controls['arylHalide'].value"
+                                            (valueChange)="onValueChange('arylHalide', $event)"
                                             type="electrophile"
                                         >
                                         </app-marvinjs-input>
@@ -106,8 +107,9 @@
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter amine SMILES..."
-                                            formControlName="amineSmiles"
                                             type="nucleophile"
+                                            [value]="request.form.controls['amine'].value"
+                                            (valueChange)="onValueChange('amine', $event)"
                                         >
                                         </app-marvinjs-input>
                                     </div>
@@ -123,6 +125,7 @@
         <div
             class="flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
         >
+            <!-- TODO: validate parent form using input from marvin-js-input -->
             <div class="flex flex-col">
                 <div class="mb-2 flex items-end justify-center">
                     <span class="mb-1 pr-12">
