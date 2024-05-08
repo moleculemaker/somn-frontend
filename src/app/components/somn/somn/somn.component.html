@@ -63,7 +63,11 @@
                                             <span class="font-light"
                                                 >Example:
                                                 <span
-                                                    class="font-normal underline"
+                                                    class="font-normal underline cursor-pointer"
+                                                    (click)="
+                                                        request.form.controls['arylHalideName'].setValue('Bromobenzene');
+                                                        request.form.controls['arylHalideSmiles'].setValue('c1ccc(cc1)Br');
+                                                    "
                                                     >Bromobenzene</span
                                                 >
                                             </span>
@@ -93,7 +97,11 @@
                                             <span class="font-light"
                                                 >Example:
                                                 <span
-                                                    class="font-normal underline"
+                                                    class="font-normal underline cursor-pointer"
+                                                    (click)="
+                                                        request.form.controls['amineName'].setValue('Bromobenzene');
+                                                        request.form.controls['amineSmiles'].setValue('c1ccc(cc1)Br');
+                                                    "
                                                     >Bromobenzene</span
                                                 >
                                             </span>
@@ -123,7 +131,7 @@
 
         <!-- Subscription Email Input -->
         <div
-            class="flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
+            class="sticky bottom-0 flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
         >
             <!-- TODO: validate parent form using input from marvin-js-input -->
             <div class="flex flex-col">
@@ -158,7 +166,7 @@
                     <p-checkbox
                         name="subscription"
                         styleClass="subscription-checkbox"
-                        label="Agree to receive email notifications and updates about Novostoic."
+                        label="Agree to receive email notifications and updates about Somn."
                         [binary]="true"
                         [formControl]="request.form.controls['agreeToSubscription']"
                     ></p-checkbox>

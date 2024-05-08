@@ -2,8 +2,10 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   ViewChild,
 } from "@angular/core";
@@ -15,6 +17,8 @@ interface HeatmapData {
   base: string;
   catalyst: string;
   yield: number;
+  isHighlighted: boolean;
+  rowId: number;
 }
 
 @Component({
@@ -25,7 +29,9 @@ interface HeatmapData {
 export class HeatmapComponent implements AfterViewInit, OnChanges {
   @Input() styleClass: string = "";
   @Input() data: HeatmapData[] = [];
-  @ViewChild("container") container: ElementRef<HTMLDivElement>;
+  @Input() selectedCell: number | null = null;
+  @Output() selectedCellChange = new EventEmitter<number | null>();
+  @ViewChild("heatmapContainer") container: ElementRef<HTMLDivElement>;
 
   ngAfterViewInit() {
     this.render();
@@ -33,11 +39,14 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes["data"] && changes["data"].currentValue && this.container) {
+      this.render(this.data, null);
+    }
+    if (changes["selectedCell"]) {
       this.render();
     }
   }
 
-  render(data: HeatmapData[] = this.data) {
+  render(data: HeatmapData[] = this.data, selectedCell: number | null = this.selectedCell) {
     setTimeout(() => {
       if (!this.container) {
         return;
@@ -87,19 +96,22 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
       yAxis.selectAll("line").style("opacity", "0");
       svg.selectAll(".domain").style("opacity", "0");
 
+      d3.selectAll(".tooltip").remove();
+
       // Build color scale
       let colorScale = d3
         .scaleLinear(["#470459", "#2E8C89", "#F5E61D"])
         .domain([0, 
-          d3.mean(this.data.map((d) => d.yield))!,
-          d3.max(this.data.map((d) => d.yield))!
+          d3.mean(data.map((d) => d.yield))!,
+          d3.max(data.map((d) => d.yield))!
         ]);
 
-      var tooltip = d3
-        .select("#my_dataviz")
+      let tooltip = d3
+        .select(containerEl)
         .append("div")
-        .style("opacity", 0)
         .attr("class", "tooltip")
+        .style("opacity", 0)
+        .style("position", "fixed")
         .style("background-color", "white")
         .style("border", "solid")
         .style("border-width", "2px")
@@ -107,32 +119,58 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .style("padding", "5px");
 
       // Three function that change the tooltip when user hover / move / leave a cell
-      var mouseover = (d: any) => {
+      let mouseover = (event: MouseEvent, d: any) => {
         tooltip.style("opacity", 1);
-      };
-      var mousemove = (d: any) => {
         tooltip
-          .html("The exact value of<br>this cell is: " + d.value)
-          .style("left", d3.pointer(this)[0] + 70 + "px")
-          .style("top", d3.pointer(this)[1] + "px");
+          .html((d.yield.toFixed(4) * 100).toFixed(2) + "%")
+          .style("left", (event.x - 20) + "px")
+          .style("top", (event.y - 40) + "px")
+          .style("pointer-events", "none");
+
+        console.log(event)
       };
-      var mouseleave = (d: any) => {
+      let mousedown = (event: MouseEvent, d: any) => {
+        if (!d.isHighlighted) {
+          this.selectedCellChange.emit(null);
+          return;
+        }
+        this.selectedCellChange.emit(d.rowId);
+      }
+      let mouseleave = (event: MouseEvent, d: any) => {
         tooltip.style("opacity", 0);
       };
 
       // add the squares
       svg
         .selectAll()
-        .data(this.data, (d: any) => d.solventBase + ":" + d.catalyst)
+        .data(this.data.filter(d => d.rowId !== selectedCell), (d: any) => d.solventBase + ":" + d.catalyst)
         .enter()
         .append("rect")
+        .attr("class", "cell")
         .attr("x", (d: any) => x(d.catalyst) || "unknown")
         .attr("y", (d) => y(d.solventBase) || "unknown")
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
-        .style("fill", (d) => colorScale(d.yield))
+        .attr("fill", (d) => d.isHighlighted ? colorScale(d.yield) : "#DEE2E6")
         .on("mouseover", mouseover)
-        .on("mousemove", mousemove)
+        .on("mousedown", mousedown)
+        .on("mouseleave", mouseleave);
+
+      svg
+        .selectAll()
+        .data(this.data.filter(d => d.rowId === selectedCell), (d: any) => d.solventBase + ":" + d.catalyst)
+        .enter()
+        .append("rect")
+        .attr("class", "cell")
+        .attr("x", (d: any) => x(d.catalyst) || "unknown")
+        .attr("y", (d) => y(d.solventBase) || "unknown")
+        .attr("width", x.bandwidth())
+        .attr("height", y.bandwidth())
+        .attr("stroke", "white")
+        .attr("stroke-width", 3)
+        .attr("fill", (d) => colorScale(d.yield))
+        .on("mouseover", mouseover)
+        .on("mousedown", mousedown)
         .on("mouseleave", mouseleave);
 
       svg
