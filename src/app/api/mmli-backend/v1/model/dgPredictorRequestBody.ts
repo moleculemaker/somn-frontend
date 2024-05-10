@@ -9,15 +9,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ReactionsInner } from './reactionsInner';
 
 
-export interface SomnRequestBody { 
+export interface DgPredictorRequestBody { 
     jobId: string;
     user_email: string;
-    reactant_pair_name: string;
-    el: string;
-    el_name: string;
-    nuc: string;
-    nuc_name: string;
+    ph: number;
+    ionic_strength: number;
+    reactions: Array<ReactionsInner>;
 }
 

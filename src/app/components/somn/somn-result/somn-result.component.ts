@@ -5,7 +5,11 @@ import { FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
-import { SomnService } from '~/app/services/somn.service';
+import { Products, SomnService } from '~/app/services/somn.service';
+
+import baseJson from "../about-somn/base_map.json";
+import solventJson from "../about-somn/solvent_map.json";
+import catalystJson from "../about-somn/catalyst_map.json";
 
 @Component({
   selector: 'app-somn-result',
@@ -36,18 +40,39 @@ export class SomnResultComponent {
 
   response$ = this.statusResponse$.pipe(
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
-    switchMap(() => this.somnService.getResult(this.jobId)),
+    switchMap((job) => {
+      const jobInfo = JSON.parse(job.job_info || '');
+      return this.somnService.getResult(this.jobId).pipe(
+        map((data: Products) => ({
+          data,
+          reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
+          arylHalide: {
+            name: jobInfo.el_name || 'aryl halide',
+            smiles: jobInfo.el || 'aryl halide smiles',
+            structures: [''],
+          },
+          amine: {
+            name: jobInfo.nuc_name || 'amine',
+            smiles: jobInfo.nuc || 'amine smiles',
+            structures: [''],
+          },
+        }))
+      )
+    }),
     tap((data) => { console.log('result: ', data) }),
     shareReplay(1),
-    switchMap((data) => of(this.somnService.response)), 
     map((resp) => ({
       ...resp,
-      data: resp.data.map((d, i) => ({
+      data: resp.data.map((d, i: number) => ({
         ...d,
-        amineName: resp.amine.name,
-        arylHalideName: resp.arylHalides.name,
+        base: baseJson[`${d["base"]}` as keyof typeof baseJson],
+        catalyst: catalystJson[`${d["catalyst"]}` as keyof typeof catalystJson],
+        solvent: solventJson[`${d["solvent"]}` as keyof typeof solventJson],
+        yield: d.yield / 100,
+        amineName: d.nuc_name,
+        arylHalideName: d.el_name,
         amineSmiles: resp.amine.smiles,
-        arylHalideSmiles: resp.arylHalides.smiles,
+        arylHalideSmiles: resp.arylHalide.smiles,
         rowId: i,
       })),
     }))//TODO: replace with actual response

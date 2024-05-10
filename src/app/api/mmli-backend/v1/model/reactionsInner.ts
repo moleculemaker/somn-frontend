@@ -9,15 +9,15 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ReactionSmiles } from './reactionSmiles';
+import { ReactionKeggId } from './reactionKeggId';
 
 
-export interface SomnRequestBody { 
-    jobId: string;
-    user_email: string;
-    reactant_pair_name: string;
-    el: string;
-    el_name: string;
-    nuc: string;
-    nuc_name: string;
+export interface ReactionsInner { 
+    type: string;
+    smiles: string;
+    molecule_number: string;
+    molecule_inchi_or_smiles: string;
+    reaction_keggid: string;
 }
 

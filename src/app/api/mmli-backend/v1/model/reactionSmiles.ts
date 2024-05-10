@@ -11,13 +11,8 @@
  */
 
 
-export interface SomnRequestBody { 
-    jobId: string;
-    user_email: string;
-    reactant_pair_name: string;
-    el: string;
-    el_name: string;
-    nuc: string;
-    nuc_name: string;
+export interface ReactionSmiles { 
+    type: string;
+    smiles: string;
 }
 

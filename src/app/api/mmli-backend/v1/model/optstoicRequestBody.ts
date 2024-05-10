@@ -11,13 +11,10 @@
  */
 
 
-export interface SomnRequestBody { 
+export interface OptstoicRequestBody { 
     jobId: string;
     user_email: string;
-    reactant_pair_name: string;
-    el: string;
-    el_name: string;
-    nuc: string;
-    nuc_name: string;
+    primary_precursor: string;
+    target_molecule: string;
 }
 

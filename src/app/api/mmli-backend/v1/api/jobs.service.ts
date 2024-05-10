@@ -19,11 +19,11 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
+import { BodyCreateJobJobTypeJobsPost } from '../model/bodyCreateJobJobTypeJobsPost';
+// @ts-ignore
 import { HTTPValidationError } from '../model/hTTPValidationError';
 // @ts-ignore
 import { Job } from '../model/job';
-// @ts-ignore
-import { JobCreate } from '../model/jobCreate';
 // @ts-ignore
 import { JobUpdate } from '../model/jobUpdate';
 
@@ -101,19 +101,16 @@ export class JobsService {
      * Create Job
      * Create a new run for a new or existing Job
      * @param jobType 
-     * @param jobCreate 
+     * @param bodyCreateJobJobTypeJobsPost 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createJobJobTypeJobsPost(jobType: string, jobCreate: JobCreate, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<Job>;
-    public createJobJobTypeJobsPost(jobType: string, jobCreate: JobCreate, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<Job>>;
-    public createJobJobTypeJobsPost(jobType: string, jobCreate: JobCreate, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<Job>>;
-    public createJobJobTypeJobsPost(jobType: string, jobCreate: JobCreate, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+    public createJobJobTypeJobsPost(jobType: string, bodyCreateJobJobTypeJobsPost?: BodyCreateJobJobTypeJobsPost, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<Job>;
+    public createJobJobTypeJobsPost(jobType: string, bodyCreateJobJobTypeJobsPost?: BodyCreateJobJobTypeJobsPost, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<Job>>;
+    public createJobJobTypeJobsPost(jobType: string, bodyCreateJobJobTypeJobsPost?: BodyCreateJobJobTypeJobsPost, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<Job>>;
+    public createJobJobTypeJobsPost(jobType: string, bodyCreateJobJobTypeJobsPost?: BodyCreateJobJobTypeJobsPost, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         if (jobType === null || jobType === undefined) {
             throw new Error('Required parameter jobType was null or undefined when calling createJobJobTypeJobsPost.');
-        }
-        if (jobCreate === null || jobCreate === undefined) {
-            throw new Error('Required parameter jobCreate was null or undefined when calling createJobJobTypeJobsPost.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -160,7 +157,7 @@ export class JobsService {
         return this.httpClient.request<Job>('post', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: jobCreate,
+                body: bodyCreateJobJobTypeJobsPost,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

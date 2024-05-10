@@ -30,7 +30,7 @@ export class SomnComponent {
     this.somnService.createJobAndRunSomn(
       this.request.toRequestBody()
     ).subscribe((response) => {
-      this.router.navigate(['somn', 'result', response.jobId]);
+      this.router.navigate(['somn', 'result', response.job_id]);
     })
   }
 }
