@@ -107,16 +107,9 @@
                     </div>
                 </ng-template>
             </p-panel>
-            <div
-                class="flex w-1/4 flex-col rounded-md border border-solid border-[--surface-d]"
-                *ngIf="(topYieldConditions$ | async) as topYieldConditions"
-            >
-                <div
-                    class="flex w-full items-center justify-between rounded-t-md bg-gray-50 p-4"
-                >
-                    <span class="font-semibold">Top Predictions</span>
-                </div>
-                <hr />
+            <p-panel class="w-1/4" 
+                header="Top Predictions"
+                *ngIf="(topYieldConditions$ | async) as topYieldConditions">
                 <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
                     <span
                         class="w-1/2 underline decoration-dotted"
@@ -148,7 +141,7 @@
                         Solvent {{ topYieldConditions.conditions[0].solvent }}
                     </div>
                 </div>
-            </div>
+            </p-panel>
         </div>
         <p-panel styleClass="my-4">
             <ng-template pTemplate="header">

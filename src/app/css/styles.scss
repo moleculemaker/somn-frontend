@@ -24,6 +24,10 @@ example: document.documentElement.style.setProperty('--text-color', '#ff0000');
 		@apply w-full;
 		@apply font-semibold;
 	}
+
+	.p-panel-header:has(button) {
+		@apply py-3;
+	}
   
 	.p-panel-content {
 		padding: 0;
