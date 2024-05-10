@@ -13,6 +13,7 @@ example: document.documentElement.style.setProperty('--text-color', '#ff0000');
 
 */
 
+/************************** MMLI Customized Theme **************************/
 .p-panel {
 	@apply h-full;
 
@@ -40,6 +41,7 @@ example: document.documentElement.style.setProperty('--text-color', '#ff0000');
 button {
 	@apply font-normal;
 }
+/**************************** MMLI Customized END **************************/
 
 
 
