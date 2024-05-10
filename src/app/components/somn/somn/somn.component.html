@@ -86,18 +86,6 @@
                                             type="electrophile"
                                         >
                                         </app-marvinjs-input>
-                                        <ng-container
-                                            *ngIf="request.form.controls['arylHalideSmiles'].value"
-                                        >
-                                            <!-- <ng-container
-                                                *ngTemplateOutlet="moleculeDiagram; context: {
-                                                    options: ['a', 'b'],
-                                                    formControlName: 'arylHalideReactionSite',
-                                                    diagram: arylHalideImage$ | async,
-                                                    isInfo: !request.form.controls['arylHalideReactionSite'].value
-                                                }"
-                                            ></ng-container> -->
-                                        </ng-container>
                                     </div>
                                     <div class="flex w-1/2 flex-col">
                                         <div
@@ -132,18 +120,6 @@
                                             (valueChange)="onValueChange('amine', $event)"
                                         >
                                         </app-marvinjs-input>
-                                        <ng-container
-                                            *ngIf="request.form.controls['amineSmiles'].value"
-                                        >
-                                            <!-- <ng-container
-                                                *ngTemplateOutlet="moleculeDiagram; context: {
-                                                    options: ['a', 'b'],
-                                                    formControlName: 'amineReactionSite',
-                                                    diagram: amineImage$ | async,
-                                                    isInfo: !request.form.controls['amineReactionSite'].value
-                                                }"
-                                            ></ng-container> -->
-                                        </ng-container>
                                     </div>
                                 </div>
                             </section>
@@ -205,47 +181,5 @@
                 icon="pi pi-arrow-right"
             ></p-button>
         </div>
-
-        <!-- <ng-template
-            #moleculeDiagram
-            let-options="options"
-            let-diagram="diagram"
-            let-formControlName="formControlName"
-            let-isInfo="isInfo"
-        >
-            <div
-                class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
-            >
-                <i class="pi pi-check-circle absolute left-3 top-3"></i>
-                <div class="flex items-center justify-center">
-                    <div [innerHTML]="diagram | safe:'html'"></div>
-                </div>
-                <div
-                    class="m-2 flex flex-col gap-2 rounded-md p-2"
-                    [class]="isInfo ? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
-                >
-                    <div
-                        class="flex items-center gap-2"
-                        [class]="isInfo ? 'text-[#696CFF]' : 'text-[#1EA97C]'"
-                    >
-                        <i
-                            class="pi"
-                            [class]="isInfo ? 'pi-info-circle' : 'pi-check-circle'"
-                        ></i>
-                        <div>
-                            More than one reaction site has been detected in
-                            your input; please specify the intended site to
-                            continue.
-                        </div>
-                    </div>
-                    <p-dropdown
-                        styleClass="w-full"
-                        [options]="options"
-                        [formControlName]="formControlName"
-                        placeholder="Select Reaction Site"
-                    ></p-dropdown>
-                </div>
-            </div>
-        </ng-template> -->
     </form>
 </div>
