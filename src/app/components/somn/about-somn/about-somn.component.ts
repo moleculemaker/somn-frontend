@@ -4,11 +4,14 @@ import { SomnService } from "~/app/services/somn.service";
 import { Table } from "primeng/table";
 import { FilterService } from "primeng/api";
 import { Products } from "~/app/services/somn.service";
+
 import amineJson from "./amine_smiles.json";
 import arylHalideJson from "./bromide_smiles.json";
 import baseJson from "./base_map.json";
 import solventJson from "./solvent_map.json";
+import catalystJson from "./catalyst_map.json";
 import testJson from "./test.json";
+
 import * as d3 from "d3";
 
 enum ActiveAboutPanel {
@@ -42,7 +45,7 @@ export class AboutSomnComponent implements OnInit {
     el_name: arylHalideJson[`${data["arylHalide"]}` as keyof typeof arylHalideJson],
     nuc_name: amineJson[`${data["amine"]}` as keyof typeof amineJson],
     base: baseJson[`${data["base"]}` as keyof typeof baseJson],
-    catalyst: data["catalyst"],
+    catalyst: catalystJson[`${data["catalyst"]}` as keyof typeof catalystJson],
     solvent: solventJson[`${data["solvent"]}` as keyof typeof solventJson],
     yield: data["yield"] / 100,
     stdev: 0,

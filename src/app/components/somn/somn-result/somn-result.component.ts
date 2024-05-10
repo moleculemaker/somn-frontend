@@ -9,7 +9,7 @@ import { Products, SomnService } from '~/app/services/somn.service';
 
 import baseJson from "../about-somn/base_map.json";
 import solventJson from "../about-somn/solvent_map.json";
-import testJson from "../about-somn/test.json";
+import catalystJson from "../about-somn/catalyst_map.json";
 
 @Component({
   selector: 'app-somn-result',
@@ -66,7 +66,7 @@ export class SomnResultComponent {
       data: resp.data.map((d, i: number) => ({
         ...d,
         base: baseJson[`${d["base"]}` as keyof typeof baseJson],
-        catalyst: d["catalyst"],
+        catalyst: catalystJson[`${d["catalyst"]}` as keyof typeof catalystJson],
         solvent: solventJson[`${d["solvent"]}` as keyof typeof solventJson],
         yield: d.yield / 100,
         amineName: d.nuc_name,
