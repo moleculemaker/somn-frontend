@@ -66,7 +66,7 @@
                                                     class="font-normal underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['arylHalideName'].setValue('Bromobenzene');
-                                                        request.form.controls['arylHalideSmiles'].setValue('c1ccc(cc1)Br');
+                                                        request.form.controls['arylHalide'].controls['smiles'].setValue('c1ccc(cc1)Br');
                                                     "
                                                     >Bromobenzene</span
                                                 >
@@ -81,22 +81,11 @@
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter aryl halide SMILES..."
-                                            [smiles]="request.form.controls['arylHalideSmiles'].value || ''"
-                                            (smilesChange)="request.form.controls['arylHalideSmiles'].setValue($event)"
+                                            [value]="request.form.controls['arylHalide'].value"
+                                            (valueChange)="onValueChange('arylHalide', $event)"
+                                            type="electrophile"
                                         >
                                         </app-marvinjs-input>
-                                        <ng-container
-                                            *ngIf="request.form.controls['arylHalideSmiles'].value"
-                                        >
-                                            <!-- <ng-container
-                                                *ngTemplateOutlet="moleculeDiagram; context: {
-                                                    options: ['a', 'b'],
-                                                    formControlName: 'arylHalideReactionSite',
-                                                    diagram: arylHalideImage$ | async,
-                                                    isInfo: !request.form.controls['arylHalideReactionSite'].value
-                                                }"
-                                            ></ng-container> -->
-                                        </ng-container>
                                     </div>
                                     <div class="flex w-1/2 flex-col">
                                         <div
@@ -111,7 +100,7 @@
                                                     class="font-normal underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['amineName'].setValue('Bromobenzene');
-                                                        request.form.controls['amineSmiles'].setValue('c1ccc(cc1)Br');
+                                                        request.form.controls['amine'].controls['smiles'].setValue('c1ccc(cc1)Br');
                                                     "
                                                     >Bromobenzene</span
                                                 >
@@ -126,22 +115,11 @@
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter amine SMILES..."
-                                            [smiles]="request.form.controls['amineSmiles'].value || ''"
-                                            (smilesChange)="request.form.controls['amineSmiles'].setValue($event)"
+                                            type="nucleophile"
+                                            [value]="request.form.controls['amine'].value"
+                                            (valueChange)="onValueChange('amine', $event)"
                                         >
                                         </app-marvinjs-input>
-                                        <ng-container
-                                            *ngIf="request.form.controls['amineSmiles'].value"
-                                        >
-                                            <!-- <ng-container
-                                                *ngTemplateOutlet="moleculeDiagram; context: {
-                                                    options: ['a', 'b'],
-                                                    formControlName: 'amineReactionSite',
-                                                    diagram: amineImage$ | async,
-                                                    isInfo: !request.form.controls['amineReactionSite'].value
-                                                }"
-                                            ></ng-container> -->
-                                        </ng-container>
                                     </div>
                                 </div>
                             </section>
@@ -155,6 +133,7 @@
         <div
             class="sticky bottom-0 flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
         >
+            <!-- TODO: validate parent form using input from marvin-js-input -->
             <div class="flex flex-col">
                 <div class="mb-2 flex items-end justify-center">
                     <span class="mb-1 pr-12">
@@ -202,47 +181,5 @@
                 icon="pi pi-arrow-right"
             ></p-button>
         </div>
-
-        <!-- <ng-template
-            #moleculeDiagram
-            let-options="options"
-            let-diagram="diagram"
-            let-formControlName="formControlName"
-            let-isInfo="isInfo"
-        >
-            <div
-                class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
-            >
-                <i class="pi pi-check-circle absolute left-3 top-3"></i>
-                <div class="flex items-center justify-center">
-                    <div [innerHTML]="diagram | safe:'html'"></div>
-                </div>
-                <div
-                    class="m-2 flex flex-col gap-2 rounded-md p-2"
-                    [class]="isInfo ? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
-                >
-                    <div
-                        class="flex items-center gap-2"
-                        [class]="isInfo ? 'text-[#696CFF]' : 'text-[#1EA97C]'"
-                    >
-                        <i
-                            class="pi"
-                            [class]="isInfo ? 'pi-info-circle' : 'pi-check-circle'"
-                        ></i>
-                        <div>
-                            More than one reaction site has been detected in
-                            your input; please specify the intended site to
-                            continue.
-                        </div>
-                    </div>
-                    <p-dropdown
-                        styleClass="w-full"
-                        [options]="options"
-                        [formControlName]="formControlName"
-                        placeholder="Select Reaction Site"
-                    ></p-dropdown>
-                </div>
-            </div>
-        </ng-template> -->
     </form>
 </div>

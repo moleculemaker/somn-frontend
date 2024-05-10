@@ -5,6 +5,10 @@
   border-width: 1px;
   border-radius: 6px;
 
+  &.invalid {
+    border-color: var(--status-error-color);
+  }
+
   .p-inputgroup{
     input{
       border-width: 0px;
@@ -43,4 +47,17 @@
     display: block;
     height: 100%;
   }
+}
+
+.dot {
+  display: inline-block;
+  height: .8rem;
+  width: .8rem;
+  border-radius: 50%;
+}
+
+.active {
+  @apply border-[#3B82F6];
+  @apply outline-[#BFDBFE]; 
+  @apply outline;
 }
