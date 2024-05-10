@@ -11,13 +11,10 @@
  */
 
 
-export interface SomnRequestBody { 
-    jobId: string;
-    user_email: string;
-    reactant_pair_name: string;
-    el: string;
-    el_name: string;
-    nuc: string;
-    nuc_name: string;
+export interface ReactionKeggId { 
+    type: string;
+    molecule_number: string;
+    molecule_inchi_or_smiles: string;
+    reaction_keggid: string;
 }
 

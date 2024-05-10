@@ -1,39 +1,20 @@
 import { Injectable } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { FilesService, Job, JobCreate, JobType, JobsService, SomnRequestBody } from "../api/mmli-backend/v1";
-import { SomnService as SomApiService } from "../api/mmli-backend/v1/api/somn.service";
+import { FilesService, Job, JobType, JobsService, SomnRequestBody } from "../api/mmli-backend/v1";
+import { JobCreate } from "../api/mmli-backend/v1/model/jobCreate";
 
 import sampleRequest from '../../assets/example_request.json';
 import sampleResponse from '../../assets/example_response.json';
-import { Observable, switchMap, take } from "rxjs";
-import { PostResponse } from "../models";
+import { Observable, map } from "rxjs";
 
 export type Products = Array<{
-  catalyst:
-    | 1
-    | 2
-    | 3
-    | 4
-    | 5
-    | 6
-    | 7
-    | 8
-    | 9
-    | 10
-    | 11
-    | 12
-    | 13
-    | 14
-    | 15
-    | 16
-    | 17
-    | 18
-    | 19
-    | 20
-    | 21
-  solvent: "Dioxane" | "Toulene" | "tAmOH";
-  base: "K2CO3" | "NaOtBu" | "DBU";
+  nuc_name: string;
+  el_name: string;
+  catalyst: number | string;
+  solvent: number | string;
+  base: string;
   yield: number;
+  stdev: number;
 }>;
 
 function generateData(): Products {
@@ -61,10 +42,10 @@ export class SomnRequest {
       user_email: this.form.controls["subscriberEmail"].value || "",
       jobId: '',
       reactant_pair_name: this.form.controls["reactantPairName"].value || "",
-      amine_name: this.form.controls["amineName"].value || "",
-      amine_smiles: this.form.controls["amineSmiles"].value || "",
-      aryl_halide_name: this.form.controls["arylHalideName"].value || "",
-      aryl_halide_smiles: this.form.controls["arylHalideSmiles"].value || "",
+      nuc_name: this.form.controls["amineName"].value || "",
+      nuc: this.form.controls["amineSmiles"].value || "",
+      el_name: this.form.controls["arylHalideName"].value || "",
+      el: this.form.controls["arylHalideSmiles"].value || "",
     };
   }
 }
@@ -77,7 +58,6 @@ export class SomnService {
 
   constructor(
     private jobsService: JobsService,
-    private somnService: SomApiService,
     private filesService: FilesService,
   ) {}
 
@@ -101,22 +81,17 @@ export class SomnService {
     }))
   };
 
-  createJobAndRunSomn(requestBody: SomnRequestBody): Observable<PostResponse>{
+  createJobAndRunSomn(requestBody: SomnRequestBody): Observable<Job>{
     const jobCreate: JobCreate = {
       job_info: JSON.stringify(requestBody),
       email: requestBody.user_email,
     }
-
-    return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, jobCreate)
-      .pipe(switchMap((response) => {
-        console.log('Job created', response);
-        requestBody.jobId = response.job_id!;
-        return this.somnService.startSomnSomnRunPost(requestBody)
-      }))
+    return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, jobCreate);
   }
 
   getResultStatus(jobID: string): Observable<Job>{
-    return this.jobsService.getJobByTypeAndJobIdAndRunIdJobTypeJobsJobIdRunIdGet(JobType.Somn, jobID, '0');
+    return this.jobsService.listJobsByTypeAndJobIdJobTypeJobsJobIdGet(JobType.Somn, jobID)
+      .pipe(map((jobs) => jobs[0]));
   }
 
   getResult(jobID: string): Observable<any>{
@@ -136,25 +111,4 @@ export class SomnService {
     request.form.setValue(sampleRequest);
     return request;
   }
-
-  // getHeatmapData() {
-  //   const data = this.data;
-  //   const map = new Map();
-  //   data.forEach((d) => {
-  //     const key = `${d.catalyst}-${d.solvent}/${d.base}`;
-  //     if (map.has(key)) {
-  //       console.warn("ignore data ", d, " because of key duplication");
-  //       return;
-  //     }
-  //     map.set(key, {
-  //       catalyst: d.catalyst,
-  //       solventBase: `${d.base} / ${d.solvent}`,
-  //       solvent: `${d.solvent}`,
-  //       base: `${d.base}`,
-  //       yield: d.yield,
-  //     });
-  //   });
-
-  //   return Array.from(map.values());
-  // }
 }

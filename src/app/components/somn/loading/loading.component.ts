@@ -10,5 +10,5 @@ import { interval } from "rxjs";
   },
 })
 export class LoadingComponent {
-  loadingValue$ = interval(200);
+  loadingValue$ = interval(1000);
 }
