@@ -13,6 +13,30 @@ example: document.documentElement.style.setProperty('--text-color', '#ff0000');
 
 */
 
+.p-panel {
+	@apply h-full;
+
+	.p-panel-header {
+		@apply flex;
+		@apply items-center;
+		@apply justify-between;
+		@apply p-4;
+		@apply w-full;
+		@apply font-semibold;
+	}
+  
+	.p-panel-content {
+		padding: 0;
+		@apply flex;
+		@apply flex-col;
+		@apply grow;
+	}
+}
+
+button {
+	@apply font-normal;
+}
+
 
 
 //****************

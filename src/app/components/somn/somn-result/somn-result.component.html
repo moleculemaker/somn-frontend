@@ -33,14 +33,7 @@
     <app-loading *ngIf="isLoading$ | async"></app-loading>
     <div *ngIf="!(isLoading$ | async)">
         <div class="my-4 flex gap-2">
-            <p-panel class="grow">
-                <ng-template pTemplate="header">
-                    <div
-                        class="flex w-full items-center justify-between p-4"
-                    >
-                        <span class="font-semibold">Reactants</span>
-                    </div>
-                </ng-template>
+            <p-panel class="grow" header="Reactant">
                 <ng-template pTemplate="content">
                     <div class="flex w-full" *ngIf="(response$ | async) as response">
                         <div
@@ -159,26 +152,22 @@
         </div>
         <p-panel styleClass="my-4">
             <ng-template pTemplate="header">
-                <div
-                    class="flex w-full items-center justify-between p-2 px-4"
-                >
-                    <span class="font-semibold">Predicted Conditions</span>
-                    <div class="flex items-center gap-2">
-                        <button
-                            class="border-green rounded-lg border p-2"
-                            (click)="showFilters$.next(!showFilters$.value)"
-                        >
-                            <i class="pi pi-filter"></i>
-                            Filter
-                            <p-chip>{{ numFilters$ | async }}</p-chip>
-                        </button>
-                        <button
-                            class="border-green rounded-lg border p-2"
-                            (click)="clearAllFilters()"
-                        >
-                            Clear All
-                        </button>
-                    </div>
+                <span class="grow">Predicted Conditions</span>
+                <div class="flex items-center gap-2">
+                    <button
+                        class="border-green rounded-lg border p-2"
+                        (click)="showFilters$.next(!showFilters$.value)"
+                    >
+                        <i class="pi pi-filter"></i>
+                        Filter
+                        <p-chip>{{ numFilters$ | async }}</p-chip>
+                    </button>
+                    <button
+                        class="border-green rounded-lg border p-2"
+                        (click)="clearAllFilters()"
+                    >
+                        Clear All
+                    </button>
                 </div>
             </ng-template>
 
