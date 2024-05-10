@@ -88,14 +88,14 @@
                                         <ng-container
                                             *ngIf="request.form.controls['arylHalideSmiles'].value"
                                         >
-                                            <ng-container
+                                            <!-- <ng-container
                                                 *ngTemplateOutlet="moleculeDiagram; context: {
                                                     options: ['a', 'b'],
                                                     formControlName: 'arylHalideReactionSite',
-                                                    diagram: 'https://fakeimg.pl/640x360',
+                                                    diagram: arylHalideImage$ | async,
                                                     isInfo: !request.form.controls['arylHalideReactionSite'].value
                                                 }"
-                                            ></ng-container>
+                                            ></ng-container> -->
                                         </ng-container>
                                     </div>
                                     <div class="flex w-1/2 flex-col">
@@ -133,14 +133,14 @@
                                         <ng-container
                                             *ngIf="request.form.controls['amineSmiles'].value"
                                         >
-                                            <ng-container
+                                            <!-- <ng-container
                                                 *ngTemplateOutlet="moleculeDiagram; context: {
                                                     options: ['a', 'b'],
                                                     formControlName: 'amineReactionSite',
-                                                    diagram: 'https://fakeimg.pl/640x360',
+                                                    diagram: amineImage$ | async,
                                                     isInfo: !request.form.controls['amineReactionSite'].value
                                                 }"
-                                            ></ng-container>
+                                            ></ng-container> -->
                                         </ng-container>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@
             ></p-button>
         </div>
 
-        <ng-template
+        <!-- <ng-template
             #moleculeDiagram
             let-options="options"
             let-diagram="diagram"
@@ -215,9 +215,9 @@
             >
                 <i class="pi pi-check-circle absolute left-3 top-3"></i>
                 <div class="flex items-center justify-center">
-                    <img class="h-[180px] w-auto" [src]="diagram" />
+                    <div [innerHTML]="diagram | safe:'html'"></div>
                 </div>
-                <!-- <div
+                <div
                     class="m-2 flex flex-col gap-2 rounded-md p-2"
                     [class]="isInfo ? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
                 >
@@ -241,8 +241,8 @@
                         [formControlName]="formControlName"
                         placeholder="Select Reaction Site"
                     ></p-dropdown>
-                </div> -->
+                </div>
             </div>
-        </ng-template>
+        </ng-template> -->
     </form>
 </div>
