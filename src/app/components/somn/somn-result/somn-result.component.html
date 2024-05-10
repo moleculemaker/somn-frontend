@@ -135,7 +135,7 @@
                             <span class="inline-block h-3 w-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
                             {{ topYieldConditions.topYield | number: "2.0-0" }}%
                         </span>
-                        <br />({{ topYieldConditions.conditions.length }} Condition)
+                        <br />({{ topYieldConditions.conditions.length }} Condition{{ topYieldConditions.conditions.length > 1 ? 's' : '' }})
                     </div>
                 </div>
                 <hr />

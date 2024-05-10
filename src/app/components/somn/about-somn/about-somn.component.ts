@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { BehaviorSubject, Observable, combineLatest, map, of, tap } from "rxjs";
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { BehaviorSubject, Observable, combineLatest, map, of } from "rxjs";
 import { SomnService } from "~/app/services/somn.service";
 import { Table } from "primeng/table";
 import { FilterService } from "primeng/api";
