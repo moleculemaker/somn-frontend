@@ -1,5 +1,5 @@
 export * from './analyzeRequestBody';
-export * from './checkReactionSiteResponse';
+export * from './bodyCreateJobJobTypeJobsPost';
 export * from './chemicalAutoCompleteResponse';
 export * from './dgPredictorRequestBody';
 export * from './enzRankRequestBody';
@@ -8,7 +8,6 @@ export * from './flaggedMolecule';
 export * from './flaggedMoleculeDelete';
 export * from './hTTPValidationError';
 export * from './job';
-export * from './jobCreate';
 export * from './jobStatus';
 export * from './jobType';
 export * from './jobUpdate';

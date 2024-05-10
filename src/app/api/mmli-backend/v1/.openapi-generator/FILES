@@ -13,7 +13,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/analyzeRequestBody.ts
-model/checkReactionSiteResponse.ts
+model/bodyCreateJobJobTypeJobsPost.ts
 model/chemicalAutoCompleteResponse.ts
 model/dgPredictorRequestBody.ts
 model/enzRankRequestBody.ts
@@ -22,7 +22,6 @@ model/flaggedMolecule.ts
 model/flaggedMoleculeDelete.ts
 model/hTTPValidationError.ts
 model/job.ts
-model/jobCreate.ts
 model/jobStatus.ts
 model/jobType.ts
 model/jobUpdate.ts

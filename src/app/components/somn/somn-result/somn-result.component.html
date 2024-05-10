@@ -59,11 +59,11 @@
                                 >
                                     <img
                                         class="h-auto w-[100px]"
-                                        [src]="response.arylHalides.structures[0]"
+                                        [src]="response.arylHalide.structures[0]"
                                     />
                                     <img
                                         class="h-auto w-[100px]"
-                                        [src]="response.arylHalides.structures[1]"
+                                        [src]="response.arylHalide.structures[1]"
                                     />
                                 </div>
                                 <div
@@ -71,7 +71,7 @@
                                 >
                                     <ng-container
                                         *ngTemplateOutlet="moleculeInfo; context: {
-                                        $implicit: response.arylHalides,
+                                        $implicit: response.arylHalide,
                                         showSmiles: true
                                     }"
                                     ></ng-container>
@@ -135,7 +135,7 @@
                             <span class="inline-block h-3 w-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
                             {{ topYieldConditions.topYield | number: "2.0-0" }}%
                         </span>
-                        <br />({{ topYieldConditions.conditions.length }} Condition)
+                        <br />({{ topYieldConditions.conditions.length }} Condition{{ topYieldConditions.conditions.length > 1 ? 's' : '' }})
                     </div>
                 </div>
                 <hr />

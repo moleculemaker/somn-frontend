@@ -11,13 +11,10 @@
  */
 
 
-export interface SomnRequestBody { 
-    jobId: string;
-    user_email: string;
-    reactant_pair_name: string;
-    el: string;
-    el_name: string;
-    nuc: string;
-    nuc_name: string;
+export interface BodyCreateJobJobTypeJobsPost { 
+    job_id?: string;
+    run_id?: string;
+    email?: string;
+    job_info?: string;
 }
 
