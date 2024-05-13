@@ -14,4 +14,6 @@ export class LoadingComponent {
     agreeToSubscription: new FormControl(false),
     subscriberEmail: new FormControl("", [Validators.required, Validators.email]),
   });
+
+  // TODO: Implement subscription to job
 }
