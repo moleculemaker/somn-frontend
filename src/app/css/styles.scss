@@ -55,7 +55,7 @@ example: document.documentElement.style.setProperty('--text-color', '#ff0000');
 //****************
 
 @import 'core/reset';
-// @import 'shared';
+@import 'shared';
 
 //**************** host ******************
 
@@ -131,16 +131,22 @@ h2 {
 	@apply text-3xl;
 }
 
-h3 {
-	@apply text-2xl;
-}
-
 h4 {
 	@apply text-xl;
+	@apply opacity-100;
+
+	text: {
+        transform: none;
+    }
 }
 
 h5 {
 	@apply text-lg;
+	@apply opacity-100;
+
+	text: {
+        transform: none;
+    }
 }
 
 h6 {

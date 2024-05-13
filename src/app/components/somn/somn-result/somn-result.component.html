@@ -3,8 +3,10 @@
     <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
             <h5 class="flex items-center gap-2 mb-2 font-bold leading-xl">
-                Job ID: {{ status.job_id || 'loading' }} <button type="button" title="copy job id"><i class="pi pi-copy"></i></button>
-                
+                Job ID: {{ status.job_id || 'loading' }} 
+                <button type="button" title="copy job id" class="border-none cursor-pointer">
+                    <i class="pi pi-copy"></i>
+                </button>
             </h5>
             <h6 class="text-text-secondary leading-lg">
                 Reactant Pair Name: {{ (response$ | async)?.reactantPairName || 'loading...' }}
