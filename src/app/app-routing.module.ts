@@ -10,7 +10,7 @@ import { FontMatchComponent } from "./components/somn/font-match/font-match.comp
 
 const routes: Routes = [
   { path: "about", component: AboutSomnComponent },
-  { path: "font-match", component: FontMatchComponent },
+  // { path: "font-match", component: FontMatchComponent },
   { path: "", pathMatch:"full", redirectTo: "home" },
   {
     path: "somn",
