@@ -2,7 +2,7 @@
  <div class="grow">
     <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
-            <h5 class="flex items-center gap-2 mb-2 font-bold leading-xl">
+            <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl">
                 Job ID: {{ status.job_id || 'loading' }} 
                 <button type="button" title="copy job id" class="border-none cursor-pointer">
                     <i class="pi pi-copy"></i>

@@ -1,37 +1,89 @@
-<div class="mt-6 flex flex-col">
+<div class="flex flex-col mt-6">
     <p-progressBar
         class="w-full"
-        [showValue]="false"
-        [value]="loadingValue$ | async"
+        mode="indeterminate"
         [style]="{height: '10px'}"
     ></p-progressBar>
-    <div class="mt-2 text-end text-[--text-color-secondary]">
+    <!-- <div class="mt-2 text-end text-[--text-color-secondary]">
         Estimated remaining processing time: 30 minutes
-    </div>
+    </div> -->
 </div>
-<div
-    class="my-8 flex max-h-[540px] grow items-center gap-12 rounded-md bg-[--surface-b] px-12 pb-12"
->
-    <img
-        class="h-auto w-[300px]"
-        src="assets/laptop.png"
-        alt="Data science on laptop screen"
-    />
-    <div class="max-w-[480px]">
-        <h2 class="mb-6">What is Somn?</h2>
-        <p class="leading-6">
-            Somn is an open-source tool, committed to broadening access
-            to AI-enabled synthesis planning. Interested in applying
-            this project framework to another chemical system or
-            restarting Somn’s active learning workflow with your own
-            data? Explore Somn’s public code repository here: <br/>
-            <a
-                class="text-[#0080FF] underline leading-6"
-                href="https://github.com/SEDenmarkLab/Lucid_Somnambulist"
-            >
-                <i class="pi pi-external-link mx-2"></i>
-                https://github.com/SEDenmarkLab/Lucid_Somnambulist
-            </a>
-        </p>
+<div class="flex gap-4">
+    <div
+        class="my-8 flex max-h-[540px] grow items-center gap-12 rounded-md bg-[#F3F5FB] px-12 pb-12 w-1/2"
+    >
+        <div class="max-w-[480px]">
+            <h4 class="my-12">Want us to let you know when your job is done?</h4>
+            <p class="leading-lg">
+                Leave an email to get an notification when your results are ready to view.
+            </p>
+            <div class="w-full my-4">
+                <div class="p-inputgroup">
+                    <input
+                        id="subscriber-email"
+                        type="email"
+                        aria-describedby="subscriber-email-help"
+                        [class]="'h-12 w-full'"
+                        pInputText
+                        placeholder="Enter email here"
+                        formControlName="subscriberEmail"
+                    />
+                    <button type="button" class="p-2 px-6 font-bold text-white bg-primary"
+                        [class.bg-[#64748B]]="form.invalid"
+                        [disabled]="form.invalid"
+                    >Submit</button>
+                </div>
+                <small
+                    id="subscriber-email-help"
+                    class="block mt-2 p-error"
+                    *ngIf="form.invalid && form.dirty"
+                    >Email is invalid.</small
+                >
+            </div>
+
+            <p-checkbox
+                name="subscription"
+                styleClass="subscription-checkbox"
+                label="Agree to receive email notifications and updates about Somn."
+                formControlName="agreeToSubscription"
+                [binary]="true"
+            ></p-checkbox>
+        </div>
+    </div>
+    <div
+        class="my-8 flex h-[26.5rem] grow items-center gap-12 rounded-md bg-[#F3F5FB] px-12 pb-12 w-1/2"
+    >
+        <div class="max-w-[480px]">
+            <h4 class="my-12">What is Somn?</h4>
+            <p class="leading-lg">
+                Machine-learning methods have great potential to accelerate the identification of reaction 
+                conditions for chemical transformations. Somn has been developed to predict substrate-adaptive 
+                conditions for palladium (Pd)–catalyzed carbon-nitrogen (C–N) couplings.
+            </p>
+            <p class="pt-6 leading-lg">
+                Learn more <a
+                    class="text-[#0080FF] underline font-semibold"
+                    href="/about"
+                >
+                    about the model
+                </a> design and development, access <a
+                    class="text-[#0080FF] underline font-semibold"
+                    href="/about"
+                >
+                    training data
+                </a>, <a
+                    class="text-[#0080FF] underline font-semibold"
+                    href="/about"
+                >
+                    GitHub
+                </a> public code 
+                repository, and <a
+                    class="text-[#0080FF] underline font-semibold"
+                    href="/about"
+                >
+                    publications
+                </a>.
+            </p>
+        </div>
     </div>
 </div>

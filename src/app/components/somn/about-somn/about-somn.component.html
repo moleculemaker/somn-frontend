@@ -1,14 +1,14 @@
-<div class="-mb-4 flex h-full flex-col">
-    <div class="mt-6 flex h-full flex-col items-center">
-        <div class="lg:w-screen-lg flex w-full p-4">
+<div class="flex flex-col h-full -mb-4">
+    <div class="flex flex-col items-center h-full mt-6">
+        <div class="flex w-full p-4 lg:w-screen-lg">
             <a class="font-bold" href="/">
                 <h6>
-                    <i class="pi pi-chevron-left text-xs"></i>
+                    <i class="text-xs pi pi-chevron-left"></i>
                     <span class="ml-4 text-[#224063]">Back to Home page</span>
                 </h6>
             </a>
         </div>
-        <div class="lg:w-screen-lg flex w-full grow p-4 pb-0">
+        <div class="flex w-full p-4 pb-0 lg:w-screen-lg grow">
             <nav class="flex w-[200px] flex-col">
                 <button
                     class="z-10 flex items-center border-r-2 border-solid p-4 hover:bg-gray-100 active:border-[#495057] text-nowrap"
@@ -57,38 +57,42 @@
                 </button>
             </nav>
 
+            <div class="-ml-0.5 h-full border-l-2 border-solid border-[#e5e7eb]"></div>
+
             <!-- About -->
-            <main
-                *ngIf="activePanel$.value === ActiveAboutPanel.ABOUT"
-                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
-            >
-                <h1 class="mb-4 font-bold">About</h1>
-                <p class="max-w-screen-md leading-6">
-                    Machine-learning methods have great potential to accelerate
-                    the identification of reaction conditions for chemical
-                    transformations. Somn has been developed to predict
-                    substrate-adaptive conditions for palladium (Pd)–catalyzed
-                    carbon-nitrogen (C–N) couplings. The design and construction
-                    of this tool required the generation of an experimental
-                    dataset that explores a diverse network of reactant pairings
-                    across a set of reaction conditions. A large scope of C–N
-                    couplings was actively learned by neural network models by
-                    using a systematic process to design experiments.
-                </p>
-                <p class="mt-8 max-w-screen-md leading-6">
-                    The models showed good performance in experimental
-                    validation: Ten products were isolated in more than 85%
-                    yield from a range of couplings with out-of-sample reactants
-                    designed to challenge the models. Importantly, the developed
-                    workflow continually improves the prediction capability of
-                    the tool as the corpus of data grows.
-                </p>
-            </main>
+            <div class="max-w-screen-md">
+                <main
+                    *ngIf="activePanel$.value === ActiveAboutPanel.ABOUT"
+                    class="w-full h-full pb-4 pl-16"
+                >
+                    <h1 class="mb-4 font-bold">About</h1>
+                    <h5 class="leading-xl">
+                        Machine-learning methods have great potential to accelerate
+                        the identification of reaction conditions for chemical
+                        transformations. Somn has been developed to predict
+                        substrate-adaptive conditions for palladium (Pd)–catalyzed
+                        carbon-nitrogen (C–N) couplings. The design and construction
+                        of this tool required the generation of an experimental
+                        dataset that explores a diverse network of reactant pairings
+                        across a set of reaction conditions. A large scope of C–N
+                        couplings was actively learned by neural network models by
+                        using a systematic process to design experiments.
+                    </h5>
+                    <h5 class="mt-8 leading-xl">
+                        The models showed good performance in experimental
+                        validation: Ten products were isolated in more than 85%
+                        yield from a range of couplings with out-of-sample reactants
+                        designed to challenge the models. Importantly, the developed
+                        workflow continually improves the prediction capability of
+                        the tool as the corpus of data grows.
+                    </h5>
+                </main>
+            </div>
 
             <!-- Training Data -->
             <main
                 *ngIf="activePanel$.value === ActiveAboutPanel.TRAINING_DATA"
-                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
+                class="w-full h-full pb-4 pl-16"
             >
                 <div class="flex items-center justify-between">
                     <h1 class="font-bold">Training Data</h1>
@@ -99,10 +103,10 @@
                         (click)="resultsTable.exportCSV()"
                     ></p-button>
                 </div>
-                <p class="mt-3 mb-4 max-w-screen-md leading-6">
+                <h5 class="mt-3 mb-4 leading-xl">
                     Browse Somn’s training dataset and view overall model
                     performance plots (training, validation, and test).
-                </p>
+                </h5>
                 <div>
                     <p-table
                         #resultsTable
@@ -120,7 +124,7 @@
                                 Training Data
                                 <div class="flex items-center gap-2">
                                     <button
-                                        class="border-green rounded-lg border p-2 font-normal"
+                                        class="btn-outline"
                                         (click)="showFilters$.next(!showFilters$.value)"
                                     >
                                         <i class="pi pi-filter"></i>
@@ -130,7 +134,7 @@
                                         >
                                     </button>
                                     <button
-                                        class="border-green rounded-lg border p-2 font-normal"
+                                        class="btn-outline"
                                         (click)="clearAllFilters()"
                                     >
                                         Clear All
@@ -138,7 +142,7 @@
                                 </div>
                             </div>
 
-                            <hr *ngIf="showFilters$.value" class="-mx-4 my-2" />
+                            <hr *ngIf="showFilters$.value" class="my-2 -mx-4" />
                             <div *ngIf="showFilters$.value" class="flex gap-2">
                                 <p-columnFilter
                                     class="w-1/5"
@@ -272,8 +276,8 @@
                                 ></app-yield-filter>
                             </div>
 
-                            <hr class="-mx-4 mt-2" />
-                            <div class="-mx-4 -mb-4 bg-white py-4">
+                            <hr class="mt-2 -mx-4" />
+                            <div class="py-4 -mx-4 -mb-4 bg-white">
                                 <div
                                     class="px-8 text-lg font-semibold underline decoration-dotted"
                                 >
@@ -320,7 +324,7 @@
                                 <td>{{ row.solvent }}</td>
                                 <td>{{ row.base }}</td>
                                 <td>
-                                    <span class="inline-block h-3 w-3" [style]="{ background: row.color }"></span>
+                                    <span class="inline-block w-3 h-3" [style]="{ background: row.color }"></span>
                                     {{ row.yield * 100 | number:'1.1-2' }}%
                                 </td>
                             </tr>
@@ -329,80 +333,85 @@
                 </div>
             </main>
 
-            <!-- Github -->
-            <main
-                *ngIf="activePanel$.value === ActiveAboutPanel.GITHUB"
-                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
-            >
-                <h1 class="mb-4 font-bold">Github</h1>
-                <p class="max-w-screen-md leading-6">
-                    Somn is an open-source tool, committed to broadening access
-                    to AI-enabled synthesis planning. Interested in applying
-                    this project framework to another chemical system or
-                    restarting Somn’s active learning workflow with your own
-                    data? Explore Somn’s public code repository here:
-                    <a
-                        class="text-[#0080FF] underline"
-                        href="https://github.com/SEDenmarkLab/Lucid_Somnambulist"
-                    >
-                        <i class="pi pi-external-link mx-2"></i>
-                        https://github.com/SEDenmarkLab/Lucid_Somnambulist
-                    </a>
-                </p>
-            </main>
-
-            <!-- Publications -->
-            <main
-                *ngIf="activePanel$.value === ActiveAboutPanel.PUBLICATIONS"
-                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
-            >
-                <h1 class="mb-4 font-bold">Publications</h1>
-                <p class="max-w-screen-md leading-6">
-                    Learn more about the research process behind the design and
-                    construction of Somn.
-                </p>
-
-                <ul class="mt-8">
-                    <li class="mt-4 flex items-center">
-                        <span class="font-semibold leading-6"
-                            >Science Research Article:</span
-                        >
+            <div class="max-w-screen-md">
+                <!-- Github -->
+                <main
+                    *ngIf="activePanel$.value === ActiveAboutPanel.GITHUB"
+                    class="w-full h-full pb-4 pl-16"
+                >
+                    <h1 class="mb-4 font-bold">Github</h1>
+                    <h5 class="leading-xl">
+                        Somn is an open-source tool, committed to broadening access
+                        to AI-enabled synthesis planning. Interested in applying
+                        this project framework to another chemical system or
+                        restarting Somn’s active learning workflow with your own
+                        data? Explore Somn’s public code repository here:
                         <a
                             class="text-[#0080FF] underline"
-                            href="https://www.science.org/doi/10.1126/science.adg2114"
-                            ><i class="pi pi-external-link mx-2"></i>DOI:
-                            10.1126/science.adg2114</a
+                            href="https://github.com/SEDenmarkLab/Lucid_Somnambulist"
                         >
-                    </li>
-                    <li class="mt-4 flex items-center">
-                        <span class="font-semibold leading-6"
-                            >ChemRxiv Manuscript:</span
-                        >
-                        <!-- TODO: add missing link -->
-                        <a class="text-[#0080FF] underline" href=""
-                            ><i class="pi pi-external-link mx-2"></i>DOI:
-                            10.26434/chemrxiv-2022-hspwv-v2</a
-                        >
-                    </li>
-                </ul>
-            </main>
+                            <i class="mx-2 pi pi-external-link"></i>
+                            https://github.com/SEDenmarkLab/Lucid_Somnambulist
+                        </a>
+                    </h5>
+                </main>
 
-            <!-- Get Involved -->
-            <main
-                *ngIf="activePanel$.value === ActiveAboutPanel.GET_INVOLVED"
-                class="-ml-0.5 h-full w-full border-l-2 border-solid border-[#e5e7eb] pb-4 pl-16"
-            >
-                <h1 class="mb-4 font-bold">Get involved</h1>
-                <p class="max-w-screen-md leading-6">
-                    We welcome you questions, suggestions, and feedback! Get in
-                    touch with us via email: 
-                    <a
-                        class="font-semibold text-[#0080FF] underline"
-                        href="mailto:somn-feedback@moleculemaker.org"
-                        >somn-feedback@moleculemaker.org</a
-                    >
-                </p>
-            </main>
+                <!-- Publications -->
+                <main
+                    *ngIf="activePanel$.value === ActiveAboutPanel.PUBLICATIONS"
+                    class="w-full h-full pb-4 pl-16"
+                >
+                    <h1 class="mb-4 font-bold">Publications</h1>
+                    <h5 class="leading-xl">
+                        Learn more about the research process behind the design and
+                        construction of Somn.
+                    </h5>
+
+                    <ul class="mt-8">
+                        <li class="flex items-center mt-4">
+                            <h5 class="mt-0 font-semibold opacity-100 leading-xl"
+                                >Science Research Article:</h5
+                            >
+                            <h5 class="mt-0 opacity-100 leading-xl">
+                                <a
+                                    class="text-[#0080FF] underline"
+                                    href="https://www.science.org/doi/10.1126/science.adg2114"
+                                    ><i class="mx-2 pi pi-external-link"></i>DOI:
+                                    10.1126/science.adg2114</a
+                                >
+                            </h5>
+                        </li>
+                        <li class="flex items-center mt-4">
+                            <h5 class="mt-0 font-semibold opacity-100 leading-xl"
+                                >ChemRxiv Manuscript:</h5
+                            >
+                            <h5 class="mt-0 opacity-100 leading-xl">
+                                <a class="text-[#0080FF] underline" href="https://chemrxiv.org/engage/chemrxiv/article-details/63e81a7afcfb27a31f9b6e66"
+                                    ><i class="mx-2 pi pi-external-link"></i>DOI:
+                                    10.26434/chemrxiv-2022-hspwv-v2</a
+                                >
+                            </h5>
+                        </li>
+                    </ul>
+                </main>
+
+                <!-- Get Involved -->
+                <main
+                    *ngIf="activePanel$.value === ActiveAboutPanel.GET_INVOLVED"
+                    class="w-full h-full pb-4 pl-16"
+                >
+                    <h1 class="mb-4 font-bold">Get involved</h1>
+                    <h5 class="leading-xl">
+                        We welcome you questions, suggestions, and feedback! Get in
+                        touch with us via email: 
+                        <a
+                            class="font-semibold text-[#0080FF] underline"
+                            href="mailto:somn-feedback@moleculemaker.org"
+                            >somn-feedback@moleculemaker.org</a
+                        >
+                    </h5>
+                </main>
+            </div>
         </div>
     </div>
 </div>

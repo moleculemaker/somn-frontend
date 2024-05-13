@@ -125,15 +125,22 @@ button {
 
 h1 {
 	@apply text-4xl;
+	@apply font-bold;
+	@apply leading-xl;
 }
 
 h2 {
 	@apply text-3xl;
+	@apply font-bold;
+	@apply leading-normal;
 }
 
 h4 {
 	@apply text-xl;
+	@apply leading-lg;
 	@apply opacity-100;
+	@apply font-bold;
+	@apply leading-lg;
 
 	text: {
         transform: none;
@@ -142,7 +149,6 @@ h4 {
 
 h5 {
 	@apply text-lg;
-	@apply opacity-100;
 
 	text: {
         transform: none;
@@ -151,6 +157,7 @@ h5 {
 
 h6 {
 	@apply text-base;
+	@apply leading-lg;
 }
 
 small {
