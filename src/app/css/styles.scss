@@ -82,6 +82,10 @@ html, body {
 		@apply p-4;
 		@apply w-full;
 		@apply font-semibold;
+
+		.p-panel-title {
+			@apply font-semibold;
+		}
 	}
 
 	.p-panel-header:has(button) {
@@ -145,5 +149,25 @@ h6 {
 
 small {
 	@apply text-sm;
+}
+
+hr {
+	@apply border-t;
+	@apply border-b-0;
+	@apply border-solid;
+	@apply border-[--surface-d];
+	@apply m-0;
+}
+
+.btn-outline {
+	@apply border;
+	@apply border-solid;
+	@apply border-[--surface-d];
+	@apply bg-transparent;
+	@apply text-text-primary;
+	@apply rounded-md;
+	@apply p-2;
+	@apply text-base;
+	@apply leading-lg;
 }
 /**************************** MMLI Customized END **************************/
