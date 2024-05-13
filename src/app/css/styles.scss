@@ -106,8 +106,17 @@ html, body {
 	}
 }
 
+.pi {
+	font-size: inherit;
+}
+
+body, span, div, p {
+	@apply text-base;
+}
+
 button {
 	@apply font-normal;
+	@apply bg-transparent;
 }
 
 h1 {
@@ -131,10 +140,6 @@ h5 {
 }
 
 h6 {
-	@apply text-base;
-}
-
-body {
 	@apply text-base;
 }
 

@@ -3,7 +3,7 @@ module.exports = {
   content: ["./src/**/*.{html,ts,scss}"],
   theme: {
     fontSize: {
-      "sm": "0.65625rem",
+      "sm": "0.75rem",
       "base": "0.875rem",
       "lg": "1.09375rem",
       "xl": "1.3125rem",
@@ -21,6 +21,10 @@ module.exports = {
     extend: {
       colors: {
         primary: "#224063",
+        text: {
+          primary: "#495057",
+          secondary: "#6C757D",
+        },
         gray: {
           50: "#f8f9fa",
           primary: "#495057",
