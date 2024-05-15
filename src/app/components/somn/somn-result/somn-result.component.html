@@ -11,7 +11,7 @@
             <h6 class="text-text-secondary leading-lg">
                 Reactant Pair Name: {{ (response$ | async)?.reactantPairName || 'loading...' }}
                 <span class="mx-2">|</span>
-                Submission Time: {{ status.time_created | date: 'short' }}
+                Submission Time: {{ ((status.time_created || 0) * 1000) | date: 'short' }}
             </h6>
         </div>
         <div class="flex items-center gap-2">
