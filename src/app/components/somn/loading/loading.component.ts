@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { interval } from "rxjs";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 @Component({
   selector: "app-loading",
@@ -10,5 +10,10 @@ import { interval } from "rxjs";
   },
 })
 export class LoadingComponent {
-  loadingValue$ = interval(1000);
+  form = new FormGroup({
+    agreeToSubscription: new FormControl(false),
+    subscriberEmail: new FormControl("", [Validators.required, Validators.email]),
+  });
+
+  // TODO: Implement subscription to job
 }

@@ -1,25 +1,25 @@
-<div class="flex h-full flex-col">
-    <div class="mt-16 flex justify-center">
-        <div class="lg:w-screen-lg p-4">
-            <h1 class="font-bold">Welcome to Somn!</h1>
-            <p class="mt-4 max-w-screen-md leading-6">
+<div class="flex flex-col h-full">
+    <div class="flex justify-center mt-16">
+        <div class="w-full p-4">
+            <h1 class="font-bold leading-xl">Welcome to Somn!</h1>
+            <h5 class="max-w-screen-md mt-4 leading-xl">
                 We’re trained a model called Somn for predicting
                 substrate-adaptive conditions for C-N couplings. Somn is your
                 experimental design assistant: you provide reactant pairs and
                 Somn will make yield percent predictions for a variety of
                 reaction conditions (catalysts, solvents, and bases), which you
                 can use to inform your own synthesis planning.
-            </p>
-            <p class="mt-4 max-w-screen-md leading-6">
+            </h5>
+            <h5 class="max-w-screen-md mt-4 leading-xl">
                 Learn more about how Somn works below and get started using the
                 tool today.
-            </p>
+            </h5>
         </div>
     </div>
 
-    <div class="mt-4 flex justify-center">
-        <div class="lg:w-screen-lg p-4">
-            <h2 class="text-bold pb-6">Somn Workflow</h2>
+    <div class="flex justify-center mt-4">
+        <div class="p-4 lg:w-screen-lg">
+            <h4 class="pb-6">Somn Workflow</h4>
             <div class="flex gap-2">
                 <!-- TODO: Image gets scaled on small screen -->
                 <p-card
@@ -46,9 +46,9 @@
                         </div>
                     </ng-template>
 
-                    <h3 class="-mt-6">Request Configuration</h3>
-                    <ul class="-mb-6 ml-6 list-disc">
-                        <li class="mt-4 pl-2">
+                    <h5 class="mt-0 font-bold opacity-100 leading-lg">Request Configuration</h5>
+                    <ul class="ml-6 list-disc">
+                        <li class="pl-2 mt-4 leading-normal">
                             Input an aryl halide / amine reactant pair for
                             reaction condition prediction (catalysts, solvents,
                             andbases)
@@ -96,14 +96,14 @@
                         </div>
                     </ng-template>
 
-                    <h3 class="-mt-6">Analysis</h3>
-                    <ul class="-mb-6 ml-6 list-disc">
-                        <li class="mt-4 pl-2">
+                    <h5 class="mt-0 font-bold opacity-100 leading-lg">Analysis</h5>
+                    <ul class="ml-6 list-disc">
+                        <li class="pl-2 mt-4 leading-normal">
                             Somn analyzes your reactant pair input to make yield
                             percentage predictions across a variety of reaction
                             conditions
                         </li>
-                        <li class="pl-2 pt-2">
+                        <li class="pt-2 pl-2 leading-normal">
                             Optionally submit an email address to receive a
                             notification when your results are ready
                         </li>
@@ -158,9 +158,9 @@
                         </div>
                     </ng-template>
 
-                    <h3 class="-mt-6">Model Results</h3>
-                    <ul class="-mb-6 ml-6 list-disc">
-                        <li class="mt-4 pl-2">
+                    <h5 class="mt-0 font-bold opacity-100 leading-lg">Model Results</h5>
+                    <ul class="ml-6 list-disc">
+                        <li class="pl-2 mt-4 leading-normal">
                             Access model outputs such as yield percentage
                             predictions and reaction conditions for your input
                             reactants
@@ -171,7 +171,7 @@
         </div>
     </div>
 
-    <div class="lg:w-screen-lg mt-6 p-4">
+    <div class="p-4 mt-6 lg:w-screen-lg">
         <div class="flex justify-end">
             <a href="/somn">
                 <p-button

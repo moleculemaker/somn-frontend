@@ -1,15 +1,3 @@
-::ng-deep .p-panel {
-    @apply h-full;
-
-    .p-panel-header,
-    .p-panel-content {
-        padding: 0;
-        @apply flex;
-        @apply flex-col;
-        @apply grow;
-    }
-}
-
 ::ng-deep .p-tabview-panels {
     @apply h-full;
     @apply w-full;

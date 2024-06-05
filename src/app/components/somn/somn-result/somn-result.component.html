@@ -1,55 +1,40 @@
  <!-- Model Results -->
  <div class="grow">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
-            <h2 class="flex items-center mb-2 gap-2 text-[#495057]">
-                <!-- TODO: add return button -->
-                <!-- <span>
-                    <button
-                        class="inline-flex items-center rounded-lg p-1 border bg-[#F8F9FA]"
-                    >
-                        <i class="text-sm pi pi-chevron-left"></i>
-                    </button>
-                </span> -->
-                Job ID: {{ status.job_id || 'loading' }} <button type="button" title="copy job id">
-                    <i class="pi pi-copy" (click)="copyAndPasteURL()" ></i>
+            <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl">
+                Job ID: {{ status.job_id || 'loading' }} 
+                <button type="button" title="copy job id" class="border-none cursor-pointer">
+                    <i class="pi pi-copy" (click)="copyAndPasteURL()"></i>
                 </button>
-                
-            </h2>
-            <p class="leading-6 text-[--text-color-secondary]">
+            </h5>
+            <h6 class="text-text-secondary leading-lg">
                 Reactant Pair Name: {{ (response$ | async)?.reactantPairName || 'loading...' }}
                 <span class="mx-2">|</span>
                 Submission Time: {{ ((status.time_created || 0) * 1000) | date: 'short' }}
-            </p>
+            </h6>
         </div>
         <div class="flex items-center gap-2">
             <p-splitButton label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
             <div class="flex flex-col justify-center">
-                <button class="p-3 px-4 font-semibold text-white border rounded-md bg-primary" (click)="onExportResults()">
+                <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="onExportResults()">
                     <i class="mr-2 pi pi-download"></i>
-                    Export
+                    <span class="font-semibold">Export</span>                    
                 </button>
             </div>
         </div>
     </div>
     <app-loading *ngIf="isLoading$ | async"></app-loading>
     <div *ngIf="!(isLoading$ | async)">
-        <div class="flex gap-2 my-4">
-            <p-panel class="grow">
-                <ng-template pTemplate="header">
-                    <div
-                        class="flex items-center justify-between w-full p-4"
-                    >
-                        <span class="font-semibold">Reactants</span>
-                    </div>
-                </ng-template>
+        <div class="flex gap-2">
+            <p-panel class="grow" header="Reactant">
                 <ng-template pTemplate="content">
                     <div class="flex w-full" *ngIf="(response$ | async) as response">
                         <div
                             class="flex flex-col justify-between w-1/2 p-4"
                         >
                             <div class="flex items-center mb-2">
-                                <span class="ml-2 text-base"
+                                <span class="leading-xl"
                                     >Aryl Halides</span
                                 >
                             </div>
@@ -77,7 +62,7 @@
                             class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4"
                         >
                             <div class="flex items-center">
-                                <span class="ml-2 text-base">Amine</span>
+                                <span class="text-base leading-xl">Amine</span>
                             </div>
                             <div
                                 class="flex items-stretch justify-between gap-4 px-2"
@@ -102,16 +87,9 @@
                     </div>
                 </ng-template>
             </p-panel>
-            <div
-                class="flex w-1/4 flex-col rounded-md border border-solid border-[--surface-d]"
-                *ngIf="(topYieldConditions$ | async) as topYieldConditions"
-            >
-                <div
-                    class="flex items-center justify-between w-full p-4 rounded-t-md bg-gray-50"
-                >
-                    <span class="font-semibold">Top Predictions</span>
-                </div>
-                <hr />
+            <p-panel class="w-1/4" 
+                header="Top Predictions"
+                *ngIf="(topYieldConditions$ | async) as topYieldConditions">
                 <div class="flex justify-between p-2 px-4 leading-5 h-1/2">
                     <span
                         class="w-1/2 underline decoration-dotted"
@@ -143,30 +121,26 @@
                         Solvent {{ topYieldConditions.conditions[0].solvent }}
                     </div>
                 </div>
-            </div>
+            </p-panel>
         </div>
         <p-panel styleClass="my-4">
             <ng-template pTemplate="header">
-                <div
-                    class="flex items-center justify-between w-full p-2 px-4"
-                >
-                    <span class="font-semibold">Predicted Conditions</span>
-                    <div class="flex items-center gap-2">
-                        <button
-                            class="p-2 border rounded-lg border-green"
-                            (click)="showFilters$.next(!showFilters$.value)"
-                        >
-                            <i class="pi pi-filter"></i>
-                            Filter
-                            <p-chip>{{ numFilters$ | async }}</p-chip>
-                        </button>
-                        <button
-                            class="p-2 border rounded-lg border-green"
-                            (click)="clearAllFilters()"
-                        >
-                            Clear All
-                        </button>
-                    </div>
+                <span class="grow">Predicted Conditions</span>
+                <div class="flex items-center gap-2">
+                    <button
+                        class="btn-outline"
+                        (click)="showFilters$.next(!showFilters$.value)"
+                    >
+                        <i class="pi pi-filter"></i>
+                        <h6 class="inline leading-lg">Filter</h6>
+                        <p-chip>{{ numFilters$ | async }}</p-chip>
+                    </button>
+                    <button
+                        class="btn-outline"
+                        (click)="clearAllFilters()"
+                    >
+                        Clear All
+                    </button>
                 </div>
             </ng-template>
 
@@ -294,15 +268,15 @@
 
 <ng-template #moleculeInfo let-molecule let-showSmiles="showSmiles">
     <div class="flex justify-between mt-2">
-        <span class="font-light">Name</span>
-        <span class="font-semibold text-end">{{ molecule.name }}</span>
+        <span class="leading-sm">Name</span>
+        <span class="font-semibold text-end leading-base">{{ molecule.name }}</span>
     </div>
     <div *ngIf="showSmiles" class="flex justify-between mt-2">
-        <span class="font-light">SMILES</span>
-        <span class="font-semibold text-end">{{ molecule.smiles }}</span>
+        <span class="leading-sm">SMILES</span>
+        <span class="font-semibold text-end leading-base">{{ molecule.smiles }}</span>
     </div>
     <div class="flex justify-between mt-2">
-        <span class="font-light">Reaction Site</span>
-        <span class="font-semibold text-end">{{ molecule.reactionSite }}</span>
+        <span class="leading-sm">Reaction Site</span>
+        <span class="font-semibold text-end leading-base">{{ molecule.reactionSite }}</span>
     </div>
 </ng-template>

@@ -1,80 +1,77 @@
 <!-- Request Configuration -->
 <div class="grow">
     <form
-        class="flex h-full flex-col justify-between"
+        class="flex flex-col justify-between h-full"
         [formGroup]="request.form"
         (ngSubmit)="onSubmit(request)"
     >
         <div>
-            <h2 class="mb-2">Input reactant pair for C-N coupling</h2>
-            <p class="leading-6">
-                Please input one aryl halide / amine reactant pair to
-                analyze for reaction condition predictions (catalyst, base,
-                solvent).
-            </p>
+            <div class="my-6">
+                <h5 class="mb-2 font-bold opacity-100 leading-lg">Input reactant pair for C-N coupling</h5>
+                <h6 class="leading-lg text-text-secondary">
+                    Please input one aryl halide / amine reactant pair to
+                    analyze for reaction condition predictions (catalyst, base,
+                    solvent).
+                </h6>
+            </div>
 
-            <!-- Pathway Search -->
-            <div class="mt-2 flex flex-col gap-6">
-                <p-panel class="my-6">
+            <div class="flex flex-col gap-6">
+                <p-panel>
                     <ng-template pTemplate="header">
-                        <div
-                            class="flex w-full items-center justify-between p-2 px-4"
-                        >
-                            <span class="text-lg">Reactant Pair</span>
-                            <div class="flex gap-2">
-                                <button
-                                    type="button"
-                                    class="flex items-center rounded-md border p-2"
-                                    (click)="useExample()"
-                                >
-                                    <i class="pi pi-box mr-2"></i>
-                                    Use an Example
-                                </button>
-                            </div>
+                        <span class="grow">Reactant Pair</span>
+                        <div class="flex gap-2">
+                            <button
+                                type="button"
+                                class="flex items-center btn-outline"
+                                (click)="useExample()"
+                            >
+                                <i class="mr-2 pi pi-box"></i>
+                                Use an Example
+                            </button>
                         </div>
                     </ng-template>
                     <ng-template pTemplate="content">
                         <div class="p-4">
                             <section>
-                                <h3>Name your reactant pair</h3>
+                                <p class="font-semibold leading-lg">Name your reactant pair</p>
                                 <input
                                     pInputText
-                                    class="mt-2 w-full"
+                                    class="w-full mt-2"
                                     placeholder="Enter reactant pair name..."
                                     formControlName="reactantPairName"
                                 />
                             </section>
                             <section class="mt-2">
-                                <h3>
+                                <p class="font-semibold leading-lg">
                                     Enter your reactants<i
-                                        class="pi pi-info-circle ml-2"
+                                        class="ml-2 pi pi-info-circle"
                                         pTooltip="Somn has been trained on reactants with only one reaction site; thus, it is encouraged to input reactants with one reaction site for analysis. If you enter a reactant with multiple reaction sites, you will be required to specify the intended reaction site."
                                     ></i>
-                                </h3>
+                                </p>
                                 <div class="flex w-full gap-2">
-                                    <div class="flex w-1/2 flex-col">
+                                    <div class="flex flex-col w-1/2">
                                         <div
-                                            class="mt-2 flex justify-between text-sm"
+                                            class="flex justify-between mt-2 text-sm"
                                         >
-                                            <span class="font-semibold"
+                                            <small class="font-semibold leading-xl"
                                                 >Aryl Halide
-                                                (bromide/chloride)</span
+                                                (bromide/chloride)</small
                                             >
-                                            <span class="font-light"
+                                            <small class="leading-xl text-text-secondary"
                                                 >Example:
-                                                <span
-                                                    class="font-normal underline cursor-pointer"
+                                                <small
+                                                    class="font-semibold underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['arylHalideName'].setValue('Bromobenzene');
                                                         request.form.controls['arylHalide'].controls['smiles'].setValue('c1ccc(cc1)Br');
                                                     "
-                                                    >Bromobenzene</span
+                                                    >Bromobenzene</small
                                                 >
-                                            </span>
+                                            </small>
                                         </div>
                                         <input
                                             pInputText
-                                            class="mt-2 w-full"
+                                            class="w-full mt-2"
                                             placeholder="Enter aryl halide name..."
                                             formControlName="arylHalideName"
                                         />
@@ -87,28 +84,28 @@
                                         >
                                         </app-marvinjs-input>
                                     </div>
-                                    <div class="flex w-1/2 flex-col">
+                                    <div class="flex flex-col w-1/2">
                                         <div
-                                            class="mt-2 flex justify-between text-sm"
+                                            class="flex justify-between mt-2 text-sm"
                                         >
-                                            <span class="font-semibold"
-                                                >Amine</span
+                                            <small class="font-semibold leading-xl"
+                                                >Amine</small
                                             >
-                                            <span class="font-light"
+                                            <small class="leading-xl text-text-secondary"
                                                 >Example:
-                                                <span
-                                                    class="font-normal underline cursor-pointer"
+                                                <small
+                                                    class="font-semibold underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['amineName'].setValue('Bromobenzene');
                                                         request.form.controls['amine'].controls['smiles'].setValue('c1ccc(cc1)Br');
                                                     "
-                                                    >Bromobenzene</span
+                                                    >Bromobenzene</small
                                                 >
-                                            </span>
+                                            </small>
                                         </div>
                                         <input
                                             pInputText
-                                            class="mt-2 w-full"
+                                            class="w-full mt-2"
                                             placeholder="Enter amine name..."
                                             formControlName="amineName"
                                         />
@@ -135,11 +132,11 @@
         >
             <!-- TODO: validate parent form using input from marvin-js-input -->
             <div class="flex flex-col">
-                <div class="mb-2 flex items-end justify-center">
-                    <span class="mb-1 pr-12">
-                        <h2 class="m-0 mr-2 inline">Email</h2>
-                        Leave an email to get an notification when your
-                        results are ready.
+                <div class="flex items-end justify-center mb-2">
+                    <span class="pr-12 mb-1">
+                        <h5 class="inline m-0 mr-2 font-semibold opacity-100 leading-lg">Email</h5>
+                        <h6 class="inline-block leading-lg">Leave an email to get an notification when your
+                        results are ready.</h6>
                     </span>
                 </div>
                 <div class="w-full">
@@ -158,7 +155,7 @@
                         *ngIf="request.form.controls['subscriberEmail'].invalid
                             && request.form.controls['subscriberEmail'].dirty"
                         id="subscriber-email-help"
-                        class="p-error mt-2 block"
+                        class="block mt-2 p-error"
                         >Email is invalid.</small
                     >
                 </div>

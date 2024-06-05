@@ -6,9 +6,11 @@ import { AboutSomnComponent } from "./components/somn/about-somn/about-somn.comp
 import { SomnComponent } from "./components/somn/somn/somn.component";
 import { MainLayoutComponent } from "./components/somn/main-layout/main-layout.component";
 import { SomnResultComponent } from "./components/somn/somn-result/somn-result.component";
+import { FontMatchComponent } from "./components/somn/font-match/font-match.component";
 
 const routes: Routes = [
   { path: "about", component: AboutSomnComponent },
+  // { path: "font-match", component: FontMatchComponent },
   { path: "", pathMatch:"full", redirectTo: "home" },
   {
     path: "somn",
