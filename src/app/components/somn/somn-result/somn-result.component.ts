@@ -36,7 +36,6 @@ export class SomnResultComponent {
 
   isLoading$ = this.statusResponse$.pipe(
     map((job) => job.phase === JobStatus.Processing || job.phase === JobStatus.Queued),
-    map((loading) => true),
   );
 
   response$ = this.statusResponse$.pipe(

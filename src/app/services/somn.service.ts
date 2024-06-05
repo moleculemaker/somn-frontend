@@ -119,6 +119,14 @@ export class SomnService {
     return this.filesService.getErrorsBucketNameErrorsJobIdGet(JobType.Somn, jobID);
   }
 
+  updateSubscriberEmail(jobId: string, email: string) {
+    return this.jobsService.patchExistingJobJobTypeJobsJobIdRunIdPatch(JobType.Somn, {
+      job_id: jobId,
+      run_id: 0,
+      email: email,
+    });
+  }
+
   newRequest() {
     return new SomnRequest();
   }

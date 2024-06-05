@@ -1,5 +1,7 @@
 import { Component } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { ActivatedRoute } from "@angular/router";
+import { SomnService } from "~/app/services/somn.service";
 
 @Component({
   selector: "app-loading",
@@ -15,5 +17,20 @@ export class LoadingComponent {
     subscriberEmail: new FormControl("", [Validators.required, Validators.email]),
   });
 
-  // TODO: Implement subscription to job
+  jobId: string = this.route.snapshot.paramMap.get("id") || "";
+
+  constructor(
+    private route: ActivatedRoute,
+    private somnService: SomnService,
+  ) {}
+
+  onSubmit() {
+    if (this.form.invalid) {
+      return;
+    }
+    
+    this.somnService.updateSubscriberEmail(this.jobId, 
+      this.form.controls["subscriberEmail"].value || ''
+    );
+  }
 }
