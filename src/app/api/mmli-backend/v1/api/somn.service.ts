@@ -22,8 +22,6 @@ import { Observable }                                        from 'rxjs';
 import { CheckReactionSiteResponse } from '../model/checkReactionSiteResponse';
 // @ts-ignore
 import { HTTPValidationError } from '../model/hTTPValidationError';
-// @ts-ignore
-import { SomnRequestBody } from '../model/somnRequestBody';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -99,13 +97,14 @@ export class SomnService {
      * Check Reaction Sites
      * @param smiles 
      * @param role 
+     * @param requestBody 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<CheckReactionSiteResponse>;
-    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<CheckReactionSiteResponse>>;
-    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<CheckReactionSiteResponse>>;
-    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, requestBody?: Array<number>, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<CheckReactionSiteResponse>;
+    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, requestBody?: Array<number>, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<CheckReactionSiteResponse>>;
+    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, requestBody?: Array<number>, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<CheckReactionSiteResponse>>;
+    public checkReactionSitesSomnAllReactionSitesGet(smiles: string, role: string, requestBody?: Array<number>, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
         if (smiles === null || smiles === undefined) {
             throw new Error('Required parameter smiles was null or undefined when calling checkReactionSitesSomnAllReactionSitesGet.');
         }
@@ -121,65 +120,6 @@ export class SomnService {
         if (role !== undefined && role !== null) {
           localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
             <any>role, 'role');
-        }
-
-        let localVarHeaders = this.defaultHeaders;
-
-        let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
-        if (localVarHttpHeaderAcceptSelected === undefined) {
-            // to determine the Accept header
-            const httpHeaderAccepts: string[] = [
-                'application/json'
-            ];
-            localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
-        }
-        if (localVarHttpHeaderAcceptSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
-        }
-
-        let localVarHttpContext: HttpContext | undefined = options && options.context;
-        if (localVarHttpContext === undefined) {
-            localVarHttpContext = new HttpContext();
-        }
-
-
-        let responseType_: 'text' | 'json' | 'blob' = 'json';
-        if (localVarHttpHeaderAcceptSelected) {
-            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
-                responseType_ = 'text';
-            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
-                responseType_ = 'json';
-            } else {
-                responseType_ = 'blob';
-            }
-        }
-
-        let localVarPath = `/somn/all-reaction-sites`;
-        return this.httpClient.request<CheckReactionSiteResponse>('get', `${this.configuration.basePath}${localVarPath}`,
-            {
-                context: localVarHttpContext,
-                params: localVarQueryParameters,
-                responseType: <any>responseType_,
-                withCredentials: this.configuration.withCredentials,
-                headers: localVarHeaders,
-                observe: observe,
-                reportProgress: reportProgress
-            }
-        );
-    }
-
-    /**
-     * Start Somn
-     * @param somnRequestBody 
-     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
-     * @param reportProgress flag to report request and response progress.
-     */
-    public startSomnSomnRunPost(somnRequestBody: SomnRequestBody, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any>;
-    public startSomnSomnRunPost(somnRequestBody: SomnRequestBody, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<any>>;
-    public startSomnSomnRunPost(somnRequestBody: SomnRequestBody, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<any>>;
-    public startSomnSomnRunPost(somnRequestBody: SomnRequestBody, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
-        if (somnRequestBody === null || somnRequestBody === undefined) {
-            throw new Error('Required parameter somnRequestBody was null or undefined when calling startSomnSomnRunPost.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -222,11 +162,12 @@ export class SomnService {
             }
         }
 
-        let localVarPath = `/somn/run`;
-        return this.httpClient.request<any>('post', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/somn/all-reaction-sites`;
+        return this.httpClient.request<CheckReactionSiteResponse>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: somnRequestBody,
+                body: requestBody,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,
