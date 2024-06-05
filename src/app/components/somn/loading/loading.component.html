@@ -1,13 +1,10 @@
-<div class="mt-6 flex flex-col">
+<div class="flex flex-col mt-6">
     <p-progressBar
         class="w-full"
         [showValue]="false"
-        [value]="loadingValue$ | async"
+        mode="indeterminate"
         [style]="{height: '10px'}"
     ></p-progressBar>
-    <div class="mt-2 text-end text-[--text-color-secondary]">
-        Estimated remaining processing time: 30 minutes
-    </div>
 </div>
 <div
     class="my-8 flex max-h-[540px] grow items-center gap-12 rounded-md bg-[--surface-b] px-12 pb-12"
@@ -29,7 +26,7 @@
                 class="text-[#0080FF] underline leading-6"
                 href="https://github.com/SEDenmarkLab/Lucid_Somnambulist"
             >
-                <i class="pi pi-external-link mx-2"></i>
+                <i class="mx-2 pi pi-external-link"></i>
                 https://github.com/SEDenmarkLab/Lucid_Somnambulist
             </a>
         </p>

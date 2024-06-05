@@ -42,19 +42,23 @@ export class SomnResultComponent {
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
     switchMap((job) => {
       const jobInfo = JSON.parse(job.job_info || '');
-      return this.somnService.getResult(this.jobId).pipe(
-        map((data: Products) => ({
-          data,
+      return combineLatest([
+        this.somnService.getResult(this.jobId),
+        this.somnService.checkReactionSites(jobInfo.el, 'electrophile'),
+        this.somnService.checkReactionSites(jobInfo.nuc, 'nucleophile'),
+      ]).pipe(
+        map(([data, el, nuc]) => ({
+          data: data as Products,
           reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
           arylHalide: {
             name: jobInfo.el_name || 'aryl halide',
             smiles: jobInfo.el || 'aryl halide smiles',
-            structures: [''],
+            structure: el.svg,
           },
           amine: {
             name: jobInfo.nuc_name || 'amine',
             smiles: jobInfo.nuc || 'amine smiles',
-            structures: [''],
+            structure: nuc.svg,
           },
         }))
       )
@@ -223,6 +227,20 @@ export class SomnResultComponent {
       return `${response.reactantPairName}-${status.job_id}`;
     }),
   );
+
+  copyAndPasteURL(): void {
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = window.location.href;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+  }
 
   constructor(
     private somnService: SomnService,
