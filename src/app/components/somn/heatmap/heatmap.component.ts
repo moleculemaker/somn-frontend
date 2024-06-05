@@ -188,7 +188,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .style("text-anchor", "end")
         .attr("fill", "black")
         .attr("font-weight", "600")
-        .attr("transform", "translate(200, 60)")
+        .attr("transform", "translate(200, 90)")
         .text("Catalyst");
     });
   }
