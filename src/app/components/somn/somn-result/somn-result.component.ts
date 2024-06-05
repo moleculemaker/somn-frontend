@@ -42,10 +42,12 @@ export class SomnResultComponent {
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
     switchMap((job) => {
       const jobInfo = JSON.parse(job.job_info || '');
+      const elIdxes = jobInfo['el_idx'] ? [jobInfo['el_idx']] : [];
+      const nucIdxes = jobInfo['nuc_idx'] ? [jobInfo['nuc_idx']] : [];
       return combineLatest([
         this.somnService.getResult(this.jobId),
-        this.somnService.checkReactionSites(jobInfo.el, 'electrophile'),
-        this.somnService.checkReactionSites(jobInfo.nuc, 'nucleophile'),
+        this.somnService.checkReactionSites(jobInfo.el, 'electrophile', elIdxes),
+        this.somnService.checkReactionSites(jobInfo.nuc, 'nucleophile', nucIdxes),
       ]).pipe(
         map(([data, el, nuc]) => ({
           data: data as Products,
