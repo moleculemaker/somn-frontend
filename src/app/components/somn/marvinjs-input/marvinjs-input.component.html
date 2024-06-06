@@ -40,13 +40,13 @@
             class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
             [class.invalid]="control.errors && control.dirty"
         >
-            <i class="pi pi-check-circle absolute left-3 top-3"></i>
+            <i class="absolute pi pi-check-circle left-3 top-3"></i>
             <div class="flex items-center justify-center">
-                <div #svgContainer [innerHTML]="svg$.value | safe:'html'"></div>
+                <div id="svgContainer" [innerHTML]="svg$.value | safe:'html'"></div>
             </div>
             <div
                 *ngIf="reactionSitesOptions$.value.length > 1"
-                class="m-2 flex flex-col gap-2 rounded-md p-2"
+                class="flex flex-col gap-2 p-2 m-2 rounded-md"
                 [class]="(control.value === null)? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
             >
                 <div
@@ -79,7 +79,7 @@
     <ng-template pTemplate="content">
         <ng-container *ngIf="(reactionSiteSvgs$ | async) as options">
             <ng-container *ngIf="formGroup.controls['reactionSite'] as control">
-                <div class="p-4 flex gap-4 flex-wrap justify-stretch cursor-pointer">
+                <div class="flex flex-wrap gap-4 p-4 cursor-pointer justify-stretch">
                     <span *ngFor="let option of options; let i = index" 
                         [class.active]="control.value === option.value"
                         class="
@@ -91,7 +91,7 @@
                             control.markAsDirty()
                         "
                     >
-                        <div class="mb-2 ml-2 flex items-center gap-2"><div class="dot" [style]="{ background: colors[i] }"></div> Reaction Site {{ i + 1 }}</div>
+                        <div class="flex items-center gap-2 mb-2 ml-2"><div class="dot" [style]="{ background: colors[i] }"></div> Reaction Site {{ i + 1 }}</div>
                         <div [innerHTML]="option.svg | safe:'html'" class="inline-block rounded-md border-solid border-[#DEE2E6] border p-2 bg-white"></div>
                     </span>
                 </div>

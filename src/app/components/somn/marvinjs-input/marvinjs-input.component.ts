@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef } from "@angular/core";
-import { AbstractControl, AsyncValidator, ControlValueAccessor, FormControl, FormGroup, NG_ASYNC_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validators } from "@angular/forms";
-import { BehaviorSubject, Observable, catchError, combineLatest, debounceTime, filter, interval, map, of, skipUntil, switchMap, take, takeUntil, tap, timer } from "rxjs";
+import { AbstractControl, FormControl, FormGroup, NG_ASYNC_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validators } from "@angular/forms";
+import { BehaviorSubject, Observable, catchError, combineLatest, debounceTime, filter, interval, map, of, switchMap, takeUntil, tap } from "rxjs";
 import { SomnService, ReactionSiteInput, ReactionSiteInputFormControls } from "~/app/services/somn.service";
 
 import * as d3 from "d3";
@@ -37,7 +37,6 @@ export class MarvinjsInputComponent {
   };
 
   @Output() valueChange = new EventEmitter<ReactionSiteInput>();
-  @ViewChild('svgContainer') svgContainer: ElementRef<HTMLDivElement>;
 
   formGroup = new FormGroup<ReactionSiteInputFormControls>({
     smiles: new FormControl("", [Validators.required], [this.validate.bind(this)]),
@@ -91,11 +90,13 @@ export class MarvinjsInputComponent {
   constructor(
     private somnService: SomnService,
   ) {
-    interval(1000)
-      .pipe(takeUntil(this.svgSetupNeeded$.pipe(filter((v) => !v))))
-      .subscribe(() => {
-        if (this.svgContainer && this.svgContainer.nativeElement.innerHTML !== "") {
-          const svg = this.svgContainer.nativeElement.querySelector('svg');
+    setInterval(() => {
+      if (this.svgSetupNeeded$.value) {
+        const svgContainer = document.getElementById('svgContainer');
+        console.log('1');
+        if (svgContainer && svgContainer.innerHTML !== "") {
+          // console.log(svgContainer);
+          const svg = svgContainer.querySelector('svg');
           const ellipses = d3.select(svg).selectAll('ellipse');
           const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
 
@@ -121,11 +122,13 @@ export class MarvinjsInputComponent {
           
           this.svgSetupNeeded$.next(false);
         }
-      });
+      }
+    }, 1000);
 
     this.formGroup.controls['reactionSite'].valueChanges.subscribe((v) => {
-      if (this.svgContainer && this.svgContainer.nativeElement.innerHTML !== "") {
-        const svg = this.svgContainer.nativeElement.querySelector('svg');
+      const svgContainer = document.getElementById('svgContainer');
+      if (svgContainer && svgContainer.innerHTML !== "") {
+        const svg = svgContainer.querySelector('svg');
         const ellipses = d3.select(svg).selectAll('ellipse');
 
         if (ellipses.size() <= 1) {
