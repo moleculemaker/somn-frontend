@@ -42,27 +42,45 @@ export class SomnResultComponent {
     skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
     switchMap((job) => {
       const jobInfo = JSON.parse(job.job_info || '');
-      const elIdxes = jobInfo['el_idx'] ? [jobInfo['el_idx']] : [];
-      const nucIdxes = jobInfo['nuc_idx'] ? [jobInfo['nuc_idx']] : [];
       return combineLatest([
         this.somnService.getResult(this.jobId),
-        this.somnService.checkReactionSites(jobInfo.el, 'electrophile', elIdxes),
-        this.somnService.checkReactionSites(jobInfo.nuc, 'nucleophile', nucIdxes),
+        this.somnService.checkReactionSites(jobInfo.el, 'electrophile'),
+        this.somnService.checkReactionSites(jobInfo.nuc, 'nucleophile'),
+        of(jobInfo),
       ]).pipe(
-        map(([data, el, nuc]) => ({
-          data: data as Products,
-          reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
-          arylHalide: {
-            name: jobInfo.el_name || 'aryl halide',
-            smiles: jobInfo.el || 'aryl halide smiles',
-            structure: el.svg,
-          },
-          amine: {
-            name: jobInfo.nuc_name || 'amine',
-            smiles: jobInfo.nuc || 'amine smiles',
-            structure: nuc.svg,
-          },
-        }))
+        map(([data, el, nuc, jobInfo]) => {
+          const hightlighedSvg = (svg: string, site: number) => {
+            const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
+            const container = document.createElement('div');
+            container.innerHTML = svg;
+            let ellipses = d3.select(container).selectAll('ellipse');
+
+            ellipses.each((d, i, nodes) => {
+              const node = d3.select(nodes[i]);
+              const data = parseInt(node.attr('class').split('atom-')[1]);
+              node
+                .attr('style', '')
+                .attr('fill', data === site ? colors[i % colors.length] : '#5F6C8D40');
+            });
+
+            return container.innerHTML;
+          }
+
+          return {
+            data: data as Products,
+            reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
+            arylHalide: {
+              name: jobInfo.el_name || 'aryl halide',
+              smiles: jobInfo.el || 'aryl halide smiles',
+              structure: hightlighedSvg(el.svg, jobInfo.el_idx),
+            },
+            amine: {
+              name: jobInfo.nuc_name || 'amine',
+              smiles: jobInfo.nuc || 'amine smiles',
+              structure: hightlighedSvg(nuc.svg, jobInfo.nuc_idx),
+            },
+          };
+        })
       )
     }),
     tap((data) => { console.log('result: ', data) }),

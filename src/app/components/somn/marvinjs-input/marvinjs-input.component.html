@@ -42,7 +42,7 @@
         >
             <i class="absolute pi pi-check-circle left-3 top-3"></i>
             <div class="flex items-center justify-center">
-                <div id="svgContainer" [innerHTML]="svg$.value | safe:'html'"></div>
+                <div class="svgContainer" [innerHTML]="svg$.value | safe:'html'"></div>
             </div>
             <div
                 *ngIf="reactionSitesOptions$.value.length > 1"
