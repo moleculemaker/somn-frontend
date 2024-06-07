@@ -93,62 +93,60 @@ export class MarvinjsInputComponent {
   ) {
     setInterval(() => {
       if (this.svgSetupNeeded$.value) {
-        const svgContainers = document.querySelectorAll('.svgContainer');
-        svgContainers.forEach((svgContainer) => {
-          if (svgContainer && svgContainer.innerHTML !== "") {
-            const svg = svgContainer.querySelector('svg');
-            const ellipses = d3.select(svg).selectAll('ellipse');
-            const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
-  
-            d3.select(svg).select('rect').style('fill', '#ffffff00');
-  
-            ellipses.each((d, i, nodes) => {
-              const node = d3.select(nodes[i]);
-              node
-                .attr('style', 'cursor: pointer;')
-                .attr('fill', colors[i % colors.length]);
-            });
-  
-            ellipses.on('click', (e, d) => {
-              const className = e.target.getAttribute('class');
-              const data = className.split('atom-')[1];
-              this.formGroup.controls['reactionSite'].setValue(parseInt(data));
-              this.formGroup.controls['reactionSite'].markAsDirty();
-            });
-            
-            this.svgSetupNeeded$.next(false);
-          }
-        });
-      }
-    }, 1000);
-
-    this.formGroup.controls['reactionSite'].valueChanges.subscribe((v) => {
-      const svgContainers = document.querySelectorAll('.svgContainer');
-      svgContainers.forEach((svgContainer) => {
-        if (svgContainer && svgContainer.innerHTML !== "") {
-          const svg = svgContainer.querySelector('svg');
+        if (this.svgContainer && this.svgContainer.nativeElement.innerHTML !== "") {
+          const svg = this.svgContainer.nativeElement.querySelector('svg');
           const ellipses = d3.select(svg).selectAll('ellipse');
+          const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
+
+          d3.select(svg).select('rect').style('fill', '#ffffff00');
 
           ellipses.each((d, i, nodes) => {
             const node = d3.select(nodes[i]);
-            const className = node.attr('class');
-            const data = parseInt(className.split('atom-')[1]);
-
             node
-              .attr('data-idx', data)
               .attr('style', 'cursor: pointer;')
-              .attr('fill', v === data ? this.colors[i % this.colors.length] : '#5F6C8D40');
+              .attr('fill', colors[i % colors.length]);
           });
 
-          ellipses.on('click', (e) => {
-            const data = e.target.getAttribute('data-idx');
+          ellipses.on('click', (e, d) => {
+            const className = e.target.getAttribute('class');
+            const data = className.split('atom-')[1];
             this.formGroup.controls['reactionSite'].setValue(parseInt(data));
             this.formGroup.controls['reactionSite'].markAsDirty();
           });
           
           this.svgSetupNeeded$.next(false);
         }
-      });
+      }
+    }, 1000);
+
+    this.formGroup.controls['reactionSite'].valueChanges.subscribe((v) => {
+      if (this.svgContainer && this.svgContainer.nativeElement.innerHTML !== "") {
+        const svg = this.svgContainer.nativeElement.querySelector('svg');
+        const ellipses = d3.select(svg).selectAll('ellipse');
+
+        if (ellipses.size() <= 1) {
+          return;
+        }
+
+        ellipses.each((d, i, nodes) => {
+          const node = d3.select(nodes[i]);
+          const className = node.attr('class');
+          const data = parseInt(className.split('atom-')[1]);
+
+          node
+            .attr('data-idx', data)
+            .attr('style', 'cursor: pointer;')
+            .attr('fill', v === data ? this.colors[i % this.colors.length] : '#5F6C8D40');
+        });
+
+        ellipses.on('click', (e) => {
+          const data = e.target.getAttribute('data-idx');
+          this.formGroup.controls['reactionSite'].setValue(parseInt(data));
+          this.formGroup.controls['reactionSite'].markAsDirty();
+        });
+        
+        this.svgSetupNeeded$.next(false);
+      }
     });
 
     this.formGroup.statusChanges.subscribe((v) => {

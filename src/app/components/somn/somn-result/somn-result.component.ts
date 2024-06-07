@@ -31,7 +31,7 @@ export class SomnResultComponent {
       || data.phase === JobStatus.Queued
     , true),
     shareReplay(1),
-    tap((data) => { console.log('job status: ', data.phase) }),
+    tap((data) => { console.log('job status: ', data.phase, data) }),
   );
 
   isLoading$ = this.statusResponse$.pipe(
@@ -54,6 +54,8 @@ export class SomnResultComponent {
             const container = document.createElement('div');
             container.innerHTML = svg;
             let ellipses = d3.select(container).selectAll('ellipse');
+
+            console.log(site);
 
             ellipses.each((d, i, nodes) => {
               const node = d3.select(nodes[i]);
