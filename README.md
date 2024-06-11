@@ -14,7 +14,7 @@ hub.chemaxon.com/artifactory/api/npm/npm/:email=<email>
 hub.chemaxon.com/artifactory/api/npm/npm/:always-auth=true
 ```
 
-Reach out to developers for the secrets.
+MMLI members can reach out to developers for the secrets. Non-MMLI members will need to make their own arrangements for a MarvinJS license.
 
 Run `npm start` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
