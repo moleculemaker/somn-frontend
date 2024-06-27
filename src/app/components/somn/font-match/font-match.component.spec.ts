@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ExportMenuComponent } from './export-menu.component';
+import { FontMatchComponent } from './font-match.component';
 
-describe('ExportMenuComponent', () => {
-  let component: ExportMenuComponent;
-  let fixture: ComponentFixture<ExportMenuComponent>;
+describe('FontMatchComponent', () => {
+  let component: FontMatchComponent;
+  let fixture: ComponentFixture<FontMatchComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ExportMenuComponent ]
+      declarations: [ FontMatchComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ExportMenuComponent);
+    fixture = TestBed.createComponent(FontMatchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

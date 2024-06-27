@@ -1,53 +1,40 @@
  <!-- Model Results -->
  <div class="grow">
-    <div class="flex justify-between items-center">
+    <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
-            <h2 class="flex items-center mb-2 gap-2 text-[#495057]">
-                <!-- TODO: add return button -->
-                <!-- <span>
-                    <button
-                        class="inline-flex items-center rounded-lg p-1 border bg-[#F8F9FA]"
-                    >
-                        <i class="pi pi-chevron-left text-sm"></i>
-                    </button>
-                </span> -->
-                Job ID: {{ status.job_id || 'loading' }} <button type="button" title="copy job id"><i class="pi pi-copy"></i></button>
-                
-            </h2>
-            <p class="leading-6 text-[--text-color-secondary]">
+            <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl">
+                Job ID: {{ status.job_id || 'loading' }} 
+                <button type="button" title="copy job id" class="border-none cursor-pointer">
+                    <i class="pi pi-copy"></i>
+                </button>
+            </h5>
+            <h6 class="text-text-secondary leading-lg">
                 Reactant Pair Name: {{ (response$ | async)?.reactantPairName || 'loading...' }}
                 <span class="mx-2">|</span>
-                Submission Time: {{ status.time_created | date: 'short' }}
-            </p>
+                Submission Time: {{ ((status.time_created || 0) * 1000) | date: 'short' }}
+            </h6>
         </div>
         <div class="flex items-center gap-2">
             <p-splitButton label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
             <div class="flex flex-col justify-center">
-                <button class="rounded-md border p-3 px-4 bg-primary text-white font-semibold" (click)="onExportResults()">
-                    <i class="pi pi-download mr-2"></i>
-                    Export
+                <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="onExportResults()">
+                    <i class="mr-2 pi pi-download"></i>
+                    <span class="font-semibold">Export</span>                    
                 </button>
             </div>
         </div>
     </div>
     <app-loading *ngIf="isLoading$ | async"></app-loading>
     <div *ngIf="!(isLoading$ | async)">
-        <div class="my-4 flex gap-2">
-            <p-panel class="grow">
-                <ng-template pTemplate="header">
-                    <div
-                        class="flex w-full items-center justify-between p-4"
-                    >
-                        <span class="font-semibold">Reactants</span>
-                    </div>
-                </ng-template>
+        <div class="flex gap-2">
+            <p-panel class="grow" header="Reactant">
                 <ng-template pTemplate="content">
                     <div class="flex w-full" *ngIf="(response$ | async) as response">
                         <div
-                            class="flex w-1/2 flex-col justify-between p-4"
+                            class="flex flex-col justify-between w-1/2 p-4"
                         >
-                            <div class="mb-2 flex items-center">
-                                <span class="ml-2 text-base"
+                            <div class="flex items-center mb-2">
+                                <span class="leading-xl"
                                     >Aryl Halides</span
                                 >
                             </div>
@@ -67,7 +54,7 @@
                                     />
                                 </div>
                                 <div
-                                    class="flex grow flex-col justify-between"
+                                    class="flex flex-col justify-between grow"
                                 >
                                     <ng-container
                                         *ngTemplateOutlet="moleculeInfo; context: {
@@ -82,7 +69,7 @@
                             class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4"
                         >
                             <div class="flex items-center">
-                                <span class="ml-2 text-base">Amine</span>
+                                <span class="text-base leading-xl">Amine</span>
                             </div>
                             <div
                                 class="flex items-stretch justify-between gap-4 px-2"
@@ -100,7 +87,7 @@
                                     />
                                 </div>
                                 <div
-                                    class="flex grow flex-col justify-between"
+                                    class="flex flex-col justify-between grow"
                                 >
                                     <ng-container
                                         *ngTemplateOutlet="moleculeInfo; context: {
@@ -114,17 +101,10 @@
                     </div>
                 </ng-template>
             </p-panel>
-            <div
-                class="flex w-1/4 flex-col rounded-md border border-solid border-[--surface-d]"
-                *ngIf="(topYieldConditions$ | async) as topYieldConditions"
-            >
-                <div
-                    class="flex w-full items-center justify-between rounded-t-md bg-gray-50 p-4"
-                >
-                    <span class="font-semibold">Top Predictions</span>
-                </div>
-                <hr />
-                <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
+            <p-panel class="w-1/4" 
+                header="Top Predictions"
+                *ngIf="(topYieldConditions$ | async) as topYieldConditions">
+                <div class="flex justify-between p-2 px-4 leading-5 h-1/2">
                     <span
                         class="w-1/2 underline decoration-dotted"
                     >
@@ -132,14 +112,14 @@
                     </span>
                     <div class="grow text-end">
                         <span class="font-semibold">
-                            <span class="inline-block h-3 w-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
+                            <span class="inline-block w-3 h-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
                             {{ topYieldConditions.topYield | number: "2.0-0" }}%
                         </span>
                         <br />({{ topYieldConditions.conditions.length }} Condition{{ topYieldConditions.conditions.length > 1 ? 's' : '' }})
                     </div>
                 </div>
                 <hr />
-                <div class="flex h-1/2 justify-between p-2 px-4 leading-5">
+                <div class="flex justify-between p-2 px-4 leading-5 h-1/2">
                     <span
                         class="w-1/2 underline decoration-dotted"
                     >
@@ -147,7 +127,7 @@
                             Top Reaction Conditions
                         </span>
                     </span>
-                    <div class="grow text-end font-semibold">
+                    <div class="font-semibold grow text-end">
                         Catalyst {{ topYieldConditions.conditions[0].catalyst }}
                         <br/>
                         Base {{ topYieldConditions.conditions[0].base }}
@@ -155,35 +135,31 @@
                         Solvent {{ topYieldConditions.conditions[0].solvent }}
                     </div>
                 </div>
-            </div>
+            </p-panel>
         </div>
         <p-panel styleClass="my-4">
             <ng-template pTemplate="header">
-                <div
-                    class="flex w-full items-center justify-between p-2 px-4"
-                >
-                    <span class="font-semibold">Predicted Conditions</span>
-                    <div class="flex items-center gap-2">
-                        <button
-                            class="border-green rounded-lg border p-2"
-                            (click)="showFilters$.next(!showFilters$.value)"
-                        >
-                            <i class="pi pi-filter"></i>
-                            Filter
-                            <p-chip>{{ numFilters$ | async }}</p-chip>
-                        </button>
-                        <button
-                            class="border-green rounded-lg border p-2"
-                            (click)="clearAllFilters()"
-                        >
-                            Clear All
-                        </button>
-                    </div>
+                <span class="grow">Predicted Conditions</span>
+                <div class="flex items-center gap-2">
+                    <button
+                        class="btn-outline"
+                        (click)="showFilters$.next(!showFilters$.value)"
+                    >
+                        <i class="pi pi-filter"></i>
+                        <h6 class="inline leading-lg">Filter</h6>
+                        <p-chip>{{ numFilters$ | async }}</p-chip>
+                    </button>
+                    <button
+                        class="btn-outline"
+                        (click)="clearAllFilters()"
+                    >
+                        Clear All
+                    </button>
                 </div>
             </ng-template>
 
             <div class="flex flex-col">
-                <div *ngIf="showFilters$.value" class="flex w-full gap-4 bg-gray-50 p-2 px-4">
+                <div *ngIf="showFilters$.value" class="flex w-full gap-4 p-2 px-4 bg-gray-50">
                     <p-multiSelect
                         class="w-1/4"
                         styleClass="w-full"
@@ -236,7 +212,7 @@
                     <div class="w-1/2 bg-gray-50">
                         <div class="pt-6">
                             <div
-                                class="text-md px-8 font-bold underline decoration-dotted"
+                                class="px-8 font-bold underline text-md decoration-dotted"
                             >
                                 Yield %
                             </div>
@@ -266,7 +242,7 @@
                         dataKey="rowId"
                         [rows]="10"
                         [rowsPerPageOptions]="[10, 20, 50]"
-                        class="h-full w-1/2"
+                        class="w-1/2 h-full"
                         tableStyleClass="w-1/2"
                         styleClass="w-full border-l border-solid border-[--surface-d]"
                     >
@@ -292,7 +268,7 @@
                                 <td>{{ row.base }}</td>
                                 <td>{{ row.solvent }}</td>
                                 <td>
-                                    <span class="inline-block h-3 w-3" [style]="{ background: row.color }"></span>
+                                    <span class="inline-block w-3 h-3" [style]="{ background: row.color }"></span>
                                     {{ row.yield * 100 | number:'1.1-2' }}%
                                 </td>
                             </tr>
@@ -305,16 +281,16 @@
 </div>
 
 <ng-template #moleculeInfo let-molecule let-showSmiles="showSmiles">
-    <div class="mt-2 flex justify-between">
-        <span class="font-light">Name</span>
-        <span class="text-end font-semibold">{{ molecule.name }}</span>
+    <div class="flex justify-between mt-2">
+        <span class="leading-sm">Name</span>
+        <span class="font-semibold text-end leading-base">{{ molecule.name }}</span>
     </div>
-    <div *ngIf="showSmiles" class="mt-2 flex justify-between">
-        <span class="font-light">SMILES</span>
-        <span class="text-end font-semibold">{{ molecule.smiles }}</span>
+    <div *ngIf="showSmiles" class="flex justify-between mt-2">
+        <span class="leading-sm">SMILES</span>
+        <span class="font-semibold text-end leading-base">{{ molecule.smiles }}</span>
     </div>
-    <div class="mt-2 flex justify-between">
-        <span class="font-light">Reaction Site</span>
-        <span class="text-end font-semibold">{{ molecule.reactionSite }}</span>
+    <div class="flex justify-between mt-2">
+        <span class="leading-sm">Reaction Site</span>
+        <span class="font-semibold text-end leading-base">{{ molecule.reactionSite }}</span>
     </div>
 </ng-template>
