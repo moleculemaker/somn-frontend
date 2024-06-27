@@ -5,7 +5,7 @@
             <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl">
                 Job ID: {{ status.job_id || 'loading' }} 
                 <button type="button" title="copy job id" class="border-none cursor-pointer">
-                    <i class="pi pi-copy"></i>
+                    <i class="pi pi-copy" (click)="copyAndPasteURL()"></i>
                 </button>
             </h5>
             <h6 class="text-text-secondary leading-lg">
@@ -31,7 +31,7 @@
                 <ng-template pTemplate="content">
                     <div class="flex w-full" *ngIf="(response$ | async) as response">
                         <div
-                            class="flex flex-col justify-between w-1/2 p-4"
+                            class="flex flex-col justify-between w-1/2 p-4 max-w-[400px]"
                         >
                             <div class="flex items-center mb-2">
                                 <span class="leading-xl"
@@ -44,14 +44,7 @@
                                 <div
                                     class="rounded-md border border-solid border-[--surface-d] p-2"
                                 >
-                                    <img
-                                        class="h-auto w-[100px]"
-                                        [src]="response.arylHalide.structures[0]"
-                                    />
-                                    <img
-                                        class="h-auto w-[100px]"
-                                        [src]="response.arylHalide.structures[1]"
-                                    />
+                                    <app-molecule-image [width]="100" [height]="60" [molecule]="response.arylHalide.structure"></app-molecule-image>
                                 </div>
                                 <div
                                     class="flex flex-col justify-between grow"
@@ -66,7 +59,7 @@
                             </div>
                         </div>
                         <div
-                            class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4"
+                            class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4 max-w-[400px]"
                         >
                             <div class="flex items-center">
                                 <span class="text-base leading-xl">Amine</span>
@@ -77,14 +70,7 @@
                                 <div
                                     class="rounded-md border border-solid border-[--surface-d] p-2"
                                 >
-                                    <img
-                                        class="h-auto w-[100px]"
-                                        [src]="response.amine.structures[0]"
-                                    />
-                                    <img
-                                        class="h-auto w-[100px]"
-                                        [src]="response.amine.structures[1]"
-                                    />
+                                    <app-molecule-image [width]="100" [height]="60" [molecule]="response.amine.structure"></app-molecule-image>
                                 </div>
                                 <div
                                     class="flex flex-col justify-between grow"
@@ -283,14 +269,14 @@
 <ng-template #moleculeInfo let-molecule let-showSmiles="showSmiles">
     <div class="flex justify-between mt-2">
         <span class="leading-sm">Name</span>
-        <span class="font-semibold text-end leading-base">{{ molecule.name }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.name }}</span>
     </div>
     <div *ngIf="showSmiles" class="flex justify-between mt-2">
         <span class="leading-sm">SMILES</span>
-        <span class="font-semibold text-end leading-base">{{ molecule.smiles }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.smiles }}</span>
     </div>
     <div class="flex justify-between mt-2">
         <span class="leading-sm">Reaction Site</span>
-        <span class="font-semibold text-end leading-base">{{ molecule.reactionSite }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.reactionSite }}</span>
     </div>
 </ng-template>

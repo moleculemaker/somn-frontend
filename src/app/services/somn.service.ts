@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { FilesService, Job, JobType, JobsService, SomnRequestBody, SomnService as SomeApiService } from "../api/mmli-backend/v1";
+import { BodyCreateJobJobTypeJobsPost, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
 import { JobCreate } from "../api/mmli-backend/v1/model/jobCreate";
 
 import sampleRequest from '../../assets/example_request.json';
@@ -49,15 +49,21 @@ export class SomnRequest {
     subscriberEmail: new FormControl("", [Validators.email]),
   });
 
-  toRequestBody(): SomnRequestBody {
-    return {
-      user_email: this.form.controls["subscriberEmail"].value || "",
-      jobId: '',
+  toRequestBody(): BodyCreateJobJobTypeJobsPost {
+    const job_info = {
       reactant_pair_name: this.form.controls["reactantPairName"].value || "",
+      
       nuc_name: this.form.controls["amineName"].value || "",
       nuc: this.form.controls["amine"].value.smiles || "",
+      // nuc_idx: this.form.controls["amine"].value.reactionSite || 0,
+
       el_name: this.form.controls["arylHalideName"].value || "",
       el: this.form.controls["arylHalide"].value.smiles || "",
+      // el_idx: this.form.controls["arylHalide"].value.reactionSite || 0,
+    }
+    return {
+      email: this.form.controls["subscriberEmail"].value || "",
+      job_info: JSON.stringify(job_info),
     };
   }
 }
@@ -94,16 +100,12 @@ export class SomnService {
     }))
   };
 
-  createJobAndRunSomn(requestBody: SomnRequestBody): Observable<Job>{
-    const jobCreate: JobCreate = {
-      job_info: JSON.stringify(requestBody),
-      email: requestBody.user_email,
-    }
-    return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, jobCreate);
+  createJobAndRunSomn(requestBody: BodyCreateJobJobTypeJobsPost): Observable<Job>{
+    return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, requestBody);
   }
 
-  checkReactionSites(smiles: string, type: string): Observable<CheckReactionSiteResponse> {
-    return this.somnService.checkReactionSitesSomnAllReactionSitesGet(smiles, type);
+  checkReactionSites(smiles: string, type: string, hightlight_idxes?: number[]): Observable<CheckReactionSiteResponse> {
+    return this.somnService.checkReactionSitesSomnAllReactionSitesGet(smiles, type, hightlight_idxes);
   }
 
   getResultStatus(jobID: string): Observable<Job>{
@@ -117,6 +119,14 @@ export class SomnService {
 
   getError(jobID: string): Observable<string>{
     return this.filesService.getErrorsBucketNameErrorsJobIdGet(JobType.Somn, jobID);
+  }
+
+  updateSubscriberEmail(jobId: string, email: string) {
+    return this.jobsService.patchExistingJobJobTypeJobsJobIdRunIdPatch(JobType.Somn, {
+      job_id: jobId,
+      run_id: 0,
+      email: email,
+    });
   }
 
   newRequest() {
