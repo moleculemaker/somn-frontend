@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: "about", component: AboutSomnComponent },
   // { path: "font-match", component: FontMatchComponent },
   { path: "", pathMatch:"full", redirectTo: "home" },
+  { path: "results/:id", redirectTo: "somn/result/:id" },
   {
     path: "somn",
     component: MainLayoutComponent,
