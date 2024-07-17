@@ -55,11 +55,11 @@ export class SomnRequest {
       
       nuc_name: this.form.controls["amineName"].value || "",
       nuc: this.form.controls["amine"].value.smiles || "",
-      // nuc_idx: this.form.controls["amine"].value.reactionSite || 0,
+      nuc_idx: this.form.controls["amine"].value.reactionSite || "-",
 
       el_name: this.form.controls["arylHalideName"].value || "",
       el: this.form.controls["arylHalide"].value.smiles || "",
-      // el_idx: this.form.controls["arylHalide"].value.reactionSite || 0,
+      el_idx: this.form.controls["arylHalide"].value.reactionSite || "-",
     }
     return {
       email: this.form.controls["subscriberEmail"].value || "",
