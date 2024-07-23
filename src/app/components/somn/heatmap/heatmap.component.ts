@@ -53,7 +53,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
       }
 
       let containerEl = this.container.nativeElement;
-      let margin = { top: 120, right: 20, bottom: 100, left: 140 },
+      let margin = { top: 60, right: 20, bottom: 100, left: 140 },
         width = containerEl.clientWidth - margin.left - margin.right,
         height = containerEl.clientHeight - margin.top - margin.bottom;
 

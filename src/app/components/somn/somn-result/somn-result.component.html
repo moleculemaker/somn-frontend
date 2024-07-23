@@ -208,7 +208,7 @@
                                     Yield %
                                 </div>
                                 <app-density-plot
-                                    styleClass="h-[150px] pl-16 pr-6"
+                                    styleClass="pl-16 pr-6"
                                     [originalData]="(response$ | async)?.data || []"
                                     [data]="(filteredDataWithoutYieldRange$ | async) || []"
                                     [selectedRegion]="(selectedYield$ | async)!"
