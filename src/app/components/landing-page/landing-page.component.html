@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <div class="flex justify-center mt-4">
+    <div id="container-somn-workflow" class="flex justify-center mt-4">
         <div class="p-4 lg:w-screen-lg">
             <h4 class="pb-6">Somn Workflow</h4>
             <div class="flex gap-2">
@@ -173,7 +173,7 @@
 
     <div class="p-4 mt-6 lg:w-screen-lg">
         <div class="flex justify-end">
-            <a href="/somn">
+            <a href="/somn" id="btn-start-using-somn">
                 <p-button
                     label="Start Using Somn"
                     styleClass="bg-[#224063]"
@@ -184,3 +184,35 @@
         </div>
     </div>
 </div>
+
+<p-dialog
+    #tutorialDialog
+    header="Welcome!" 
+    [(visible)]="displayTutorial" 
+    [modal]="true" 
+    [style]="{ width: '350px' }" 
+    [draggable]="false" 
+    [resizable]="false"
+>
+    <div class="flex flex-col gap-6 -mb-2">
+        <p class="leading-xl">
+            Welcome to Somn, a substrate-adaptive condition predictor for C–N couplings. Would you like us to show you around the homepage? You can always access this tour later.
+        </p>
+        <div class="flex items-center gap-2">
+            <p-checkbox [(ngModel)]="tutorialService.showTutorial" [binary]="true"></p-checkbox>
+            <label for="show-tour">Don't show this message again</label>
+        </div>
+        <div class="flex justify-between">
+            <p-button 
+                (onClick)="displayTutorial = false"
+                styleClass="p-button-outlined" 
+                label="Skip Tour">
+            </p-button>
+            <p-button
+                (onClick)="displayTutorial = false; tutorialService.driver.drive()"
+                label="Start Tour"
+                styleClass="bg-[#224063]"
+            ></p-button>
+        </div>
+    </div>
+</p-dialog>

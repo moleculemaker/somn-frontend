@@ -10,6 +10,7 @@ import { Products, SomnService } from '~/app/services/somn.service';
 import baseJson from "../about-somn/base_map.json";
 import solventJson from "../about-somn/solvent_map.json";
 import catalystJson from "../about-somn/catalyst_map.json";
+import { TutorialService } from '~/app/services/tutorial.service';
 
 @Component({
   selector: 'app-somn-result',
@@ -23,6 +24,8 @@ export class SomnResultComponent {
   @ViewChild("resultsTable") resultsTable: Table;
   
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
+  catalystsInfo: { [key: string]: string[] } = catalystJson;
+  displayTutorial: boolean = true;
 
   statusResponse$ = timer(0, 10000).pipe(
     switchMap(() => this.somnService.getResultStatus(this.jobId)),
@@ -92,7 +95,7 @@ export class SomnResultComponent {
       data: resp.data.map((d, i: number) => ({
         ...d,
         base: baseJson[`${d["base"]}` as keyof typeof baseJson],
-        catalyst: catalystJson[`${d["catalyst"]}` as keyof typeof catalystJson],
+        catalyst: catalystJson[`${d["catalyst"]}` as keyof typeof catalystJson][0],
         solvent: solventJson[`${d["solvent"]}` as keyof typeof solventJson],
         yield: d.yield / 100,
         amineName: d.nuc_name,
@@ -101,7 +104,7 @@ export class SomnResultComponent {
         arylHalideSmiles: resp.arylHalide.smiles,
         rowId: i,
       })),
-    }))//TODO: replace with actual response
+    }))
   );
 
   showFilters$ = new BehaviorSubject(true);
@@ -268,6 +271,7 @@ export class SomnResultComponent {
     private somnService: SomnService,
     private filterService: FilterService,
     private route: ActivatedRoute,
+    protected tutorialService: TutorialService,
   ) {
     const sub1 = combineLatest([
       this.selectedCell$,
@@ -291,6 +295,112 @@ export class SomnResultComponent {
     });
 
     this.subscriptions.push(sub1, sub2);
+
+    // setup tutorial
+    tutorialService.tutorialKey = 'show-result-page-tutorial';
+    if (!tutorialService.showTutorial) {
+      this.displayTutorial = true;
+    } else {
+      this.displayTutorial = false;
+    }
+
+    tutorialService.onStart = () => {
+      this.displayTutorial = true;
+    };
+
+    tutorialService.driver.setConfig({ showProgress: true });
+    tutorialService.driver.setSteps([
+      {
+        element: '#btn-request-options',
+        popover: {
+          title: 'Request Options',
+          description: 'Modify and resubmit your request, or run a new request in another tab.',
+          side: 'bottom',
+          align: 'end'
+        }
+      },
+      {
+        element: "#btn-export",
+        popover: {
+          title: "Export",
+          description: 'Download your results. Current formats supported include PNG for visualizations (yield % distribution and heatmap) and CSV for tabular results.',
+          side: "bottom",
+          align: "end"
+        }
+      },
+      {
+        element: '#container-job-id',
+        popover: {
+          title: "Job ID",
+          description: 'Copy the link to your Job ID to revisit your results at a later time.',
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-reactants',
+        popover: {
+          title: "Reactants",
+          description: 'Review your input reactant pair.',
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-top-predictions',
+        popover: {
+          title: "Top Predictions Summary",
+          description: 'Preview the highest yield % and associated reaction conditions predicted for your request.',
+          side: "left",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-predicted-conditions',
+        popover: {
+          title: "Predicted Conditions",
+          description: 'Explore the reaction conditions and yield % predictions for your request via filters, yield % distribution and heatmap visualizations, and tabular results.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-filters',
+        popover: {
+          title: "Filter",
+          description: 'Use the filter bar to refine your results view by catalyst, base, solvent, or yield %.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#diagram-yield-distribution',
+        popover: {
+          title: "Yield % Distribution",
+          description: 'Use the sliders and/or input boxes to filter your results view by yield %.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#diagram-heatmap',
+        popover: {
+          title: "Heatmap",
+          description: 'Hover or click on an individual square in the heatmap to view the yield % details for that set of reaction conditions.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-table',
+        popover: {
+          title: "Table",
+          description: 'Sort, scroll, and page through the tabular view to find reaction conditions of interest.',
+          side: "left",
+          align: "center"
+        }
+      },
+    ]);
   }
 
   ngOnInit() {

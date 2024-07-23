@@ -1,13 +1,14 @@
-import { Component } from "@angular/core";
+import { AfterViewInit, Component, OnInit } from "@angular/core";
 import { UserInfoService } from "./services/userinfo.service";
-import { MenuItem } from "primeng/api";
+import { ConfirmationService, MenuItem } from "primeng/api";
+import { TutorialService } from "./services/tutorial.service";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   emailstring: string =
     "mailto:somn-feedback@moleculemaker.org?Subject=User feedback for Somn";
   showCite: boolean = false;
@@ -32,7 +33,10 @@ export class AppComponent {
     return this.userInfoService.userInfo;
   }
 
-  constructor(private userInfoService: UserInfoService) {}
+  constructor(
+    private userInfoService: UserInfoService,
+    protected tutorialService: TutorialService
+  ) {}
 
   ngOnInit() {
     this.userInfoService.fetchUserInfo();

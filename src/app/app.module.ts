@@ -9,7 +9,6 @@ import { AppComponent } from "./app.component";
 import { ButtonModule } from "primeng/button";
 import { InputTextareaModule } from "primeng/inputtextarea";
 import { PanelModule } from "primeng/panel";
-import { PrimeIcons } from "primeng/api";
 import { ProgressBarModule } from "primeng/progressbar";
 import { SelectButtonModule } from "primeng/selectbutton";
 import { SkeletonModule } from "primeng/skeleton";
@@ -27,10 +26,12 @@ import { RadioButtonModule } from "primeng/radiobutton";
 import { CheckboxModule } from "primeng/checkbox";
 import { CardModule } from "primeng/card";
 import { ChipModule } from "primeng/chip";
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputNumber, InputNumberModule } from "primeng/inputnumber";
 import { TabViewModule } from "primeng/tabview";
 import { TabMenuModule } from "primeng/tabmenu";
 import { SplitButtonModule } from "primeng/splitbutton";
+import { BlockUIModule } from 'primeng/blockui';
 
 import { LandingPageComponent } from "./components/landing-page/landing-page.component";
 import { LoadingComponent } from "./components/somn/loading/loading.component";
@@ -66,6 +67,7 @@ import { YieldFilterComponent } from './components/somn/yield-filter/yield-filte
 import { SomnResultComponent } from './components/somn/somn-result/somn-result.component';
 import { MainLayoutComponent } from './components/somn/main-layout/main-layout.component';
 import { MoleculeImageComponent } from "./components/somn/molecule-image/molecule-image.component";
+import { ConfirmationService } from "primeng/api";
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig("/assets/config/envvars.json");
@@ -87,6 +89,7 @@ const initAppFn = (envService: EnvironmentService) => {
     SomnResultComponent,
     MainLayoutComponent,
     MoleculeImageComponent,
+
     // FileDragNDropDirective,
     // ConfigurationComponent,
     // ResultsComponent,
@@ -99,8 +102,10 @@ const initAppFn = (envService: EnvironmentService) => {
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
+    BlockUIModule,
     CardModule,
     ChipModule,
+    ConfirmDialogModule,
     FormsModule,
     MessagesModule,
     ButtonModule,
@@ -143,6 +148,7 @@ const initAppFn = (envService: EnvironmentService) => {
   ],
   providers: [
     EnvironmentService,
+    ConfirmationService,
     {
       provide: APP_INITIALIZER,
       useFactory: initAppFn,

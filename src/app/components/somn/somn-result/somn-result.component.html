@@ -2,7 +2,7 @@
  <div class="grow">
     <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
-            <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl">
+            <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl" id="container-job-id">
                 Job ID: {{ status.job_id || 'loading' }} 
                 <button type="button" title="copy job id" class="border-none cursor-pointer">
                     <i class="pi pi-copy" (click)="copyAndPasteURL()"></i>
@@ -15,8 +15,8 @@
             </h6>
         </div>
         <div class="flex items-center gap-2">
-            <p-splitButton label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
-            <div class="flex flex-col justify-center">
+            <p-splitButton id="btn-request-options" label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
+            <div id="btn-export" class="flex flex-col justify-center">
                 <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="onExportResults()">
                     <i class="mr-2 pi pi-download"></i>
                     <span class="font-semibold">Export</span>                    
@@ -27,242 +27,250 @@
     <app-loading *ngIf="isLoading$ | async"></app-loading>
     <div *ngIf="!(isLoading$ | async)">
         <div class="flex gap-2">
-            <p-panel class="grow" header="Reactant">
-                <ng-template pTemplate="content">
-                    <div class="flex w-full" *ngIf="(response$ | async) as response">
-                        <div
-                            class="flex flex-col justify-between w-1/2 p-4 max-w-[400px]"
-                        >
-                            <div class="flex items-center mb-2">
-                                <span class="leading-xl"
-                                    >Aryl Halides</span
-                                >
-                            </div>
+            <div id="container-reactants" class="grow">
+                <p-panel header="Reactant">
+                    <ng-template pTemplate="content">
+                        <div class="flex w-full" *ngIf="(response$ | async) as response">
                             <div
-                                class="flex items-stretch justify-between gap-4 px-2"
+                                class="flex flex-col justify-between w-1/2 p-4 max-w-[400px]"
                             >
-                                <div
-                                    class="rounded-md border border-solid border-[--surface-d] p-2"
-                                >
-                                    <app-molecule-image [width]="100" [height]="60" [molecule]="response.arylHalide.structure"></app-molecule-image>
+                                <div class="flex items-center mb-2">
+                                    <span class="leading-xl"
+                                        >Aryl Halides</span
+                                    >
                                 </div>
                                 <div
-                                    class="flex flex-col justify-between grow"
+                                    class="flex items-stretch justify-between gap-4 px-2"
                                 >
-                                    <ng-container
-                                        *ngTemplateOutlet="moleculeInfo; context: {
-                                        $implicit: response.arylHalide,
-                                        showSmiles: true
-                                    }"
-                                    ></ng-container>
+                                    <div
+                                        class="rounded-md border border-solid border-[--surface-d] p-2"
+                                    >
+                                        <app-molecule-image [width]="100" [height]="60" [molecule]="response.arylHalide.structure"></app-molecule-image>
+                                    </div>
+                                    <div
+                                        class="flex flex-col justify-between grow"
+                                    >
+                                        <ng-container
+                                            *ngTemplateOutlet="moleculeInfo; context: {
+                                            $implicit: response.arylHalide,
+                                            showSmiles: true
+                                        }"
+                                        ></ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4 max-w-[400px]"
+                            >
+                                <div class="flex items-center">
+                                    <span class="text-base leading-xl">Amine</span>
+                                </div>
+                                <div
+                                    class="flex items-stretch justify-between gap-4 px-2"
+                                >
+                                    <div
+                                        class="rounded-md border border-solid border-[--surface-d] p-2"
+                                    >
+                                        <app-molecule-image [width]="100" [height]="60" [molecule]="response.amine.structure"></app-molecule-image>
+                                    </div>
+                                    <div
+                                        class="flex flex-col justify-between grow"
+                                    >
+                                        <ng-container
+                                            *ngTemplateOutlet="moleculeInfo; context: {
+                                            $implicit: response.amine,
+                                            showSmiles: true
+                                        }"
+                                        ></ng-container>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div
-                            class="flex w-1/2 flex-col justify-between border-l border-solid border-[--surface-d] p-4 max-w-[400px]"
+                    </ng-template>
+                </p-panel>
+            </div>
+            <div id="container-top-predictions" class="w-1/4">
+                <p-panel 
+                    header="Top Predictions"
+                    *ngIf="(topYieldConditions$ | async) as topYieldConditions">
+                    <div class="flex justify-between p-2 px-4 leading-5 h-1/2">
+                        <span
+                            class="w-1/2 underline decoration-dotted"
                         >
-                            <div class="flex items-center">
-                                <span class="text-base leading-xl">Amine</span>
-                            </div>
-                            <div
-                                class="flex items-stretch justify-between gap-4 px-2"
-                            >
-                                <div
-                                    class="rounded-md border border-solid border-[--surface-d] p-2"
-                                >
-                                    <app-molecule-image [width]="100" [height]="60" [molecule]="response.amine.structure"></app-molecule-image>
-                                </div>
-                                <div
-                                    class="flex flex-col justify-between grow"
-                                >
-                                    <ng-container
-                                        *ngTemplateOutlet="moleculeInfo; context: {
-                                        $implicit: response.amine,
-                                        showSmiles: true
-                                    }"
-                                    ></ng-container>
-                                </div>
-                            </div>
+                            <span [tooltipPosition]="'left'" [escape]="false"  pTooltip="<span class='font-bold'>Top Yield %</span> (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites.">Top Yield %</span>
+                        </span>
+                        <div class="grow text-end">
+                            <span class="font-semibold">
+                                <span class="inline-block w-3 h-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
+                                {{ topYieldConditions.topYield | number: "2.0-0" }}%
+                            </span>
+                            <br />({{ topYieldConditions.conditions.length }} Condition{{ topYieldConditions.conditions.length > 1 ? 's' : '' }})
                         </div>
+                    </div>
+                    <hr />
+                    <div class="flex justify-between p-2 px-4 leading-5 h-1/2">
+                        <span
+                            class="w-1/2 underline decoration-dotted"
+                        >
+                            <span [tooltipPosition]="'left'" [escape]="false" pTooltip="<span class='font-bold'>Top Reaction Conditions</span> correspond to the highest predicted yield percentage for a given reactant pair/reaction sites.">
+                                Top Reaction Conditions
+                            </span>
+                        </span>
+                        <div class="font-semibold grow text-end">
+                            Catalyst {{ topYieldConditions.conditions[0].catalyst }}
+                            <br/>
+                            Base {{ topYieldConditions.conditions[0].base }}
+                            <br/>
+                            Solvent {{ topYieldConditions.conditions[0].solvent }}
+                        </div>
+                    </div>
+                </p-panel>
+            </div>
+        </div>
+        <div id="container-predicted-conditions" class="my-4">
+            <p-panel>
+                <ng-template pTemplate="header">
+                    <span class="grow">Predicted Conditions</span>
+                    <div class="flex items-center gap-2">
+                        <button
+                            class="btn-outline"
+                            (click)="showFilters$.next(!showFilters$.value)"
+                        >
+                            <i class="pi pi-filter"></i>
+                            <h6 class="inline leading-lg">Filter</h6>
+                            <p-chip>{{ numFilters$ | async }}</p-chip>
+                        </button>
+                        <button
+                            class="btn-outline"
+                            (click)="clearAllFilters()"
+                        >
+                            Clear All
+                        </button>
                     </div>
                 </ng-template>
-            </p-panel>
-            <p-panel class="w-1/4" 
-                header="Top Predictions"
-                *ngIf="(topYieldConditions$ | async) as topYieldConditions">
-                <div class="flex justify-between p-2 px-4 leading-5 h-1/2">
-                    <span
-                        class="w-1/2 underline decoration-dotted"
-                    >
-                        <span [tooltipPosition]="'left'" [escape]="false"  pTooltip="<span class='font-bold'>Top Yield %</span> (0-100%) is the highest predicted yield percentage for a given reactant pair/reaction sites.">Top Yield %</span>
-                    </span>
-                    <div class="grow text-end">
-                        <span class="font-semibold">
-                            <span class="inline-block w-3 h-3" [style]="{ background: topYieldConditions.conditions[0].color }"></span>
-                            {{ topYieldConditions.topYield | number: "2.0-0" }}%
-                        </span>
-                        <br />({{ topYieldConditions.conditions.length }} Condition{{ topYieldConditions.conditions.length > 1 ? 's' : '' }})
+
+                <div class="flex flex-col">
+                    <div *ngIf="showFilters$.value" id="container-filters" class="flex w-full gap-4 p-2 px-4 bg-gray-50">
+                        <p-multiSelect
+                            class="w-1/4"
+                            styleClass="w-full"
+                            [display]="selectedCatalysts$.value.length > 1 ? 'comma' : 'chip'"
+                            [maxSelectedLabels]="1"
+                            [selectedItemsLabel]="'{0} items'"
+                            [ngModel]="selectedCatalysts$ | async"
+                            [options]="(catalystsOptions$ | async) || []"
+                            placeholder="Catalysts"
+                            (onChange)="resultsTable.filter($event.value, 'catalyst', 'in'); selectedCatalysts$.next($event.value)"
+                            display="chip"
+                        >
+                        </p-multiSelect>
+                        <p-multiSelect
+                            class="w-1/4"
+                            styleClass="w-full"
+                            [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
+                            [maxSelectedLabels]="1"
+                            [selectedItemsLabel]="'{0} items'"
+                            [ngModel]="selectedBases$.value"
+                            [options]="(basesOptions$ | async) || []"
+                            placeholder="Bases"
+                            (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
+                        >
+                        </p-multiSelect>
+                        <p-multiSelect
+                            class="w-1/4"
+                            styleClass="w-full"
+                            [display]="selectedSolvents$.value.length > 1 ? 'comma' : 'chip'"
+                            [maxSelectedLabels]="1"
+                            [selectedItemsLabel]="'{0} items'"
+                            [ngModel]="selectedSolvents$ | async"
+                            [options]="(solventsOptions$ | async) || []"
+                            placeholder="Solvent"
+                            (onChange)="resultsTable.filter($event.value, 'solvent', 'in'); selectedSolvents$.next($event.value)"
+                            display="chip"
+                        >
+                        </p-multiSelect>
+                        <app-yield-filter class="w-1/4"
+                            [originalData]="(response$ | async)?.data || []"
+                            [data]="(filteredDataWithoutYieldRange$ | async) || []"
+                            [selectedYield]="(selectedYield$ | async)!"
+                            (selectedYieldChange)="onYieldRangeChange($event)"
+                        ></app-yield-filter>
                     </div>
-                </div>
-                <hr />
-                <div class="flex justify-between p-2 px-4 leading-5 h-1/2">
-                    <span
-                        class="w-1/2 underline decoration-dotted"
-                    >
-                        <span [tooltipPosition]="'left'" [escape]="false" pTooltip="<span class='font-bold'>Top Reaction Conditions</span> correspond to the highest predicted yield percentage for a given reactant pair/reaction sites.">
-                            Top Reaction Conditions
-                        </span>
-                    </span>
-                    <div class="font-semibold grow text-end">
-                        Catalyst {{ topYieldConditions.conditions[0].catalyst }}
-                        <br/>
-                        Base {{ topYieldConditions.conditions[0].base }}
-                        <br/>
-                        Solvent {{ topYieldConditions.conditions[0].solvent }}
+
+                    <hr *ngIf="showFilters$.value" />
+
+                    <div class="flex w-full">
+                        <div class="w-1/2 bg-gray-50">
+                            <div class="pt-6" id="diagram-yield-distribution">
+                                <div
+                                    class="px-8 font-bold underline text-md decoration-dotted"
+                                >
+                                    Yield %
+                                </div>
+                                <app-density-plot
+                                    styleClass="h-[150px] pl-16 pr-6"
+                                    [originalData]="(response$ | async)?.data || []"
+                                    [data]="(filteredDataWithoutYieldRange$ | async) || []"
+                                    [selectedRegion]="(selectedYield$ | async)!"
+                                    (selectedRegionChange)="onYieldRangeChange($event)"
+                                ></app-density-plot>
+                            </div>
+                            <app-heatmap
+                                id="diagram-heatmap"
+                                [data]="(heatmapData$ | async) || []"
+                                [selectedCell]="selectedCell$.value"
+                                (selectedCellChange)="selectedCell$.next($event)"
+                            ></app-heatmap>
+                        </div>
+                        <p-table
+                            #resultsTable
+                            id="container-table"
+                            [value]="(dataWithColor$ | async) || []"
+                            [columns]="columns"
+                            [paginator]="true"
+                            [exportFilename]="(exportFileName$ | async) || 'somn-results'"
+                            selectionMode="single"
+                            [selection]="selectedRow$ | async"
+                            (selectionChange)="selectedRow$.next($event)"
+                            dataKey="rowId"
+                            [rows]="10"
+                            [rowsPerPageOptions]="[10, 20, 50]"
+                            class="w-1/2 h-full"
+                            tableStyleClass="w-1/2"
+                            styleClass="w-full border-l border-solid border-[--surface-d]"
+                        >
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th pSortableColumn="catalyst">
+                                        Catalyst<p-sortIcon field="catalyst" />
+                                    </th>
+                                    <th pSortableColumn="base">
+                                        Base<p-sortIcon field="base" />
+                                    </th>
+                                    <th pSortableColumn="solvent">
+                                        Solvent<p-sortIcon field="solvent" />
+                                    </th>
+                                    <th pSortableColumn="yield">
+                                        Yield %<p-sortIcon field="yield" />
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-row>
+                                <tr [pSelectableRow]="row">
+                                    <td>{{ row.catalyst }}</td>
+                                    <td>{{ row.base }}</td>
+                                    <td>{{ row.solvent }}</td>
+                                    <td>
+                                        <span class="inline-block w-3 h-3" [style]="{ background: row.color }"></span>
+                                        {{ row.yield * 100 | number:'1.1-2' }}%
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
                     </div>
                 </div>
             </p-panel>
         </div>
-        <p-panel styleClass="my-4">
-            <ng-template pTemplate="header">
-                <span class="grow">Predicted Conditions</span>
-                <div class="flex items-center gap-2">
-                    <button
-                        class="btn-outline"
-                        (click)="showFilters$.next(!showFilters$.value)"
-                    >
-                        <i class="pi pi-filter"></i>
-                        <h6 class="inline leading-lg">Filter</h6>
-                        <p-chip>{{ numFilters$ | async }}</p-chip>
-                    </button>
-                    <button
-                        class="btn-outline"
-                        (click)="clearAllFilters()"
-                    >
-                        Clear All
-                    </button>
-                </div>
-            </ng-template>
-
-            <div class="flex flex-col">
-                <div *ngIf="showFilters$.value" class="flex w-full gap-4 p-2 px-4 bg-gray-50">
-                    <p-multiSelect
-                        class="w-1/4"
-                        styleClass="w-full"
-                        [display]="selectedCatalysts$.value.length > 1 ? 'comma' : 'chip'"
-                        [maxSelectedLabels]="1"
-                        [selectedItemsLabel]="'{0} items'"
-                        [ngModel]="selectedCatalysts$ | async"
-                        [options]="(catalystsOptions$ | async) || []"
-                        placeholder="Catalysts"
-                        (onChange)="resultsTable.filter($event.value, 'catalyst', 'in'); selectedCatalysts$.next($event.value)"
-                        display="chip"
-                    >
-                    </p-multiSelect>
-                    <p-multiSelect
-                        class="w-1/4"
-                        styleClass="w-full"
-                        [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
-                        [maxSelectedLabels]="1"
-                        [selectedItemsLabel]="'{0} items'"
-                        [ngModel]="selectedBases$.value"
-                        [options]="(basesOptions$ | async) || []"
-                        placeholder="Bases"
-                        (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
-                    >
-                    </p-multiSelect>
-                    <p-multiSelect
-                        class="w-1/4"
-                        styleClass="w-full"
-                        [display]="selectedSolvents$.value.length > 1 ? 'comma' : 'chip'"
-                        [maxSelectedLabels]="1"
-                        [selectedItemsLabel]="'{0} items'"
-                        [ngModel]="selectedSolvents$ | async"
-                        [options]="(solventsOptions$ | async) || []"
-                        placeholder="Solvent"
-                        (onChange)="resultsTable.filter($event.value, 'solvent', 'in'); selectedSolvents$.next($event.value)"
-                        display="chip"
-                    >
-                    </p-multiSelect>
-                    <app-yield-filter class="w-1/4"
-                        [originalData]="(response$ | async)?.data || []"
-                        [data]="(filteredDataWithoutYieldRange$ | async) || []"
-                        [selectedYield]="(selectedYield$ | async)!"
-                        (selectedYieldChange)="onYieldRangeChange($event)"
-                    ></app-yield-filter>
-                </div>
-
-                <hr *ngIf="showFilters$.value" />
-
-                <div class="flex w-full">
-                    <div class="w-1/2 bg-gray-50">
-                        <div class="pt-6">
-                            <div
-                                class="px-8 font-bold underline text-md decoration-dotted"
-                            >
-                                Yield %
-                            </div>
-                            <app-density-plot
-                                styleClass="h-[150px] pl-16 pr-6"
-                                [originalData]="(response$ | async)?.data || []"
-                                [data]="(filteredDataWithoutYieldRange$ | async) || []"
-                                [selectedRegion]="(selectedYield$ | async)!"
-                                (selectedRegionChange)="onYieldRangeChange($event)"
-                            ></app-density-plot>
-                        </div>
-                        <app-heatmap
-                            [data]="(heatmapData$ | async) || []"
-                            [selectedCell]="selectedCell$.value"
-                            (selectedCellChange)="selectedCell$.next($event)"
-                        ></app-heatmap>
-                    </div>
-                    <p-table
-                        #resultsTable
-                        [value]="(dataWithColor$ | async) || []"
-                        [columns]="columns"
-                        [paginator]="true"
-                        [exportFilename]="(exportFileName$ | async) || 'somn-results'"
-                        selectionMode="single"
-                        [selection]="selectedRow$ | async"
-                        (selectionChange)="selectedRow$.next($event)"
-                        dataKey="rowId"
-                        [rows]="10"
-                        [rowsPerPageOptions]="[10, 20, 50]"
-                        class="w-1/2 h-full"
-                        tableStyleClass="w-1/2"
-                        styleClass="w-full border-l border-solid border-[--surface-d]"
-                    >
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th pSortableColumn="catalyst">
-                                    Catalyst<p-sortIcon field="catalyst" />
-                                </th>
-                                <th pSortableColumn="base">
-                                    Base<p-sortIcon field="base" />
-                                </th>
-                                <th pSortableColumn="solvent">
-                                    Solvent<p-sortIcon field="solvent" />
-                                </th>
-                                <th pSortableColumn="yield">
-                                    Yield %<p-sortIcon field="yield" />
-                                </th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-row>
-                            <tr [pSelectableRow]="row">
-                                <td>{{ row.catalyst }}</td>
-                                <td>{{ row.base }}</td>
-                                <td>{{ row.solvent }}</td>
-                                <td>
-                                    <span class="inline-block w-3 h-3" [style]="{ background: row.color }"></span>
-                                    {{ row.yield * 100 | number:'1.1-2' }}%
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                </div>
-            </div>
-        </p-panel>
     </div>
 </div>
 
@@ -280,3 +288,35 @@
         <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.reactionSite }}</span>
     </div>
 </ng-template>
+
+<p-dialog
+    #tutorialDialog
+    header="Results"
+    [(visible)]="displayTutorial" 
+    [modal]="true" 
+    [style]="{ width: '350px' }" 
+    [draggable]="false" 
+    [resizable]="false"
+>
+    <div class="flex flex-col gap-6 -mb-2">
+        <p class="leading-xl">
+            Your results are ready! Would you like us to show you around the results page? You can always access this tour later.
+        </p>
+        <div class="flex items-center gap-2">
+            <p-checkbox [(ngModel)]="tutorialService.showTutorial" [binary]="true"></p-checkbox>
+            <label for="show-tour">Don't show this message again</label>
+        </div>
+        <div class="flex justify-between">
+            <p-button 
+                (onClick)="displayTutorial = false"
+                styleClass="p-button-outlined" 
+                label="Skip Tour">
+            </p-button>
+            <p-button
+                (onClick)="displayTutorial = false; tutorialService.driver.drive()"
+                label="Start Tour"
+                styleClass="bg-[#224063]"
+            ></p-button>
+        </div>
+    </div>
+</p-dialog>

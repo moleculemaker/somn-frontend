@@ -45,7 +45,7 @@ export class AboutSomnComponent implements OnInit {
     el_name: arylHalideJson[`${data["arylHalide"]}` as keyof typeof arylHalideJson],
     nuc_name: amineJson[`${data["amine"]}` as keyof typeof amineJson],
     base: baseJson[`${data["base"]}` as keyof typeof baseJson],
-    catalyst: catalystJson[`${data["catalyst"]}` as keyof typeof catalystJson],
+    catalyst: catalystJson[`${data["catalyst"]}` as keyof typeof catalystJson][0],
     solvent: solventJson[`${data["solvent"]}` as keyof typeof solventJson],
     yield: data["yield"] / 100,
     stdev: 0,
