@@ -102,7 +102,8 @@ body {
 
 .p-card {
   .p-card-body {
-    padding: 0.71429rem 0.85714rem 1.14286rem 0.85714rem;
+    @apply p-3;
+    @apply pb-4;
   }
 
   .p-card-content {
@@ -141,7 +142,6 @@ h2 {
 h4 {
   @apply text-xl;
   @apply leading-lg;
-  @apply opacity-100;
   @apply font-bold;
   @apply leading-lg;
 
@@ -152,6 +152,8 @@ h4 {
 
 h5 {
   @apply text-lg;
+  @apply opacity-60;
+  @apply font-normal;
 
   text: {
     transform: none;

@@ -1,4 +1,9 @@
 /** @type {import('tailwindcss').Config} */
+
+const sidebarWidth = 15 * 16;
+const sidebarWidthSm = 52;
+const maxContentWidth = 1180;
+
 module.exports = {
   content: ["./src/**/*.{html,ts,scss}"],
   theme: {
@@ -34,10 +39,13 @@ module.exports = {
         },
       },
       spacing: {
-        "screen-lg": "1180px",
+        "sidebar": "180px",
+        "sidebar-sm": "52px",
+        "content-xl": "1180px",
       },
       screens: {
-        lg: "1180px",
+        'xl-sidebar-sm': { max: `${maxContentWidth + 2 * sidebarWidthSm}px` },
+        'xl-sidebar': { max: `${maxContentWidth + 2 * sidebarWidth}px` }
       },
     },
   },

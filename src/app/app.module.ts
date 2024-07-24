@@ -68,6 +68,7 @@ import { SomnResultComponent } from './components/somn/somn-result/somn-result.c
 import { MainLayoutComponent } from './components/somn/main-layout/main-layout.component';
 import { MoleculeImageComponent } from "./components/somn/molecule-image/molecule-image.component";
 import { ConfirmationService } from "primeng/api";
+import { CenterLayoutComponent } from "./components/somn/center-layout/center-layout.component";
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig("/assets/config/envvars.json");
@@ -79,6 +80,7 @@ const initAppFn = (envService: EnvironmentService) => {
     SafePipe,
 
     LandingPageComponent,
+    CenterLayoutComponent,
     AboutSomnComponent,
     DensityPlotComponent,
     SomnComponent,

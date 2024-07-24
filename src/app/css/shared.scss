@@ -20,11 +20,12 @@ body {
 
 //**************** css ******************
 
-h1,
+// h1,
+// h4,
+// h5 
 h2,
-h3,
-h4,
-h5 {
+h3
+{
     margin: 0px;
     margin: {
         top: $padding;
@@ -32,18 +33,6 @@ h5 {
 
     font: {
         family: $font_family_header;
-    }
-}
-
-h1 {
-    font: {
-        size: 1.75rem;
-    }
-
-    & + h3 {
-        margin: {
-            top: $padding * .2;
-        }
     }
 }
 
@@ -71,28 +60,6 @@ h3 {
             top: $padding * .2;
         }
     }
-}
-
-h4 {
-    font: {
-        size: .85rem;
-        weight: normal;
-    }
-    text: {
-        transform: uppercase;
-    }
-}
-
-h5 {
-    font: {
-        size: .75rem;
-        weight: normal;
-    }
-    text: {
-        transform: uppercase;
-    }
-
-    @include opacity(60);
 }
 
 .padded {
