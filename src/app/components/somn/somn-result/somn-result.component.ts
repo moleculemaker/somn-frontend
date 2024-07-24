@@ -163,7 +163,6 @@ export class SomnResultComponent {
               : true),
         ),
     ),
-    tap(console.log)
   );
 
   dataWithColor$ = this.filteredDataWithoutYieldRange$.pipe(
@@ -224,7 +223,6 @@ export class SomnResultComponent {
           isHighlighted: isHighlighted(d),
         });
       });
-      console.log(data);
       return Array.from(map.values());
     }),
   );
