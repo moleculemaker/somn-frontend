@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { BehaviorSubject, Observable, combineLatest, map, of } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, map, of, tap } from "rxjs";
 import { SomnService } from "~/app/services/somn.service";
 import { Table } from "primeng/table";
 import { FilterService } from "primeng/api";
-import { Products } from "~/app/services/somn.service";
+import { Product } from "~/app/services/somn.service";
 
 import amineJson from "./amine_smiles.json";
 import arylHalideJson from "./bromide_smiles.json";
@@ -22,9 +22,13 @@ enum ActiveAboutPanel {
   GET_INVOLVED,
 }
 
-type TrainingData = Products[0] & {
+type TrainingData = Array<TrainingDataItem>;
+type TrainingDataItem = Omit<Product, "stdev"> & {
   solvent: string;
-};
+  nuc_name: string;
+  el_name: string;
+  stdev: number;
+}
 
 @Component({
   selector: "app-about-somn",
@@ -41,16 +45,17 @@ export class AboutSomnComponent implements OnInit {
 
   @ViewChild("resultsTable") resultsTable: Table;
 
-  trainingData$: Observable<Array<TrainingData>> = of(testJson.map((data) => ({
-    el_name: arylHalideJson[`${data["arylHalide"]}` as keyof typeof arylHalideJson],
-    nuc_name: amineJson[`${data["amine"]}` as keyof typeof amineJson],
-    base: baseJson[`${data["base"]}` as keyof typeof baseJson],
-    catalyst: catalystJson[`${data["catalyst"]}` as keyof typeof catalystJson][0],
-    solvent: solventJson[`${data["solvent"]}` as keyof typeof solventJson],
-    yield: data["yield"] / 100,
-    stdev: 0,
-  }) as TrainingData));
-  filteredTrainingData$ = new BehaviorSubject([]);
+  trainingData$: Observable<TrainingData> = of(
+    testJson.map((data) => ({
+      el_name: arylHalideJson[`${data["arylHalide"]}` as keyof typeof arylHalideJson],
+      nuc_name: amineJson[`${data["amine"]}` as keyof typeof amineJson],
+      base: baseJson[`${data["base"]}` as keyof typeof baseJson],
+      catalyst: catalystJson[`${data["catalyst"]}` as keyof typeof catalystJson],
+      solvent: solventJson[`${data["solvent"]}` as keyof typeof solventJson],
+      yield: data["yield"] / 100,
+      stdev: 0,
+    })
+  ));
 
   showFilters$ = new BehaviorSubject(true);
 
@@ -61,7 +66,7 @@ export class AboutSomnComponent implements OnInit {
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
   selectedYield$ = new BehaviorSubject<[number, number]>([0, 100]);
 
-  filteredTrainingDataWithoutYieldRange$ = combineLatest([
+  trainingDataWithoutFilteringYieldRange$ = combineLatest([
     this.trainingData$,
     this.selectedArylHalides$,
     this.selectedAmines$,
@@ -79,7 +84,7 @@ export class AboutSomnComponent implements OnInit {
         selectedSolvents,
       ]) =>
         trainingData.filter(
-          (data) =>
+          (data) => 
             (selectedArylHalides.length
               ? selectedArylHalides.includes(data["el_name"])
               : true) &&
@@ -87,21 +92,21 @@ export class AboutSomnComponent implements OnInit {
               ? selectedAmines.includes(data["nuc_name"])
               : true) &&
             (selectedCatalysts.length
-              ? selectedCatalysts.includes(data["catalyst"])
+              ? selectedCatalysts.includes(data["catalyst"][0])
               : true) &&
             (selectedBases.length
               ? selectedBases.includes(data["base"])
               : true) &&
             (selectedSolvents.length
               ? selectedSolvents.includes(data["solvent"])
-              : true),
+              : true)
         ),
     ),
   );
 
-  dataWithColor$ = this.trainingData$.pipe(
-    map((response) => 
-      response.map((d) => ({ 
+  dataWithColor$ = this.trainingDataWithoutFilteringYieldRange$.pipe(
+    map((response: TrainingData) => 
+      response.map((d) => ({
         ...d, 
         color: this.getColorAtPercentage(
           d["yield"], 
@@ -110,6 +115,7 @@ export class AboutSomnComponent implements OnInit {
         )
       })).sort((a, b) => b["yield"] - a["yield"])
     ),
+    tap(console.log)
   );
 
   getColorAtPercentage(percentage: number, min: number, max: number) {
@@ -152,7 +158,7 @@ export class AboutSomnComponent implements OnInit {
     map((data) => [...new Set(data.flatMap((d) => d.base))]),
   );
   catalystsOptions$ = this.trainingData$.pipe(
-    map((data) => [...new Set(data.flatMap((d) => d.catalyst))]),
+    map((data) => [...new Set(data.map((d) => d.catalyst[0]))]),
   );
 
   columns = [
@@ -194,17 +200,5 @@ export class AboutSomnComponent implements OnInit {
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");
     }
-  }
-
-  onReactionSiteChecked(reactionSites: any, type: string) {
-    // if (type === "amine") {
-    //   this.somnService.request.form.controls["amineReactionSite"].setValue(
-    //     reactionSites[0],
-    //   );
-    // } else {
-    //   this.somnService.request.form.controls["arylHalideReactionSite"].setValue(
-    //     reactionSites[0],
-    //   );
-    // }
   }
 }

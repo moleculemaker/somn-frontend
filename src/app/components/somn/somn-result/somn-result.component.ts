@@ -3,13 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
 import { FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription } from 'rxjs';
+import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
-import { Products, SomnService } from '~/app/services/somn.service';
+import { Product, SomnService } from '~/app/services/somn.service';
 
-import baseJson from "../about-somn/base_map.json";
-import solventJson from "../about-somn/solvent_map.json";
-import catalystJson from "../about-somn/catalyst_map.json";
 import { TutorialService } from '~/app/services/tutorial.service';
 
 @Component({
@@ -24,7 +21,6 @@ export class SomnResultComponent {
   @ViewChild("resultsTable") resultsTable: Table;
   
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
-  catalystsInfo: { [key: string]: string[] } = catalystJson;
   displayTutorial: boolean = false;
 
   statusResponse$ = timer(0, 10000).pipe(
@@ -72,7 +68,7 @@ export class SomnResultComponent {
           }
 
           return {
-            data: data as Products,
+            data: data as Product[],
             reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
             arylHalide: {
               name: jobInfo.el_name || 'aryl halide',
@@ -100,14 +96,11 @@ export class SomnResultComponent {
     shareReplay(1),
     map((resp) => ({
       ...resp,
-      data: resp.data.map((d, i: number) => ({
+      data: resp.data.map((d: Product, i: number) => ({
         ...d,
-        base: baseJson[`${d["base"]}` as keyof typeof baseJson],
-        catalyst: catalystJson[`${d["catalyst"]}` as keyof typeof catalystJson][0],
-        solvent: solventJson[`${d["solvent"]}` as keyof typeof solventJson],
         yield: d.yield / 100,
-        amineName: d.nuc_name,
-        arylHalideName: d.el_name,
+        amineName: resp.amine.name,
+        arylHalideName: resp.arylHalide.name,
         amineSmiles: resp.amine.smiles,
         arylHalideSmiles: resp.arylHalide.smiles,
         rowId: i,
@@ -141,30 +134,7 @@ export class SomnResultComponent {
     map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
   );
   catalystsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.catalyst))]),
-  );
-
-  dataWithColor$ = this.response$.pipe(
-    map((response) => 
-      response.data.map((d) => ({ 
-        ...d, 
-        color: this.getColorAtPercentage(
-          d["yield"], 
-          d3.min(response.data, d => d["yield"])!, 
-          d3.max(response.data, d => d["yield"])!
-        )
-      })).sort((a, b) => b["yield"] - a["yield"])
-    ),
-  );
-
-  topYieldConditions$ = this.dataWithColor$.pipe(
-    map((data) => {
-      const yields = Math.max(...data.map((d) => Math.floor(d["yield"] * 100)));
-      return {
-        topYield: yields,
-        conditions: data.filter((d) => Math.floor(d["yield"] * 100) >= yields),
-      }
-    }),
+    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]),
   );
 
   filteredDataWithoutYieldRange$ = combineLatest([
@@ -183,7 +153,7 @@ export class SomnResultComponent {
         response.data.filter(
           (data) =>
             (selectedCatalysts.length
-              ? selectedCatalysts.includes(data["catalyst"])
+              ? selectedCatalysts.includes(data["catalyst"][0])
               : true) &&
             (selectedBases.length
               ? selectedBases.includes(data["base"])
@@ -193,6 +163,30 @@ export class SomnResultComponent {
               : true),
         ),
     ),
+    tap(console.log)
+  );
+
+  dataWithColor$ = this.filteredDataWithoutYieldRange$.pipe(
+    map((data: Product[]) => 
+      data.map((d) => ({ 
+        ...d, 
+        color: this.getColorAtPercentage(
+          d["yield"], 
+          d3.min(data, d => d["yield"])!, 
+          d3.max(data, d => d["yield"])!
+        )
+      })).sort((a, b) => b["yield"] - a["yield"])
+    ),
+  );
+
+  topYieldConditions$ = this.dataWithColor$.pipe(
+    map((data) => {
+      const yields = Math.max(...data.map((d) => Math.floor(d["yield"] * 100)));
+      return {
+        topYield: yields,
+        conditions: data.filter((d) => Math.floor(d["yield"] * 100) >= yields),
+      }
+    }),
   );
 
   heatmapData$ = combineLatest(([
@@ -208,14 +202,14 @@ export class SomnResultComponent {
       const isHighlighted = (d: any) => {
         return (
           (bases.length ? bases.includes(d.base) : true) &&
-          (catalysts.length ? catalysts.includes(d.catalyst) : true) &&
+          (catalysts.length ? catalysts.includes(d.catalyst[0]) : true) &&
           (solvents.length ? solvents.includes(d.solvent) : true) &&
           d.yield >= yieldRange[0] / 100 &&
           d.yield <= yieldRange[1] / 100
         );
       }
-      data.forEach((d) => {
-        const key = `${d.catalyst}-${d.solvent}/${d.base}`;
+      data.forEach((d: Product & { rowId: number }) => {
+        const key = `${d.catalyst[0]}-${d.solvent}/${d.base}`;
         if (map.has(key)) {
           console.warn("ignore data ", d, " because of key duplication");
           return;
@@ -230,6 +224,7 @@ export class SomnResultComponent {
           isHighlighted: isHighlighted(d),
         });
       });
+      console.log(data);
       return Array.from(map.values());
     }),
   );

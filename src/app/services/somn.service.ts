@@ -5,29 +5,37 @@ import { JobCreate } from "../api/mmli-backend/v1/model/jobCreate";
 
 import sampleRequest from '../../assets/example_request.json';
 import sampleResponse from '../../assets/example_response.json';
+
 import { Observable, map } from "rxjs";
 import { CheckReactionSiteResponse } from "../api/mmli-backend/v1/model/checkReactionSiteResponse";
 
-export type Products = Array<{
-  nuc_name: string;
-  el_name: string;
-  catalyst: number | string;
-  solvent: number | string;
-  base: string;
+import catalystJson from '../components/somn/about-somn/catalyst_map.json';
+import baseJson from '../components/somn/about-somn/base_map.json';
+import solventJson from '../components/somn/about-somn/solvent_map.json';
+
+type ValueOf<T> = T[keyof T];
+
+export type Product = {
+  catalyst: ValueOf<typeof catalystJson>;
+  solvent: ValueOf<typeof solventJson>;
+  base: ValueOf<typeof baseJson>;
   yield: number;
   stdev: number;
-}>;
+};
 
 export interface ReactionSiteInput {
   smiles: string;
   reactionSite: number;
 }
 
-export type ReactionSiteInputFormControls = { [key in keyof ReactionSiteInput]: FormControl };
+export type SomnResponse = Array<Omit<Product, "catalyst" | "solvent" | "base">
+& {
+  catalyst: keyof typeof catalystJson;
+  solvent: keyof typeof solventJson;
+  base: keyof typeof baseJson;
+}>;
 
-function generateData(): Products {
-  return (sampleResponse as Products).sort((a, b) => a.base.localeCompare(b.base));
-}
+export type ReactionSiteInputFormControls = { [key in keyof ReactionSiteInput]: FormControl };
 
 export class SomnRequest {
   form = new FormGroup({
@@ -72,33 +80,11 @@ export class SomnRequest {
   providedIn: "root",
 })
 export class SomnService {
-  data = generateData();
-
   constructor(
     private jobsService: JobsService,
     private filesService: FilesService,
     private somnService: SomeApiService,
   ) {}
-
-  response = {
-    reactantPairName: sampleRequest.reactantPairName,
-    arylHalides: {
-      name: sampleRequest.arylHalideName,
-      smiles: sampleRequest.arylHalide.smiles,
-      reactionSite: sampleRequest.arylHalide.reactionSite,
-      structures: ["https://fakeimg.pl/640x360"],
-    },
-    amine: {
-      name: sampleRequest.amineName,
-      smiles: sampleRequest.amine.smiles,
-      reactionSite: sampleRequest.amine.reactionSite,
-      structures: ["https://fakeimg.pl/640x360"],
-    },
-    data: this.data.map((d) => ({
-      ...d,
-      yield: d.yield / 100,
-    }))
-  };
 
   createJobAndRunSomn(requestBody: BodyCreateJobJobTypeJobsPost): Observable<Job>{
     return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, requestBody);
@@ -113,8 +99,16 @@ export class SomnService {
       .pipe(map((jobs) => jobs[0]));
   }
 
-  getResult(jobID: string): Observable<any>{
-    return this.filesService.getResultsBucketNameResultsJobIdGet(JobType.Somn, jobID);
+  getResult(jobID: string): Observable<Product[]>{
+    return this.filesService.getResultsBucketNameResultsJobIdGet(JobType.Somn, jobID)
+      .pipe(
+        map((data: SomnResponse) => data.map((d) => ({
+          ...d,
+          catalyst: catalystJson[d.catalyst],
+          solvent: solventJson[d.solvent],
+          base: baseJson[d.base],
+        })
+      )));
   }
 
   getError(jobID: string): Observable<string>{

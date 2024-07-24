@@ -12,7 +12,7 @@ import {
 import * as d3 from "d3";
 import { Slider } from "primeng/slider";
 import { BehaviorSubject, combineLatest, debounceTime, filter, map, takeLast, tap, throttleTime } from "rxjs";
-import { Products } from "~/app/services/somn.service";
+import { Product } from "~/app/services/somn.service";
 
 @Component({
   selector: "app-density-plot",
@@ -22,13 +22,13 @@ import { Products } from "~/app/services/somn.service";
 export class DensityPlotComponent implements AfterViewInit, OnDestroy {
   @Input() styleClass: string = "";
 
-  originalData$ = new BehaviorSubject<Products>([]);
-  @Input() set originalData(value: Products) {
+  originalData$ = new BehaviorSubject<Product[]>([]);
+  @Input() set originalData(value: Product[]) {
     this.originalData$.next(value);
   }
 
-  data$ = new BehaviorSubject<Products>([]);
-  @Input() set data(value: Products) {
+  data$ = new BehaviorSubject<Product[]>([]);
+  @Input() set data(value: Product[]) {
     this.data$.next(value);
   }
 
@@ -105,8 +105,8 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
   }
 
   render(
-    data: Products,
-    originalData: Products,
+    data: Product[],
+    originalData: Product[],
     selectedMinVal: number,
     selectedMaxVal: number,
     minRange: number,
@@ -139,7 +139,7 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
       let x = d3.scaleLinear().domain([0, 1]).range([0, width]);
       let y = d3.scaleLinear().range([height, 0]).domain([0, 1]);
 
-      function createDensity(data: Products, minRange: number, maxRange: number) {
+      function createDensity(data: Product[], minRange: number, maxRange: number) {
         let yields = data.map((d) => d["yield"]);
         let thresholds = [];
         let density: [number, number][] = [[minRange / 100, 0]];

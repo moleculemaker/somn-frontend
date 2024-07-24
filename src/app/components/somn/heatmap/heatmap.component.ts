@@ -10,16 +10,13 @@ import {
   ViewChild,
 } from "@angular/core";
 import * as d3 from "d3";
+import { Product } from "~/app/services/somn.service";
 
-interface HeatmapData {
+type HeatmapData = Product & { 
   solventBase: string;
-  solvent: string;
-  base: string;
-  catalyst: string;
-  yield: number;
-  isHighlighted: boolean;
-  rowId: number;
-}
+  isHighlighted: boolean; 
+  rowId: number 
+};
 
 @Component({
   selector: "app-heatmap",
@@ -72,7 +69,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // Labels of row and columns
-      let myGroups = new Set(this.data.map((d) => d.catalyst));
+      let myGroups = new Set(this.data.map((d) => d.catalyst[0]));
       let myVars = new Set(this.data.map((d) => d.solventBase));
 
       // Build X scales and axis:
@@ -126,8 +123,6 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
           .style("left", (event.x - 20) + "px")
           .style("top", (event.y - 40) + "px")
           .style("pointer-events", "none");
-
-        console.log(event)
       };
       let mousedown = (event: MouseEvent, d: any) => {
         if (!d.isHighlighted) {
@@ -143,11 +138,11 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
       // add the squares
       svg
         .selectAll()
-        .data(this.data.filter(d => d.rowId !== selectedCell), (d: any) => d.solventBase + ":" + d.catalyst)
+        .data(this.data.filter(d => d.rowId !== selectedCell), (d: any) => d.solventBase + ":" + d.catalyst[0])
         .enter()
         .append("rect")
         .attr("class", "cell")
-        .attr("x", (d: any) => x(d.catalyst) || "unknown")
+        .attr("x", (d: any) => x(d.catalyst[0]) || "unknown")
         .attr("y", (d) => y(d.solventBase) || "unknown")
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
@@ -158,11 +153,11 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
 
       svg
         .selectAll()
-        .data(this.data.filter(d => d.rowId === selectedCell), (d: any) => d.solventBase + ":" + d.catalyst)
+        .data(this.data.filter(d => d.rowId === selectedCell), (d: any) => d.solventBase + ":" + d.catalyst[0])
         .enter()
         .append("rect")
         .attr("class", "cell")
-        .attr("x", (d: any) => x(d.catalyst) || "unknown")
+        .attr("x", (d: any) => x(d.catalyst[0]) || "unknown")
         .attr("y", (d) => y(d.solventBase) || "unknown")
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())

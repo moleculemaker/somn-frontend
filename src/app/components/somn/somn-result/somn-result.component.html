@@ -117,7 +117,7 @@
                             </span>
                         </span>
                         <div class="font-semibold grow text-end">
-                            Catalyst {{ topYieldConditions.conditions[0].catalyst }}
+                            Catalyst {{ topYieldConditions.conditions[0].catalyst[0] }}
                             <br/>
                             Base {{ topYieldConditions.conditions[0].base }}
                             <br/>
@@ -160,7 +160,7 @@
                             [ngModel]="selectedCatalysts$ | async"
                             [options]="(catalystsOptions$ | async) || []"
                             placeholder="Catalysts"
-                            (onChange)="resultsTable.filter($event.value, 'catalyst', 'in'); selectedCatalysts$.next($event.value)"
+                            (onChange)="selectedCatalysts$.next($event.value)"
                             display="chip"
                         >
                         </p-multiSelect>
@@ -173,7 +173,7 @@
                             [ngModel]="selectedBases$.value"
                             [options]="(basesOptions$ | async) || []"
                             placeholder="Bases"
-                            (ngModelChange)="resultsTable.filter($event.value, 'base', 'in'); selectedBases$.next($event)"
+                            (ngModelChange)="selectedBases$.next($event)"
                         >
                         </p-multiSelect>
                         <p-multiSelect
@@ -185,7 +185,7 @@
                             [ngModel]="selectedSolvents$ | async"
                             [options]="(solventsOptions$ | async) || []"
                             placeholder="Solvent"
-                            (onChange)="resultsTable.filter($event.value, 'solvent', 'in'); selectedSolvents$.next($event.value)"
+                            (onChange)="selectedSolvents$.next($event.value)"
                             display="chip"
                         >
                         </p-multiSelect>
@@ -257,7 +257,35 @@
                             </ng-template>
                             <ng-template pTemplate="body" let-row>
                                 <tr [pSelectableRow]="row">
-                                    <td>{{ row.catalyst }}</td>
+                                    <td (mouseenter)="catalystOverlay.show($event)"
+                                        (mouseleave)="catalystOverlay.hide()"
+                                    >
+                                        [Pd(allyl)({{ row.catalyst[0] }})][OTf]
+                                        <p-overlayPanel #catalystOverlay>
+                                            <div class="w-[300px] p-4">
+                                                <div
+                                                    class="flex justify-center p-2 mb-2 border border-solid rounded-md border-blue-primary"
+                                                >
+                                                    <app-molecule-image [width]="260" [height]="180" [molecule]="row.catalyst[1]"></app-molecule-image>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <div class="flex justify-between mt-2">
+                                                        <span class="leading-base opacity-60">Ligand</span>
+                                                        <span class="font-semibold text-end">{{ row.catalyst[0] }}</span>
+                                                    </div>
+                                                    <div class="flex justify-between mt-2">
+                                                        <span class="leading-base opacity-60">Catalyst</span>
+                                                        <span class="font-semibold text-end">[Pd(allyl)({{ row.catalyst[0] }})][OTf]</span>
+                                                    </div>
+                                                    <!-- TODO: add CASRN -->
+                                                    <!-- <div class="flex justify-between mt-2">
+                                                        <span class="leading-base opacity-60">KEGG ID</span>
+                                                        <span class="font-semibold text-end">{{ molecule.kegg_id }}</span>
+                                                    </div> -->
+                                                </div>
+                                            </div>
+                                        </p-overlayPanel>
+                                    </td>
                                     <td>{{ row.base }}</td>
                                     <td>{{ row.solvent }}</td>
                                     <td>
