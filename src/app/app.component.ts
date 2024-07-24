@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { UserInfoService } from "./services/userinfo.service";
-import { ConfirmationService, MenuItem } from "primeng/api";
+import { MenuItem } from "primeng/api";
 import { TutorialService } from "./services/tutorial.service";
+import { Tooltip } from "primeng/tooltip";
 
 @Component({
   selector: "app-root",
@@ -16,6 +17,8 @@ export class AppComponent implements OnInit {
   showComingSoonPopup: boolean = false;
   comingSoonTimerID: number | null = null;
   autocloseComingSoonPopup: boolean = true;
+
+  @ViewChild(Tooltip) tooltip: Tooltip;
 
   get userMenuItems(): Array<MenuItem> {
     return this.userInfo
