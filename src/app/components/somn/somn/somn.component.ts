@@ -32,7 +32,6 @@ export class SomnComponent {
       this.displayTutorial = true;
     };
 
-    tutorialService.driver.setConfig({ showProgress: true });
     tutorialService.driver.setSteps([
       {
         element: '#btn-use-example',
@@ -61,6 +60,10 @@ export class SomnComponent {
           align: "center",
           popoverClass: '!w-[520px] !max-w-[520px]',
           onPopoverRender: (popover, options) => {
+            if (options.config.onPopoverRender) {
+              options.config.onPopoverRender(popover, options);
+            }
+            
             const descriptionDOM = popover.description;
             descriptionDOM.innerHTML = `
               <div class="flex gap-2">
@@ -92,6 +95,10 @@ export class SomnComponent {
           description: 'Reactants with multiple reaction site will require you to specify the intended reaction site using the dropdown menu provided.',
           popoverClass: '!w-[520px] !max-w-[520px]',
           onPopoverRender: (popover, options) => {
+            if (options.config.onPopoverRender) {
+              options.config.onPopoverRender(popover, options);
+            }
+
             const descriptionDOM = popover.description;
             descriptionDOM.innerHTML = `
               <div class="flex flex-col gap-2">

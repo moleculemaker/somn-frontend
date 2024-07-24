@@ -311,71 +311,70 @@ export class SomnResultComponent {
       this.displayTutorial = true;
     };
 
-    tutorialService.driver.setConfig({ showProgress: true });
     tutorialService.driver.setSteps([
-      // {
-      //   element: '#btn-request-options',
-      //   popover: {
-      //     title: 'Request Options',
-      //     description: 'Modify and resubmit your request, or run a new request in another tab.',
-      //     side: 'bottom',
-      //     align: 'end'
-      //   }
-      // },
-      // {
-      //   element: "#btn-export",
-      //   popover: {
-      //     title: "Export",
-      //     description: 'Download your results. Current formats supported include PNG for visualizations (yield % distribution and heatmap) and CSV for tabular results.',
-      //     side: "bottom",
-      //     align: "end"
-      //   }
-      // },
-      // {
-      //   element: '#container-job-id',
-      //   popover: {
-      //     title: "Job ID",
-      //     description: 'Copy the link to your Job ID to revisit your results at a later time.',
-      //     side: "right",
-      //     align: "center"
-      //   }
-      // },
-      // {
-      //   element: '#container-reactants',
-      //   popover: {
-      //     title: "Reactants",
-      //     description: 'Review your input reactant pair.',
-      //     side: "right",
-      //     align: "center"
-      //   }
-      // },
-      // {
-      //   element: '#container-top-predictions',
-      //   popover: {
-      //     title: "Top Predictions Summary",
-      //     description: 'Preview the highest yield % and associated reaction conditions predicted for your request.',
-      //     side: "left",
-      //     align: "center"
-      //   }
-      // },
-      // {
-      //   element: '#container-predicted-conditions',
-      //   popover: {
-      //     title: "Predicted Conditions",
-      //     description: 'Explore the reaction conditions and yield % predictions for your request via filters, yield % distribution and heatmap visualizations, and tabular results.',
-      //     side: "top",
-      //     align: "center"
-      //   }
-      // },
-      // {
-      //   element: '#container-filters',
-      //   popover: {
-      //     title: "Filter",
-      //     description: 'Use the filter bar to refine your results view by catalyst, base, solvent, or yield %.',
-      //     side: "top",
-      //     align: "center"
-      //   }
-      // },
+      {
+        element: '#btn-request-options',
+        popover: {
+          title: 'Request Options',
+          description: 'Modify and resubmit your request, or run a new request in another tab.',
+          side: 'bottom',
+          align: 'end'
+        }
+      },
+      {
+        element: "#btn-export",
+        popover: {
+          title: "Export",
+          description: 'Download your results. Current formats supported include PNG for visualizations (yield % distribution and heatmap) and CSV for tabular results.',
+          side: "bottom",
+          align: "end"
+        }
+      },
+      {
+        element: '#container-job-id',
+        popover: {
+          title: "Job ID",
+          description: 'Copy the link to your Job ID to revisit your results at a later time.',
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-reactants',
+        popover: {
+          title: "Reactants",
+          description: 'Review your input reactant pair.',
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-top-predictions',
+        popover: {
+          title: "Top Predictions Summary",
+          description: 'Preview the highest yield % and associated reaction conditions predicted for your request.',
+          side: "left",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-predicted-conditions',
+        popover: {
+          title: "Predicted Conditions",
+          description: 'Explore the reaction conditions and yield % predictions for your request via filters, yield % distribution and heatmap visualizations, and tabular results.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-filters',
+        popover: {
+          title: "Filter",
+          description: 'Use the filter bar to refine your results view by catalyst, base, solvent, or yield %.',
+          side: "top",
+          align: "center"
+        }
+      },
       {
         element: '#diagram-yield-distribution',
         popover: {
@@ -385,24 +384,24 @@ export class SomnResultComponent {
           align: "center"
         }
       },
-      // {
-      //   element: '#diagram-heatmap',
-      //   popover: {
-      //     title: "Heatmap",
-      //     description: 'Hover or click on an individual square in the heatmap to view the yield % details for that set of reaction conditions.',
-      //     side: "top",
-      //     align: "center"
-      //   }
-      // },
-      // {
-      //   element: '#container-table',
-      //   popover: {
-      //     title: "Table",
-      //     description: 'Sort, scroll, and page through the tabular view to find reaction conditions of interest.',
-      //     side: "left",
-      //     align: "center"
-      //   }
-      // },
+      {
+        element: '#diagram-heatmap',
+        popover: {
+          title: "Heatmap",
+          description: 'Hover or click on an individual square in the heatmap to view the yield % details for that set of reaction conditions.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-table',
+        popover: {
+          title: "Table",
+          description: 'Sort, scroll, and page through the tabular view to find reaction conditions of interest.',
+          side: "left",
+          align: "center"
+        }
+      },
     ]);
   }
 

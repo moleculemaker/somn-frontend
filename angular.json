@@ -41,8 +41,7 @@
               "src/styles.scss",
               "src/app/css/styles.scss",
               "node_modules/pdfjs-dist/web/pdf_viewer.css",
-              "node_modules/@chemaxon/marvinjs/gui/css/editor.css",
-              "node_modules/driver.js/dist/driver.css"
+              "node_modules/@chemaxon/marvinjs/gui/css/editor.css"
             ],
             "scripts": [
               "node_modules/pdfjs-dist/build/pdf.js",
