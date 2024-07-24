@@ -25,7 +25,6 @@ export class LandingPageComponent {
       this.displayTutorial = true;
     };
 
-    tutorialService.driver.setConfig({ showProgress: true });
     tutorialService.driver.setSteps([
       {
         element: '.login_button',
