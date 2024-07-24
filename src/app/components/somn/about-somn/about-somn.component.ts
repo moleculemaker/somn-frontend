@@ -164,10 +164,7 @@ export class AboutSomnComponent implements OnInit {
     { field: "yield", header: "Yield" },
   ]
 
-  constructor(
-    private somnService: SomnService,
-    private filterService: FilterService,
-  ) {}
+  constructor(private filterService: FilterService) {}
 
   ngOnInit() {
     this.filterService.register(
