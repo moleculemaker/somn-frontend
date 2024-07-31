@@ -46,6 +46,7 @@ export class MarvinjsInputComponent {
 
   colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280']
   doNotSyncValue = false;
+  popupDisplayed = false;
 
   showDialog$ = new BehaviorSubject(false);
   svg$ = new BehaviorSubject<string>("");

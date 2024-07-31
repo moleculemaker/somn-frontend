@@ -26,6 +26,8 @@ export class YieldFilterComponent {
   @Output() selectedYieldChange = new EventEmitter<[number, number]>();
   @ViewChild('filter') filter: OverlayPanel;
 
+  popupDisplayed = false;
+
   onClickClear() {
     this.filter.hide();
   }

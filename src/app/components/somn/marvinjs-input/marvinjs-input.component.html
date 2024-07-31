@@ -71,7 +71,15 @@
                     </div>
                 </div>
 
-                <button (click)="op.toggle($event)" type="button" class="w-full rounded-md border-[#DEE2E6] border-solid border py-3 px-2 bg-white flex justify-between">
+                <button (click)="op.toggle($event)"
+                    type="button" 
+                    class="flex justify-between w-full px-2 py-3 bg-white border border-solid rounded-md"
+                    [class.border-[#DEE2E6]]="!popupDisplayed"
+                    [class.border-black]="popupDisplayed"
+                    [style]="{
+                        'box-shadow': popupDisplayed ? '0 0 0 0.2rem #BFDBFE' : 'none'
+                    }"
+                >
                     <span class="text-[#8A92A0]">{{ (control.value === null)
                         ? 'Select Reaction Site' 
                         : 'Reaction Site ' + (((selectedReactionSiteIndex$ | async) || 0) + 1) }}</span>
@@ -82,7 +90,11 @@
     </ng-container>
 </ng-container>
 
-<p-overlayPanel #op [style]="{'width': '510px'}">
+<p-overlayPanel #op 
+    [style]="{'width': '510px'}" 
+    (onShow)="popupDisplayed = true"
+    (onHide)="popupDisplayed = false"
+>
     <ng-template pTemplate="content">
         <ng-container *ngIf="(reactionSiteSvgs$ | async) as options">
             <ng-container *ngIf="formGroup.controls['reactionSite'] as control">

@@ -54,14 +54,17 @@ export class SomnResultComponent {
             container.innerHTML = svg;
             let ellipses = d3.select(container).selectAll('ellipse');
 
-            console.log(site);
+            if (ellipses.size() === 1) {
+              ellipses.remove();
+              return container.innerHTML;
+            }
 
             ellipses.each((d, i, nodes) => {
               const node = d3.select(nodes[i]);
               const data = parseInt(node.attr('class').split('atom-')[1]);
               node
                 .attr('style', '')
-                .attr('fill', data === site ? colors[i % colors.length] : '#5F6C8D40');
+                .attr('fill', data === site ? colors[i % colors.length] : '#ffffff00');
             });
 
             return container.innerHTML;
