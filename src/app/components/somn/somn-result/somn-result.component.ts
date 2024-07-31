@@ -19,16 +19,16 @@ import { TutorialService } from '~/app/services/tutorial.service';
 })
 export class SomnResultComponent {
   @ViewChild("resultsTable") resultsTable: Table;
-  
+
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
   displayTutorial: boolean = false;
 
   statusResponse$ = timer(0, 10000).pipe(
     switchMap(() => this.somnService.getResultStatus(this.jobId)),
-    takeWhile((data) => 
-      data.phase === JobStatus.Processing 
+    takeWhile((data) =>
+      data.phase === JobStatus.Processing
       || data.phase === JobStatus.Queued
-    , true),
+      , true),
     shareReplay(1),
     tap((data) => { console.log('job status: ', data.phase, data) }),
   );
@@ -150,6 +150,8 @@ export class SomnResultComponent {
         selectedBases,
         selectedSolvents,
       ]) =>
+      [
+        response.data,
         response.data.filter(
           (data) =>
             (selectedCatalysts.length
@@ -162,16 +164,91 @@ export class SomnResultComponent {
               ? selectedSolvents.includes(data["solvent"])
               : true),
         ),
+      ]
     ),
+    tap(([
+      data,
+      filteredData,
+    ]) => {
+      const allResultsContainer = d3.select("#color-key-all-results");
+      const filteredResultsContainer = d3.select("#color-key-filtered-results");
+      const width = 40;
+      const height = 6;
+      const cornerRadius = 3;
+      allResultsContainer.selectAll("*").remove(); // Clear existing legend
+
+      console.log(
+        'data',
+        d3.max(data, (d: any) => d['yield']),
+        d3.min(data, (d: any) => d['yield'])
+      );
+
+      let legendGradient = d3.create('defs')
+        .append("linearGradient")
+        .attr("id", "legend-gradient")
+        .attr("x1", "0%")
+        .attr("x2", "100%")
+        .attr("y1", "0%")
+        .attr("y2", "0%");
+
+      legendGradient
+        .append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", "#470459");
+
+      legendGradient
+        .append("stop")
+        .attr("offset", "50%")
+        .attr("stop-color", "#2E8C89");
+
+      legendGradient
+        .append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "#F5E61D");
+
+      // let colorScale = d3.scaleLinear([0, 50, 100], ["#470459", "#2E8C89", "#F5E61D"]); 
+
+      if (filteredData.length === data.length) {
+        allResultsContainer.html(legendGradient.node()!.outerHTML);
+        // No filters applied - show single color scale
+        allResultsContainer.append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("rx", cornerRadius)
+          .attr("ry", cornerRadius)
+          .style("fill", `url(#legend-gradient)`);
+
+      } else {
+        filteredResultsContainer.html(legendGradient.node()!.outerHTML);
+
+        // Original data (gray) scale
+        allResultsContainer.append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("rx", cornerRadius)
+          .attr("ry", cornerRadius)
+          .style("fill", "lightgray");
+
+        // Filtered data scale
+
+        filteredResultsContainer.append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("rx", cornerRadius)
+          .attr("ry", cornerRadius)
+          .style("fill", `url(#legend-gradient)`);
+      }
+    }),
+    map(([_, filteredData]) => filteredData)
   );
 
   dataWithColor$ = this.filteredDataWithoutYieldRange$.pipe(
-    map((data: Product[]) => 
-      data.map((d) => ({ 
-        ...d, 
+    map((data: Product[]) =>
+      data.map((d) => ({
+        ...d,
         color: this.getColorAtPercentage(
-          d["yield"], 
-          d3.min(data, d => d["yield"])!, 
+          d["yield"],
+          d3.min(data, d => d["yield"])!,
           d3.max(data, d => d["yield"])!
         )
       })).sort((a, b) => b["yield"] - a["yield"])
@@ -438,7 +515,7 @@ export class SomnResultComponent {
     if (v[0] === value[0] && v[1] === value[1]) {
       return;
     }
-    
+
     this.selectedYield$.next(value);
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");

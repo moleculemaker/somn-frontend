@@ -202,10 +202,24 @@
                     <div class="flex w-full">
                         <div class="w-1/2 bg-gray-50">
                             <div class="pt-6" id="diagram-yield-distribution">
-                                <div
-                                    class="px-8 font-bold underline text-md decoration-dotted"
-                                >
-                                    Yield %
+                                <div class="flex justify-between mx-4 mb-4">
+                                    <div class="font-bold underline text-md decoration-dotted">
+                                        Yield %
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <small>All Results</small>
+                                            <svg id="color-key-all-results" height="6" width="40" viewBox="0 0 40 6"></svg>
+                                        </div>
+                                        <div [class.hidden]="
+                                            !(selectedCatalysts$ | async)!.length 
+                                            && !(selectedBases$ | async)!.length 
+                                            && !(selectedSolvents$ | async)!.length
+                                        " class="flex items-center justify-between gap-2">
+                                            <small>Filtered Results</small>
+                                            <svg id="color-key-filtered-results" height="6" width="40" viewBox="0 0 40 6"></svg>
+                                        </div>
+                                    </div>
                                 </div>
                                 <app-density-plot
                                     styleClass="pl-16 pr-6"

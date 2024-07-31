@@ -44,13 +44,13 @@ export class SomnRequest {
     arylHalideName: new FormControl("", [Validators.required]),
     arylHalide: new FormGroup<ReactionSiteInputFormControls>({
       smiles: new FormControl<string>("", [Validators.required]),
-      reactionSite: new FormControl<number|null>(null, [Validators.required]),
+      reactionSite: new FormControl<number|null>(null),
     }),
 
     amineName: new FormControl("", [Validators.required]),
     amine: new FormGroup<ReactionSiteInputFormControls>({
       smiles: new FormControl("", [Validators.required]),
-      reactionSite: new FormControl<number|null>(null, [Validators.required]),
+      reactionSite: new FormControl<number|null>(null),
     }),
 
     agreeToSubscription: new FormControl(false),

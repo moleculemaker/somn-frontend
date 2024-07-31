@@ -176,7 +176,7 @@ export class MarvinjsInputComponent {
         });
         
         if (resp.reaction_site_idxes.length == 1) {
-          this.formGroup.controls['reactionSite'].setValue(resp.reaction_site_idxes[0]);
+          this.formGroup.controls['reactionSite'].setValue("-");
         }
 
         this.svgSetupNeeded$.next(true);
