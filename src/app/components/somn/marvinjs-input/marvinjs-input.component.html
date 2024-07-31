@@ -40,7 +40,10 @@
             class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
             [class.invalid]="control.errors && control.dirty"
         >
-            <i class="absolute pi pi-check-circle left-3 top-3"></i>
+            <i class="absolute pi left-3 top-3"
+                [class.pi-check-circle]="control.valid"
+                [class.pi-exclamation-circle]="control.invalid"
+            ></i>
             <div class="flex items-center justify-center">
                 <app-molecule-image 
                     [height]="300" 
