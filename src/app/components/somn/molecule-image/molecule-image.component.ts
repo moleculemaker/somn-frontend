@@ -26,7 +26,7 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
       if (svgContainer.empty()) {
         return;
       }
-      
+
       const thisReactionSite = svgContainer.select(`.atom-${this.reactionSite}`);
       if (thisReactionSite.empty()) {
         return;
@@ -53,6 +53,23 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
       .attr('rx', 20);
 
     svgContainer.select('rect').style('fill', '#ffffff00');
+    const gradient = svgContainer
+      .select('svg')
+      .append('defs')
+      .append('radialGradient')
+      .attr('id', 'outline');
+      
+    gradient.append('stop')
+      .attr('offset', '90%')
+      .attr('stop-color', '#3B82F6');
+
+    gradient.append('stop')
+      .attr('offset', '91%')
+      .attr('stop-color', '#3B82F6');
+
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', '#BFDBFE');
 
     ellipses.each((d, i, nodes) => {
       const node = d3.select(nodes[i]);
@@ -60,6 +77,17 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
         .attr('data-idx', i)
         .attr('style', 'cursor: pointer;')
         .attr('fill', this.colors[i % this.colors.length]);
+    });
+
+    ellipses.on('mouseenter', (e, d) => {
+      d3.select(e.target)
+        .attr('stroke', 'url(#outline)')
+        .attr('stroke-width', 6);
+    });
+
+    ellipses.on('mouseleave', (e, d) => {
+      d3.select(e.target)
+        .attr('stroke', 'none');
     });
 
     ellipses.on('click', (e, d) => {

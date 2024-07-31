@@ -8,7 +8,7 @@ module.exports = {
   content: ["./src/**/*.{html,ts,scss}"],
   theme: {
     fontSize: {
-      "sm": "0.75rem",
+      "sm": "0.65625rem",
       "base": "0.875rem",
       "lg": "1.09375rem",
       "xl": "1.3125rem",
