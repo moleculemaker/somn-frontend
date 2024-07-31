@@ -1,24 +1,73 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import * as d3 from 'd3';
 
 @Component({
   selector: 'app-molecule-image',
   templateUrl: './molecule-image.component.html',
   styleUrls: ['./molecule-image.component.scss']
 })
-export class MoleculeImageComponent implements OnInit {
+export class MoleculeImageComponent implements AfterViewInit, OnChanges {
   @Input() molecule: string;
   @Input() width: number = 300;
   @Input() height: number = 150;
+  @Input() reactionSite: number;
+  @Output() reactionSiteClick = new EventEmitter<number>();
+  @ViewChild('container') container: ElementRef<HTMLDivElement>;
 
-  image = ''
+  image = '';
+  colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
 
-  ngOnInit(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['reactionSite'] 
+      && !Object.is(null, changes['reactionSite'].currentValue)
+      && changes['reactionSite'].currentValue !== changes['reactionSite'].previousValue
+    ) {
+      const svgContainer = d3.select('#molecule-image');
+      if (svgContainer.empty()) {
+        return;
+      }
+      
+      const thisReactionSite = svgContainer.select(`.atom-${this.reactionSite}`);
+      if (thisReactionSite.empty()) {
+        return;
+      }
+
+      const idx = parseInt(svgContainer.select(`.atom-${this.reactionSite}`).attr('data-idx'));
+      svgContainer.selectAll('ellipse').attr('fill', '#5F6C8D40');
+      svgContainer.select(`.atom-${this.reactionSite}`)
+        .attr('fill', this.colors[idx % this.colors.length]);
+    }
+  }
+
+  ngAfterViewInit(): void {
     const element = document.createElement('div');
+
     element.innerHTML = this.molecule;
     element.querySelector('svg')?.setAttribute('width', `${this.width}px`);
     element.querySelector('svg')?.setAttribute('height', `${this.height}px`);
     element.querySelector('svg rect')?.setAttribute('style', 'opacity:1.0;fill:#FFFFFF00;stroke:none');
 
-    this.image = element.innerHTML;
+    const svgContainer = d3.select(element).attr('id', 'molecule-image');
+    const ellipses = svgContainer.selectAll('ellipse')
+      .attr('ry', 20)
+      .attr('rx', 20);
+
+    svgContainer.select('rect').style('fill', '#ffffff00');
+
+    ellipses.each((d, i, nodes) => {
+      const node = d3.select(nodes[i]);
+      node
+        .attr('data-idx', i)
+        .attr('style', 'cursor: pointer;')
+        .attr('fill', this.colors[i % this.colors.length]);
+    });
+
+    ellipses.on('click', (e, d) => {
+      const className = e.target.getAttribute('class');
+      const data = className.split('atom-')[1];
+      this.reactionSiteClick.emit(parseInt(data));
+    });
+
+    this.container.nativeElement.appendChild(element);
   }
 }
