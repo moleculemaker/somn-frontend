@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import * as d3 from "d3";
-import { Product } from "~/app/services/somn.service";
+import { Product, SomnService } from "~/app/services/somn.service";
 
 type HeatmapData = Product & { 
   solventBase: string;
@@ -29,6 +29,8 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
   @Input() selectedCell: number | null = null;
   @Output() selectedCellChange = new EventEmitter<number | null>();
   @ViewChild("heatmapContainer") container: ElementRef<HTMLDivElement>;
+
+  constructor(private somnService: SomnService) {}
 
   ngAfterViewInit() {
     this.render();
@@ -95,14 +97,6 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
 
       d3.selectAll(".tooltip").remove();
 
-      // Build color scale
-      let colorScale = d3
-        .scaleLinear(["#470459", "#2E8C89", "#F5E61D"])
-        .domain([0, 
-          d3.mean(data.map((d) => d.yield))!,
-          d3.max(data.map((d) => d.yield))!
-        ]);
-
       let tooltip = d3
         .select(containerEl)
         .append("div")
@@ -134,6 +128,8 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
       let mouseleave = (event: MouseEvent, d: any) => {
         tooltip.style("opacity", 0);
       };
+
+      const colorScale = this.somnService.getColorScale(data);
 
       // add the squares
       svg

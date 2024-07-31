@@ -68,7 +68,7 @@ export class SomnResultComponent {
           }
 
           return {
-            data: data as Product[],
+            data: data.map((d, i) => ({ ...d, yield: Math.max(0, d.yield) })),
             reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
             arylHalide: {
               name: jobInfo.el_name || 'aryl halide',
@@ -150,21 +150,21 @@ export class SomnResultComponent {
         selectedBases,
         selectedSolvents,
       ]) =>
-      [
-        response.data,
-        response.data.filter(
-          (data) =>
-            (selectedCatalysts.length
-              ? selectedCatalysts.includes(data["catalyst"][0])
-              : true) &&
-            (selectedBases.length
-              ? selectedBases.includes(data["base"])
-              : true) &&
-            (selectedSolvents.length
-              ? selectedSolvents.includes(data["solvent"])
-              : true),
-        ),
-      ]
+        [
+          response.data,
+          response.data.filter(
+            (data) =>
+              (selectedCatalysts.length
+                ? selectedCatalysts.includes(data["catalyst"][0])
+                : true) &&
+              (selectedBases.length
+                ? selectedBases.includes(data["base"])
+                : true) &&
+              (selectedSolvents.length
+                ? selectedSolvents.includes(data["solvent"])
+                : true),
+          ),
+        ]
     ),
     tap(([
       data,
@@ -177,39 +177,11 @@ export class SomnResultComponent {
       const cornerRadius = 3;
       allResultsContainer.selectAll("*").remove(); // Clear existing legend
 
-      console.log(
-        'data',
-        d3.max(data, (d: any) => d['yield']),
-        d3.min(data, (d: any) => d['yield'])
-      );
-
-      let legendGradient = d3.create('defs')
-        .append("linearGradient")
-        .attr("id", "legend-gradient")
-        .attr("x1", "0%")
-        .attr("x2", "100%")
-        .attr("y1", "0%")
-        .attr("y2", "0%");
-
-      legendGradient
-        .append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", "#470459");
-
-      legendGradient
-        .append("stop")
-        .attr("offset", "50%")
-        .attr("stop-color", "#2E8C89");
-
-      legendGradient
-        .append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", "#F5E61D");
-
-      // let colorScale = d3.scaleLinear([0, 50, 100], ["#470459", "#2E8C89", "#F5E61D"]); 
-
       if (filteredData.length === data.length) {
-        allResultsContainer.html(legendGradient.node()!.outerHTML);
+        const gradient = this.somnService.getGradientByData(data)
+          .attr('id', 'legend-gradient');
+        allResultsContainer.html(gradient.node()!.outerHTML);
+
         // No filters applied - show single color scale
         allResultsContainer.append("rect")
           .attr("width", width)
@@ -219,7 +191,9 @@ export class SomnResultComponent {
           .style("fill", `url(#legend-gradient)`);
 
       } else {
-        filteredResultsContainer.html(legendGradient.node()!.outerHTML);
+        const gradient = this.somnService.getGradientByData(filteredData)
+          .attr('id', 'legend-gradient');
+        filteredResultsContainer.html(gradient.node()!.outerHTML);
 
         // Original data (gray) scale
         allResultsContainer.append("rect")
@@ -230,7 +204,6 @@ export class SomnResultComponent {
           .style("fill", "lightgray");
 
         // Filtered data scale
-
         filteredResultsContainer.append("rect")
           .attr("width", width)
           .attr("height", height)
@@ -243,16 +216,13 @@ export class SomnResultComponent {
   );
 
   dataWithColor$ = this.filteredDataWithoutYieldRange$.pipe(
-    map((data: Product[]) =>
-      data.map((d) => ({
+    map((data: Product[]) => {
+      const colorScale = this.somnService.getColorScale(data);
+      return data.map((d) => ({
         ...d,
-        color: this.getColorAtPercentage(
-          d["yield"],
-          d3.min(data, d => d["yield"])!,
-          d3.max(data, d => d["yield"])!
-        )
+        color: colorScale(d.yield),
       })).sort((a, b) => b["yield"] - a["yield"])
-    ),
+    }),
   );
 
   topYieldConditions$ = this.dataWithColor$.pipe(
@@ -493,21 +463,6 @@ export class SomnResultComponent {
     this.selectedCatalysts$.next([]);
     this.selectedSolvents$.next([]);
     this.resultsTable.reset();
-  }
-
-  getColorAtPercentage(percentage: number, min: number, max: number) {
-    percentage = percentage > 1 ? percentage / 100 : percentage;
-    const colorStops = [
-      { offset: "0%", color: "#470459" },
-      { offset: "50%", color: "#2E8C89" },
-      { offset: "100%", color: "#F5E61D" }
-    ];
-
-    // Create a scale to map the percentage to the corresponding color stop
-    const scale = d3.scaleLinear(colorStops.map(stop => stop.color))
-      .domain(colorStops.map(stop => parseFloat(stop.offset)));
-
-    return scale((percentage - min) / (max - min) * 100);
   }
 
   onYieldRangeChange(value: [number, number]) {

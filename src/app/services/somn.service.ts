@@ -8,6 +8,7 @@ import sampleResponse from '../../assets/example_response.json';
 
 import { Observable, map } from "rxjs";
 import { CheckReactionSiteResponse } from "../api/mmli-backend/v1/model/checkReactionSiteResponse";
+import * as d3 from "d3";
 
 import catalystJson from '../components/somn/about-somn/catalyst_map.json';
 import baseJson from '../components/somn/about-somn/base_map.json';
@@ -131,5 +132,45 @@ export class SomnService {
     const request = new SomnRequest();
     request.form.setValue(sampleRequest);
     return request;
+  }
+
+  getColorScale(data: Product[]) {
+    return d3.scaleLinear(
+      [
+        d3.min(data.map((d) => d["yield"]))!,
+        d3.median(data.map((d) => d["yield"]))!,
+        d3.max(data.map((d) => d["yield"]))!,
+      ],
+      ["#470459", "#2E8C89", "#F5E61D"],
+    );
+  }
+  
+  getGradientByData(data: Product[]) {    
+
+    let legendGradient = d3.create('defs')
+      .append("linearGradient")
+      .attr("x1", "0%")
+      .attr("x2", "100%")
+      .attr("y1", "0%")
+      .attr("y2", "0%");
+
+    let colorScale = this.getColorScale(data);
+
+    legendGradient
+      .append("stop")
+      .attr("offset", "0%")
+      .attr("stop-color", colorScale(d3.min(data.map((d) => d["yield"]))!));
+
+    legendGradient
+      .append("stop")
+      .attr("offset", "50%")
+      .attr("stop-color", colorScale(d3.median(data.map((d) => d["yield"]))!));
+
+    legendGradient
+      .append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", colorScale(d3.max(data.map((d) => d["yield"]))!));
+
+    return legendGradient;
   }
 }

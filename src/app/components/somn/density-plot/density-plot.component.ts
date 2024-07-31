@@ -12,7 +12,7 @@ import {
 import * as d3 from "d3";
 import { Slider } from "primeng/slider";
 import { BehaviorSubject, combineLatest, debounceTime, filter, map, takeLast, tap, throttleTime } from "rxjs";
-import { Product } from "~/app/services/somn.service";
+import { Product, SomnService } from "~/app/services/somn.service";
 
 @Component({
   selector: "app-density-plot",
@@ -92,6 +92,8 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
       }
     }),
   ).subscribe();
+
+  constructor(private somnService: SomnService) {}
 
   ngAfterViewInit() {
     this.updateRangeDisplay(
@@ -177,29 +179,9 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
         .x((d) => x(d[0]))
         .y((d) => y(d[1]));
 
-      let gradient = svg
-        .append("defs")
-        .append("linearGradient")
-        .attr("id", "gradient")
-        .attr("x1", "0%")
-        .attr("x2", "100%")
-        .attr("y1", "0%")
-        .attr("y2", "0%");
-
-      gradient
-        .append("stop")
-        .attr("offset", "0%")
-        .attr("stop-color", "#470459");
-
-      gradient
-        .append("stop")
-        .attr("offset", "50%")
-        .attr("stop-color", "#2E8C89");
-
-      gradient
-        .append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", "#F5E61D");
+      const gradient = this.somnService.getGradientByData(data)
+        .attr("id", "gradient");
+      svg.html(gradient.node()!.outerHTML + svg.html());
 
       // Plot the area
       if (originalData.length) {
