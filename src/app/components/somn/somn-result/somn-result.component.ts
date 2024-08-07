@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
-import { FilterService } from 'primeng/api';
+import { FilterService, Message } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
@@ -22,6 +22,8 @@ export class SomnResultComponent {
 
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
   displayTutorial: boolean = false;
+
+  yieldMessages: Message[] = [];
 
   statusResponse$ = timer(0, 10000).pipe(
     switchMap(() => this.somnService.getResultStatus(this.jobId)),
@@ -69,6 +71,19 @@ export class SomnResultComponent {
 
             return container.innerHTML;
           }
+
+          // set up high yield messages, if there's any
+          let hasMesssage = false;
+          data.forEach((d, i) => {
+            if (d.yield >= 120 && !hasMesssage) {
+              this.yieldMessages.push({
+                severity: 'warn',
+                summary: 'High Yield',
+                detail: `High yield of ${d.yield}% for reaction ${i + 1}`,
+              });
+              hasMesssage = true;
+            }
+          })
 
           return {
             data: data.map((d, i) => ({ ...d, yield: Math.max(0, d.yield) })),

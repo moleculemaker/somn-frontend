@@ -26,6 +26,7 @@
     </div>
     <app-loading *ngIf="isLoading$ | async"></app-loading>
     <div *ngIf="!(isLoading$ | async)">
+        <p-messages [(value)]="yieldMessages" [enableService]="false" [closable]="false"></p-messages>
         <div class="flex gap-2">
             <div id="container-reactants" class="grow">
                 <p-panel header="Reactant">

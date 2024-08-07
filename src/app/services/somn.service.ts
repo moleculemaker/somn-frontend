@@ -139,9 +139,11 @@ export class SomnService {
       [
         d3.min(data.map((d) => d["yield"]))!,
         d3.median(data.map((d) => d["yield"]))!,
-        d3.max(data.map((d) => d["yield"]))!,
+        Math.min(d3.max(data.map((d) => d["yield"]))!, 1.2),
+        1.21,
+        Infinity,
       ],
-      ["#470459", "#2E8C89", "#F5E61D"],
+      ["#470459", "#2E8C89", "#F5E61D", "#FFF2E2", "#FFF2E2"],
     );
   }
   
@@ -166,10 +168,16 @@ export class SomnService {
       .attr("offset", "50%")
       .attr("stop-color", colorScale(d3.median(data.map((d) => d["yield"]))!));
 
+    let cap = Math.min(d3.max(data.map((d) => d["yield"]))!, 1.2);
+    legendGradient
+      .append("stop")
+      .attr("offset", "99%")
+      .attr("stop-color", colorScale(cap));
+
     legendGradient
       .append("stop")
       .attr("offset", "100%")
-      .attr("stop-color", colorScale(d3.max(data.map((d) => d["yield"]))!));
+      .attr("stop-color", colorScale(1.21));
 
     return legendGradient;
   }
