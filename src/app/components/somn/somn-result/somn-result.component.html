@@ -26,7 +26,7 @@
     </div>
     <app-loading *ngIf="isLoading$ | async"></app-loading>
     <div *ngIf="!(isLoading$ | async)">
-        <p-messages [(value)]="yieldMessages" [enableService]="false" [closable]="false"></p-messages>
+        <!-- <p-messages [(value)]="yieldMessages" [enableService]="false" [closable]="false"></p-messages> -->
         <div class="flex gap-2">
             <div id="container-reactants" class="grow">
                 <p-panel header="Reactant">
@@ -255,9 +255,9 @@
                         >
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="width: 4rem">
+                                    <!-- <th style="width: 4rem">
                                         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                                    </th>
+                                    </th> -->
                                     <th pSortableColumn="catalyst">
                                         Catalyst<p-sortIcon field="catalyst" />
                                     </th>
@@ -273,10 +273,10 @@
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-row>
-                                <tr>
-                                    <td>
+                                <tr [pSelectableRow]="row">
+                                    <!-- <td>
                                         <p-tableCheckbox [value]="row"></p-tableCheckbox>
-                                    </td>
+                                    </td> -->
                                     <td (mouseenter)="catalystOverlay.show($event)"
                                         (mouseleave)="catalystOverlay.hide()"
                                     >
