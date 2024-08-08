@@ -3,8 +3,6 @@ import { AbstractControl, FormControl, FormGroup, NG_ASYNC_VALIDATORS, NG_VALUE_
 import { BehaviorSubject, Observable, catchError, combineLatest, debounceTime, filter, interval, map, of, switchMap, takeUntil, tap } from "rxjs";
 import { SomnService, ReactionSiteInput, ReactionSiteInputFormControls } from "~/app/services/somn.service";
 
-import * as d3 from "d3";
-
 @Component({
   selector: "app-marvinjs-input",
   templateUrl: "./marvinjs-input.component.html",
@@ -37,7 +35,6 @@ export class MarvinjsInputComponent {
   };
 
   @Output() valueChange = new EventEmitter<ReactionSiteInput>();
-  @ViewChild('svgContainer') svgContainer: ElementRef;
 
   formGroup = new FormGroup<ReactionSiteInputFormControls>({
     smiles: new FormControl("", [Validators.required], [this.validate.bind(this)]),

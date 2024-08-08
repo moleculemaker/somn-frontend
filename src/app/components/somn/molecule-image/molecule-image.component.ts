@@ -22,7 +22,11 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
       && !Object.is(null, changes['reactionSite'].currentValue)
       && changes['reactionSite'].currentValue !== changes['reactionSite'].previousValue
     ) {
-      const svgContainer = d3.select('#molecule-image');
+      if (!this.container) {
+        return;
+      }
+      
+      const svgContainer = d3.select(this.container.nativeElement);
       if (svgContainer.empty()) {
         return;
       }
@@ -40,14 +44,13 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit(): void {
-    const element = document.createElement('div');
-
+    const element = this.container.nativeElement;
     element.innerHTML = this.molecule;
     element.querySelector('svg')?.setAttribute('width', `${this.width}px`);
     element.querySelector('svg')?.setAttribute('height', `${this.height}px`);
     element.querySelector('svg rect')?.setAttribute('style', 'opacity:1.0;fill:#FFFFFF00;stroke:none');
 
-    const svgContainer = d3.select(element).attr('id', 'molecule-image');
+    const svgContainer = d3.select(element);
     const ellipses = svgContainer.selectAll('ellipse')
       .attr('ry', 20)
       .attr('rx', 20);
@@ -95,7 +98,5 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
       const data = className.split('atom-')[1];
       this.reactionSiteClick.emit(parseInt(data));
     });
-
-    this.container.nativeElement.appendChild(element);
   }
 }
