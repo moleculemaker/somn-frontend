@@ -46,7 +46,8 @@ export class AboutSomnComponent implements OnInit {
   @ViewChild("resultsTable") resultsTable: Table;
 
   trainingData$: Observable<TrainingData> = of(
-    testJson.map((data) => ({
+    testJson.map((data, i) => ({
+      iid: i,
       el_name: arylHalideJson[`${data["arylHalide"]}` as keyof typeof arylHalideJson],
       nuc_name: amineJson[`${data["amine"]}` as keyof typeof amineJson],
       base: baseJson[`${data["base"]}` as keyof typeof baseJson],

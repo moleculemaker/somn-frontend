@@ -15,7 +15,7 @@ import { Product, SomnService } from "~/app/services/somn.service";
 type HeatmapData = Product & { 
   solventBase: string;
   isHighlighted: boolean; 
-  rowId: number 
+  iid: number 
 };
 
 @Component({
@@ -26,8 +26,8 @@ type HeatmapData = Product & {
 export class HeatmapComponent implements AfterViewInit, OnChanges {
   @Input() styleClass: string = "";
   @Input() data: HeatmapData[] = [];
-  @Input() selectedCell: number | null = null;
-  @Output() selectedCellChange = new EventEmitter<number | null>();
+  @Input() selectedCells: Product[] = [];
+  @Output() selectedCellsChange = new EventEmitter<Product[]>();
   @ViewChild("heatmapContainer") container: ElementRef<HTMLDivElement>;
 
   constructor(private somnService: SomnService) {}
@@ -37,15 +37,13 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes["data"] && changes["data"].currentValue && this.container) {
-      this.render(this.data, null);
-    }
-    if (changes["selectedCell"]) {
+    if ((changes["data"] && changes["data"].currentValue && this.container)
+      || (changes["selectedCells"])) {
       this.render();
     }
   }
 
-  render(data: HeatmapData[] = this.data, selectedCell: number | null = this.selectedCell) {
+  render(data: HeatmapData[] = this.data, selectedCells: Product[] = this.selectedCells) {
     setTimeout(() => {
       if (!this.container) {
         return;
@@ -120,10 +118,16 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
       };
       let mousedown = (event: MouseEvent, d: any) => {
         if (!d.isHighlighted) {
-          this.selectedCellChange.emit(null);
           return;
         }
-        this.selectedCellChange.emit(d.rowId);
+        let idx = selectedCells.findIndex((c) => c.iid === d.iid);
+        if (idx > -1) {
+          selectedCells.splice(idx, 1);
+        } else {
+          selectedCells.push(d);
+        }
+        this.render(data, selectedCells);
+        this.selectedCellsChange.emit(selectedCells);
       }
       let mouseleave = (event: MouseEvent, d: any) => {
         tooltip.style("opacity", 0);
@@ -134,7 +138,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
       // add the squares
       svg
         .selectAll()
-        .data(this.data.filter(d => d.rowId !== selectedCell), (d: any) => d.solventBase + ":" + d.catalyst[0])
+        .data(this.data.filter((d) => !selectedCells.map((c) => c.iid).includes(d.iid)), (d: any) => d.solventBase + ":" + d.catalyst[0])
         .enter()
         .append("rect")
         .attr("class", "cell")
@@ -149,7 +153,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
 
       svg
         .selectAll()
-        .data(this.data.filter(d => d.rowId === selectedCell), (d: any) => d.solventBase + ":" + d.catalyst[0])
+        .data(this.data.filter((d) => selectedCells.map((c) => c.iid).includes(d.iid)), (d: any) => d.solventBase + ":" + d.catalyst[0])
         .enter()
         .append("rect")
         .attr("class", "cell")

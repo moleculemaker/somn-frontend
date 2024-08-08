@@ -231,10 +231,10 @@
                                 ></app-density-plot>
                             </div>
                             <app-heatmap
+                                #heatmap
                                 id="diagram-heatmap"
                                 [data]="(heatmapData$ | async) || []"
-                                [selectedCell]="selectedCell$.value"
-                                (selectedCellChange)="selectedCell$.next($event)"
+                                [(selectedCells)]="selectedProducts"
                             ></app-heatmap>
                         </div>
                         <p-table
@@ -244,10 +244,9 @@
                             [columns]="columns"
                             [paginator]="true"
                             [exportFilename]="(exportFileName$ | async) || 'somn-results'"
-                            selectionMode="single"
-                            [selection]="selectedRow$ | async"
-                            (selectionChange)="selectedRow$.next($event)"
-                            dataKey="rowId"
+                            selectionMode="multiple"
+                            [(selection)]="selectedProducts"
+                            dataKey="iid"
                             [rows]="10"
                             [rowsPerPageOptions]="[10, 20, 50]"
                             class="w-1/2 h-full"
@@ -256,6 +255,9 @@
                         >
                             <ng-template pTemplate="header">
                                 <tr>
+                                    <th style="width: 4rem">
+                                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                    </th>
                                     <th pSortableColumn="catalyst">
                                         Catalyst<p-sortIcon field="catalyst" />
                                     </th>
@@ -271,7 +273,10 @@
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-row>
-                                <tr [pSelectableRow]="row">
+                                <tr>
+                                    <td>
+                                        <p-tableCheckbox [value]="row"></p-tableCheckbox>
+                                    </td>
                                     <td (mouseenter)="catalystOverlay.show($event)"
                                         (mouseleave)="catalystOverlay.hide()"
                                     >

@@ -22,6 +22,7 @@ export type Product = {
   base: ValueOf<typeof baseJson>;
   yield: number;
   stdev: number;
+  iid: number;
 };
 
 export interface ReactionSiteInput {
@@ -103,8 +104,9 @@ export class SomnService {
   getResult(jobID: string): Observable<Product[]>{
     return this.filesService.getResultsBucketNameResultsJobIdGet(JobType.Somn, jobID)
       .pipe(
-        map((data: SomnResponse) => data.map((d) => ({
+        map((data: SomnResponse) => data.map((d, i) => ({
           ...d,
+          iid: i,
           catalyst: catalystJson[d.catalyst],
           solvent: solventJson[d.solvent],
           base: baseJson[d.base],

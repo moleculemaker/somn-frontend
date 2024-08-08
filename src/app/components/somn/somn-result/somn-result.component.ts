@@ -22,6 +22,16 @@ export class SomnResultComponent {
 
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
   displayTutorial: boolean = false;
+  _selectedProducts: Product[] = [];
+
+  get selectedProducts() {
+    return this._selectedProducts;
+  }
+
+  set selectedProducts(value: Product[]) {
+    this._selectedProducts = value;
+    console.log(this._selectedProducts);
+  }
 
   yieldMessages: Message[] = [];
 
@@ -114,22 +124,18 @@ export class SomnResultComponent {
     shareReplay(1),
     map((resp) => ({
       ...resp,
-      data: resp.data.map((d: Product, i: number) => ({
+      data: resp.data.map((d: Product) => ({
         ...d,
         yield: d.yield / 100,
         amineName: resp.amine.name,
         arylHalideName: resp.arylHalide.name,
         amineSmiles: resp.amine.smiles,
         arylHalideSmiles: resp.arylHalide.smiles,
-        rowId: i,
       })),
     }))
   );
 
   showFilters$ = new BehaviorSubject(true);
-
-  selectedCell$ = new BehaviorSubject<number | null>(null);
-  selectedRow$ = new BehaviorSubject<any | null>(null);
 
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
@@ -272,7 +278,7 @@ export class SomnResultComponent {
           d.yield <= yieldRange[1] / 100
         );
       }
-      data.forEach((d: Product & { rowId: number }) => {
+      data.forEach((d: Product) => {
         const key = `${d.catalyst[0]}-${d.solvent}/${d.base}`;
         if (map.has(key)) {
           console.warn("ignore data ", d, " because of key duplication");
@@ -284,7 +290,7 @@ export class SomnResultComponent {
           solvent: `${d.solvent}`,
           base: `${d.base}`,
           yield: d.yield,
-          rowId: d.rowId,
+          iid: d.iid,
           isHighlighted: isHighlighted(d),
         });
       });
@@ -339,29 +345,6 @@ export class SomnResultComponent {
     private route: ActivatedRoute,
     protected tutorialService: TutorialService,
   ) {
-    const sub1 = combineLatest([
-      this.selectedCell$,
-      this.response$,
-    ]).pipe(tap(([cell, response]) => {
-      if (cell === null
-        || this.selectedRow$.value?.rowId === cell
-      ) {
-        return;
-      }
-      this.selectedRow$.next(response.data.find((d) => d.rowId === cell));
-    })).subscribe();
-
-    const sub2 = this.selectedRow$.subscribe((row) => {
-      if (row === null
-        || this.selectedCell$.value === row.rowId
-      ) {
-        return;
-      }
-      this.selectedCell$.next(row.rowId);
-    });
-
-    this.subscriptions.push(sub1, sub2);
-
     // setup tutorial
     tutorialService.tutorialKey = 'show-result-page-tutorial';
 
