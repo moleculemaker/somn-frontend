@@ -41,6 +41,9 @@
                                     placeholder="Enter reactant pair name..."
                                     formControlName="reactantPairName"
                                 />
+                                <ng-content *ngTemplateOutlet="error; context: {
+                                    controlName: 'reactantPairName'
+                                }"></ng-content>
                             </section>
                             <section id="input-reactants" class="mt-2">
                                 <p class="font-semibold leading-lg">
@@ -79,6 +82,9 @@
                                             placeholder="Enter aryl halide name..."
                                             formControlName="arylHalideName"
                                         />
+                                        <ng-content *ngTemplateOutlet="error; context: {
+                                            controlName: 'arylHalideName'
+                                        }"></ng-content>
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter aryl halide SMILES..."
@@ -115,6 +121,9 @@
                                             placeholder="Enter amine name..."
                                             formControlName="amineName"
                                         />
+                                        <ng-content *ngTemplateOutlet="error; context: {
+                                            controlName: 'amineName'
+                                        }"></ng-content>
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter amine SMILES..."
@@ -220,3 +229,9 @@
         </div>
     </div>
 </p-dialog>
+
+<ng-template #error let-controlName="controlName">
+    <div class="text-[--status-error-color] text-xs my-1" *ngIf="request.form.get(controlName)!.errors && request.form.get(controlName)!.dirty">
+        <div *ngIf="request.form.get(controlName)!.errors!['required']">This field is required</div>
+    </div>
+</ng-template>

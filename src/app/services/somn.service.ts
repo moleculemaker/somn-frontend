@@ -1,12 +1,10 @@
 import { Injectable } from "@angular/core";
-import { AbstractControl, FormControl, FormGroup, ValidationErrors, Validators } from "@angular/forms";
+import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { BodyCreateJobJobTypeJobsPost, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
-import { JobCreate } from "../api/mmli-backend/v1/model/jobCreate";
 
 import sampleRequest from '../../assets/example_request.json';
-import sampleResponse from '../../assets/example_response.json';
 
-import { Observable, catchError, debounceTime, map, of, switchMap } from "rxjs";
+import { Observable, map } from "rxjs";
 import { CheckReactionSiteResponse } from "../api/mmli-backend/v1/model/checkReactionSiteResponse";
 import * as d3 from "d3";
 
@@ -41,16 +39,23 @@ export class SomnRequest {
     return null;
   }
 
-  form = new FormGroup({
-    reactantPairName: new FormControl("", [Validators.required]),
+  private nameValidator(control: AbstractControl) {
+    if (!control.value || !control.value.trim().length) {
+      return {required: true};
+    }
+    return null;
+  }
 
-    arylHalideName: new FormControl("", [Validators.required]),
+  form = new FormGroup({
+    reactantPairName: new FormControl("", [Validators.required, this.nameValidator]),
+
+    arylHalideName: new FormControl("", [Validators.required, this.nameValidator]),
     arylHalide: new FormControl<ReactionSiteInput>({
       smiles: "", 
       reactionSite: null
     }, [this.reactionSiteValidator]),
 
-    amineName: new FormControl("", [Validators.required]),
+    amineName: new FormControl("", [Validators.required, this.nameValidator]),
     amine: new FormControl<ReactionSiteInput>({
       smiles: "", 
       reactionSite: null
@@ -67,13 +72,13 @@ export class SomnRequest {
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
     const job_info = {
-      reactant_pair_name: this.form.controls["reactantPairName"].value || "",
+      reactant_pair_name: (this.form.controls["reactantPairName"].value || "").trim().replace(/ /g, "_"),
       
-      nuc_name: this.form.controls["amineName"].value || "",
+      nuc_name: (this.form.controls["amineName"].value || "").trim().replace(/ /g, "_"),
       nuc: this.form.controls["amine"].value?.smiles || "",
       nuc_idx: this.form.controls["amine"].value?.reactionSite || "-",
 
-      el_name: this.form.controls["arylHalideName"].value || "",
+      el_name: (this.form.controls["arylHalideName"].value || "").trim().replace(/ /g, "_"),
       el: this.form.controls["arylHalide"].value?.smiles || "",
       el_idx: this.form.controls["arylHalide"].value?.reactionSite || "-",
     }
