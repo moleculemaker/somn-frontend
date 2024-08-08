@@ -1,7 +1,13 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, forwardRef } from "@angular/core";
-import { AbstractControl, FormControl, FormGroup, NG_ASYNC_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validators } from "@angular/forms";
-import { BehaviorSubject, Observable, catchError, combineLatest, debounceTime, filter, interval, map, of, switchMap, takeUntil, tap } from "rxjs";
-import { SomnService, ReactionSiteInput, ReactionSiteInputFormControls } from "~/app/services/somn.service";
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, forwardRef } from "@angular/core";
+import { AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_ASYNC_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validators } from "@angular/forms";
+import { BehaviorSubject, Observable, catchError, combineLatest, debounceTime, filter, interval, map, of, switchMap, take, takeUntil, tap } from "rxjs";
+import { SomnService } from "~/app/services/somn.service";
+import { ReactionSiteOption } from "../molecule-image/molecule-image.component";
+
+export interface ReactionSiteInput {
+  smiles: string | null;
+  reactionSite: string | null;
+}
 
 @Component({
   selector: "app-marvinjs-input",
@@ -12,143 +18,129 @@ import { SomnService, ReactionSiteInput, ReactionSiteInputFormControls } from "~
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => MarvinjsInputComponent),
       multi: true
-    },
-    {
-      provide: NG_ASYNC_VALIDATORS,
-      useExisting: forwardRef(() => MarvinjsInputComponent),
-      multi: true
     }
   ]
 })
-export class MarvinjsInputComponent {
+export class MarvinjsInputComponent implements ControlValueAccessor {
   @Input() placeholder: string = "";
   @Input() type: string = '';
-  @Input() set value(v: Partial<ReactionSiteInput>) {
-    if (this.doNotSyncValue) {
-      this.doNotSyncValue = false;
-      return;
-    }
-    this.formGroup.setValue({
-      smiles: v.smiles || "",
-      reactionSite: v.reactionSite || null,
-    });
-  };
 
+  @Input() value: Partial<ReactionSiteInput>;
   @Output() valueChange = new EventEmitter<ReactionSiteInput>();
 
-  formGroup = new FormGroup<ReactionSiteInputFormControls>({
+  form = new FormGroup({
     smiles: new FormControl("", [Validators.required], [this.validate.bind(this)]),
-    reactionSite: new FormControl<number|null>(null, [Validators.required]),
+    reactionSite: new FormControl<string | null>(null, [Validators.required]),
   });
 
   colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280']
-  doNotSyncValue = false;
   popupDisplayed = false;
 
   showDialog$ = new BehaviorSubject(false);
-  svg$ = new BehaviorSubject<string>("");
-  reactionSitesOptions$ = new BehaviorSubject<any[]>([]);
   svgSetupNeeded$ = new BehaviorSubject<boolean>(true);
 
-  selectedReactionSiteIndex$ = combineLatest([
-    this.reactionSitesOptions$,
-    this.formGroup.controls['reactionSite'].valueChanges,
-  ]).pipe(
-    map(([options, v]) => options.findIndex((option) => option.value === v))
-  )
+  reactionSitesOptions : ReactionSiteOption[] = [];
+  _selectedReactionSite : ReactionSiteOption | null = null;
+  svg : string | null = null;
 
-  reactionSiteSvgs$ = combineLatest([
-    this.svg$,
-    this.reactionSitesOptions$,
-  ]).pipe(
-    filter(([svg, options]) => svg !== "" && options.length > 0),
-    map(([svg, options]) => options.map((option, i) => {
-      const newElement = document.createElement('div');
-      newElement.innerHTML = svg;
+  onTouched = () => {};
 
-      const svgEl = newElement.querySelector('svg')!;
-      svgEl.setAttribute('width', '200px');
-      svgEl.setAttribute('height', '125px');
+  get selectedReactionSite() {
+    return this._selectedReactionSite;
+  }
 
-      const highlights = newElement.querySelectorAll('ellipse');
-      highlights.forEach((highlight) => {
-        highlight.removeAttribute('style');
-        highlight.setAttribute('fill', '#00000000');
-      });
+  set selectedReactionSite(value: ReactionSiteOption | null) {
+    this._selectedReactionSite = value;
+    if (this.reactionSitesOptions.length === 1) {
+      this.form.controls['reactionSite'].setValue('-');
+    } else {
+      this.form.controls['reactionSite'].setValue(value?.value!);
+    }
+  }
 
-      const theHighlight = newElement.querySelector(`ellipse.atom-${option.value}`);
-      theHighlight?.setAttribute('fill', this.colors[i % this.colors.length]);
+  constructor(private somnService: SomnService) {}
 
-      return {
-        ...option,
-        svg: newElement.innerHTML,
-      };
-    }))
-  )
+  writeValue(obj: any): void {
+    if (obj) {
+      this.form.setValue(obj);
+    }
+  }
 
-  constructor(
-    private somnService: SomnService,
-  ) {
-    this.formGroup.statusChanges.subscribe((v) => {
-      if (v === 'VALID') {
-        this.valueChange.emit(this.formGroup.value as ReactionSiteInput); 
-      } 
+  registerOnChange(fn: any): void {
+    this.form.valueChanges.subscribe(fn);
+  }
 
-      else if (v === 'INVALID') {
-        this.valueChange.emit({ smiles: "", reactionSite: 0 });
-      }
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
 
-      this.doNotSyncValue = true;
-    });
+  setDisabledState?(isDisabled: boolean): void {
+    // throw new Error("Method not implemented.");
   }
 
   validate(control: AbstractControl<any, any>): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
-    return control.valueChanges.pipe(
-      debounceTime(1000),
+    // const value = control.value;
+    return of(control.value).pipe(
+      tap(() => {
+        this.form.controls['reactionSite'].setValue(null);
+      }),
       switchMap((v) => this.somnService.checkReactionSites(v, this.type)),
-      tap((resp) => { 
-        const reactionSitesOptions: any[] = [];
-        resp.reaction_site_idxes.forEach((atomIdx, i) => {
-          reactionSitesOptions.push({
-            label: `${i}`,
-            value: atomIdx
-          });
-        });
-        
+      tap((resp) => {
         if (resp.reaction_site_idxes.length == 1) {
           const container = document.createElement('div');
           container.innerHTML = resp.svg;
           container.querySelectorAll('ellipse').forEach((el) => {el.remove()});
-          this.formGroup.controls['reactionSite'].setValue("-");
-          this.svg$.next(container.innerHTML);
+          this.svg = container.innerHTML;
 
         } else {
-          this.formGroup.controls['reactionSite'].setValue(null);
-          this.reactionSitesOptions$.next(reactionSitesOptions);
-          this.svg$.next(resp.svg);
+          this.svg = resp.svg;
+        }
+
+        this.reactionSitesOptions = [];
+        resp.reaction_site_idxes.forEach((atomIdx, i) => {
+          const newElement = document.createElement('div');
+          newElement.innerHTML = this.svg!;
+
+          const svgEl = newElement.querySelector('svg')!;
+          svgEl.setAttribute('width', '200px');
+          svgEl.setAttribute('height', '125px');
+
+          const highlights = newElement.querySelectorAll('ellipse');
+          highlights.forEach((highlight) => {
+            highlight.removeAttribute('style');
+            highlight.setAttribute('fill', '#00000000');
+          });
+
+          const theHighlight = newElement.querySelector(`ellipse.atom-${atomIdx}`);
+          theHighlight?.setAttribute('fill', this.colors[i % this.colors.length]);
+
+          this.reactionSitesOptions.push({
+            idx: i,
+            value: `${atomIdx}`,
+            svg: newElement.innerHTML,
+          });
+        });
+
+        // it's possible that the reaction site is set in form before the svg is set
+        // so check the form value and update the svg if necessary
+        if (this.reactionSitesOptions.length === 1) {
+          this.selectedReactionSite = this.reactionSitesOptions[0];
+        } else {
+          this.selectedReactionSite = this.reactionSitesOptions
+            .find((option) => option.value === this.form.controls['reactionSite'].value) || null;
         }
       }),
-      map((resp) => {
-        // I have no idea why return of(null) does not work here,
-        // however putting everything in catchError works
-        if (!resp.reaction_site_idxes.length) {
-          throw new Error('No reaction sites found');;
-        }
-        throw new Error('good');
-      }),
+      map((resp) => 
+        resp.reaction_site_idxes.length 
+        ? null 
+        : { noReactionSitesFound: true }
+      ),
       catchError((e) => {
         switch (e.message) {
-          case 'No reaction sites found':
-            return of({ noReactionSitesFound: true });
-
           case 'Chemical not supported':
             return of({ chemicalNotSupported: true });
-
-          case 'good':
-            return of(null);
-
           default:
-            return of({ invalidUserInput: true })
+            return of({ invalidUserInput: true });
         }
       }),
     );

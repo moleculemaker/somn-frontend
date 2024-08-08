@@ -64,7 +64,10 @@
                                                     class="font-semibold underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['arylHalideName'].setValue('Bromobenzene');
-                                                        request.form.controls['arylHalide'].controls['smiles'].setValue('c1ccc(cc1)Br');
+                                                        request.form.controls['arylHalide'].setValue({
+                                                            smiles: 'C1=CC=C(C=C1)Br',
+                                                            reactionSite: '-'
+                                                        });
                                                     "
                                                     >Bromobenzene</small
                                                 >
@@ -79,8 +82,7 @@
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter aryl halide SMILES..."
-                                            [value]="request.form.controls['arylHalide'].value"
-                                            (valueChange)="onValueChange('arylHalide', $event)"
+                                            formControlName="arylHalide"
                                             type="electrophile"
                                         >
                                         </app-marvinjs-input>
@@ -98,7 +100,10 @@
                                                     class="font-semibold underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['amineName'].setValue('Aniline');
-                                                        request.form.controls['amine'].controls['smiles'].setValue('NC1=CC=CC=C1');
+                                                        request.form.controls['amine'].setValue({
+                                                            smiles: 'C1=CC=C(C=C1)N',
+                                                            reactionSite: '-'
+                                                        });
                                                     "
                                                     >Aniline</small
                                                 >
@@ -114,8 +119,7 @@
                                             class="mt-2"
                                             placeholder="Enter amine SMILES..."
                                             type="nucleophile"
-                                            [value]="request.form.controls['amine'].value"
-                                            (valueChange)="onValueChange('amine', $event)"
+                                            formControlName="amine"
                                         >
                                         </app-marvinjs-input>
                                     </div>

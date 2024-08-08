@@ -1,8 +1,8 @@
 <div class="marvin-filter-container"
-    [formGroup]="formGroup"
+    [formGroup]="form"
     [class.invalid]="
-        formGroup.controls['smiles'].errors 
-        && formGroup.controls['smiles'].dirty
+        form.controls['smiles'].errors 
+        && form.controls['smiles'].dirty
     "
 >
     <div class="p-inputgroup">
@@ -26,17 +26,17 @@
     </div>
 </div>
 
-<div class="text-[--status-error-color] text-xs my-1" *ngIf="formGroup.controls['smiles'].errors && formGroup.controls['smiles'].dirty">
-    <div *ngIf="formGroup.controls['smiles'].errors['required']">This field is required</div>
-    <div *ngIf="formGroup.controls['smiles'].errors['chemicalNotSupported']">Chemical not supported</div>
-    <div *ngIf="formGroup.controls['smiles'].errors['noReactionSitesFound']">No reaction site found in chemical</div>
-    <div *ngIf="formGroup.controls['smiles'].errors['invalidUserInput']">Invalid input</div>
+<div class="text-[--status-error-color] text-xs my-1" *ngIf="form.controls['smiles'].errors && form.controls['smiles'].dirty">
+    <div *ngIf="form.controls['smiles'].errors['required']">This field is required</div>
+    <div *ngIf="form.controls['smiles'].errors['chemicalNotSupported']">Chemical not supported</div>
+    <div *ngIf="form.controls['smiles'].errors['noReactionSitesFound']">No reaction site found in chemical</div>
+    <div *ngIf="form.controls['smiles'].errors['invalidUserInput']">Invalid input</div>
 </div>
 
-<ng-container *ngIf="formGroup.controls['smiles'].valid">
-    <ng-container *ngIf="formGroup.controls['reactionSite'] as control">
+<ng-container *ngIf="form.controls['smiles'].valid">
+    <ng-container *ngIf="form.controls['reactionSite'] as control">
         <div
-            *ngIf="svg$.value"
+            *ngIf="svg"
             class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
             [class.invalid]="control.errors && control.dirty"
         >
@@ -48,24 +48,25 @@
                 <app-molecule-image 
                     [height]="300" 
                     [width]="300"
-                    [molecule]="svg$.value"
-                    [reactionSite]="control.value"
-                    (reactionSiteClick)="control.setValue($event)"
+                    [molecule]="svg"
+                    [reactionSitesOptions]="reactionSitesOptions"
+                    [selectedReactionSite]="selectedReactionSite"
+                    (selectedReactionSiteChange)="selectedReactionSite = $event"
                 >
                 </app-molecule-image>
             </div>
             <div
-                *ngIf="reactionSitesOptions$.value.length > 1"
+                *ngIf="reactionSitesOptions.length > 1"
                 class="flex flex-col gap-2 p-2 m-2 rounded-md"
-                [class]="(control.value === null)? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
+                [class]="(!control.value)? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
             >
                 <div
                     class="flex items-center gap-2"
-                    [class]="(control.value === null)? 'text-[#696CFF]' : 'text-[#1EA97C]'"
+                    [class]="(!control.value)? 'text-[#696CFF]' : 'text-[#1EA97C]'"
                 >
                     <i
                         class="pi"
-                        [class]="(control.value === null)? 'pi-info-circle' : 'pi-check-circle'"
+                        [class]="(!control.value)? 'pi-info-circle' : 'pi-check-circle'"
                     ></i>
                     <div>
                         More than one reaction site has been detected in
@@ -83,9 +84,9 @@
                         'box-shadow': popupDisplayed ? '0 0 0 0.2rem #BFDBFE' : 'none'
                     }"
                 >
-                    <span class="text-[#8A92A0]">{{ (control.value === null)
+                    <span class="text-[#8A92A0]">{{ (selectedReactionSite === null)
                         ? 'Select Reaction Site' 
-                        : 'Reaction Site ' + (((selectedReactionSiteIndex$ | async) || 0) + 1) }}</span>
+                        : 'Reaction Site ' + (selectedReactionSite.idx + 1) }}</span>
                     <i class="pi pi-chevron-down"></i>
                 </button>
             </div>
@@ -99,8 +100,8 @@
     (onHide)="popupDisplayed = false"
 >
     <ng-template pTemplate="content">
-        <ng-container *ngIf="(reactionSiteSvgs$ | async) as options">
-            <ng-container *ngIf="formGroup.controls['reactionSite'] as control">
+        <ng-container *ngIf="reactionSitesOptions as options">
+            <ng-container *ngIf="form.controls['reactionSite'] as control">
                 <div class="flex flex-wrap gap-4 p-4 cursor-pointer justify-stretch">
                     <span *ngFor="let option of options; let i = index" 
                         [class.active]="control.value === option.value"
@@ -108,10 +109,7 @@
                             inline-block rounded-md border-solid border-[#DEE2E6] border p-2 bg-white cursor-pointer
                             hover:border-[#3B82F6] hover:outline-[#BFDBFE] hover:bg-[#F6F9FC] hover:outline
                         "
-                        (click)="
-                            control.setValue(option.value); 
-                            control.markAsDirty()
-                        "
+                        (click)="selectedReactionSite = option"
                     >
                         <div class="flex items-center gap-2 mb-2 ml-2"><div class="dot" [style]="{ background: colors[i] }"></div> Reaction Site {{ i + 1 }}</div>
                         <div [innerHTML]="option.svg | safe:'html'" class="inline-block rounded-md border-solid border-[#DEE2E6] border p-2 bg-white"></div>
@@ -133,7 +131,8 @@
 >
     <app-marvin-js-editor
         class="marvin-editor"
-        formControlName="smiles"
+        [smiles]="form.controls['smiles'].value || ''"
+        (smilesChange)="form.controls['smiles'].setValue($event)"
     ></app-marvin-js-editor>
     <ng-template pTemplate="footer">
         <p-button

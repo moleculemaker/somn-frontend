@@ -1,6 +1,12 @@
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
 
+export interface ReactionSiteOption {
+  idx: number;
+  value: string;
+  svg: string;
+}
+
 @Component({
   selector: 'app-molecule-image',
   templateUrl: './molecule-image.component.html',
@@ -10,40 +16,41 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
   @Input() molecule: string;
   @Input() width: number = 300;
   @Input() height: number = 150;
-  @Input() reactionSite: number;
-  @Output() reactionSiteClick = new EventEmitter<number>();
+  @Input() selectedReactionSite: ReactionSiteOption | null;
+  @Input() reactionSitesOptions: ReactionSiteOption[];
+  @Output() selectedReactionSiteChange = new EventEmitter<ReactionSiteOption>();
   @ViewChild('container') container: ElementRef<HTMLDivElement>;
 
   image = '';
   colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['reactionSite'] 
-      && !Object.is(null, changes['reactionSite'].currentValue)
-      && changes['reactionSite'].currentValue !== changes['reactionSite'].previousValue
+    if (changes['selectedReactionSite'] 
+      && !Object.is(null, changes['selectedReactionSite'].currentValue)
+      && changes['selectedReactionSite'].currentValue !== changes['selectedReactionSite'].previousValue
     ) {
-      if (!this.container) {
-        return;
-      }
-      
-      const svgContainer = d3.select(this.container.nativeElement);
-      if (svgContainer.empty()) {
-        return;
-      }
+      this.updateHighlightedReactionSite();
+    }
 
-      const thisReactionSite = svgContainer.select(`.atom-${this.reactionSite}`);
-      if (thisReactionSite.empty()) {
-        return;
-      }
-
-      const idx = parseInt(svgContainer.select(`.atom-${this.reactionSite}`).attr('data-idx'));
-      svgContainer.selectAll('ellipse').attr('fill', '#5F6C8D40');
-      svgContainer.select(`.atom-${this.reactionSite}`)
-        .attr('fill', this.colors[idx % this.colors.length]);
+    if (changes['molecule'] 
+      && !Object.is(null, changes['molecule'].currentValue)
+      && changes['molecule'].currentValue !== changes['molecule'].previousValue
+    ) {
+      this.setupMoleculeImage();
+      this.updateHighlightedReactionSite();
     }
   }
 
   ngAfterViewInit(): void {
+    this.setupMoleculeImage();
+    this.updateHighlightedReactionSite();
+  }
+
+  setupMoleculeImage() {
+    if (!this.container) {
+      return;
+    }
+    
     const element = this.container.nativeElement;
     element.innerHTML = this.molecule;
     element.querySelector('svg')?.setAttribute('width', `${this.width}px`);
@@ -56,6 +63,8 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
       .attr('rx', 20);
 
     svgContainer.select('rect').style('fill', '#ffffff00');
+
+    // setup gradient for molecule hover
     const gradient = svgContainer
       .select('svg')
       .append('defs')
@@ -76,8 +85,10 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
 
     ellipses.each((d, i, nodes) => {
       const node = d3.select(nodes[i]);
+      const idx = node.attr('class').split('atom-')[1];
+
       node
-        .attr('data-idx', i)
+        .datum(this.reactionSitesOptions.find((o) => o.value === idx))
         .attr('style', 'cursor: pointer;')
         .attr('fill', this.colors[i % this.colors.length]);
     });
@@ -94,9 +105,32 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
     });
 
     ellipses.on('click', (e, d) => {
-      const className = e.target.getAttribute('class');
-      const data = className.split('atom-')[1];
-      this.reactionSiteClick.emit(parseInt(data));
+      this.selectedReactionSiteChange.emit(d as ReactionSiteOption);
     });
+  }
+
+  updateHighlightedReactionSite() {
+    if (!this.container) {
+      return;
+    }
+    
+    const svgContainer = d3.select(this.container.nativeElement);
+    if (svgContainer.empty()) {
+      return;
+    }
+
+    const selectedReactionSite = this.selectedReactionSite;
+    if (!selectedReactionSite) {
+      return;
+    }
+
+    const thisReactionSite = svgContainer.select(`.atom-${selectedReactionSite.value}`);
+    if (thisReactionSite.empty()) {
+      return;
+    }
+
+    svgContainer.selectAll('ellipse').attr('fill', '#5F6C8D40');
+    svgContainer.select(`.atom-${selectedReactionSite.value}`)
+      .attr('fill', this.colors[selectedReactionSite.idx % this.colors.length]);
   }
 }

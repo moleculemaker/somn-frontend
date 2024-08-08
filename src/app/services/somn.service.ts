@@ -1,18 +1,19 @@
 import { Injectable } from "@angular/core";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { AbstractControl, FormControl, FormGroup, ValidationErrors, Validators } from "@angular/forms";
 import { BodyCreateJobJobTypeJobsPost, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
 import { JobCreate } from "../api/mmli-backend/v1/model/jobCreate";
 
 import sampleRequest from '../../assets/example_request.json';
 import sampleResponse from '../../assets/example_response.json';
 
-import { Observable, map } from "rxjs";
+import { Observable, catchError, debounceTime, map, of, switchMap } from "rxjs";
 import { CheckReactionSiteResponse } from "../api/mmli-backend/v1/model/checkReactionSiteResponse";
 import * as d3 from "d3";
 
 import catalystJson from '../components/somn/about-somn/catalyst_map.json';
 import baseJson from '../components/somn/about-somn/base_map.json';
 import solventJson from '../components/somn/about-somn/solvent_map.json';
+import { ReactionSiteInput } from "../components/somn/marvinjs-input/marvinjs-input.component";
 
 type ValueOf<T> = T[keyof T];
 
@@ -25,11 +26,6 @@ export type Product = {
   iid: number;
 };
 
-export interface ReactionSiteInput {
-  smiles: string;
-  reactionSite: number;
-}
-
 export type SomnResponse = Array<Omit<Product, "catalyst" | "solvent" | "base">
 & {
   catalyst: keyof typeof catalystJson;
@@ -37,39 +33,49 @@ export type SomnResponse = Array<Omit<Product, "catalyst" | "solvent" | "base">
   base: keyof typeof baseJson;
 }>;
 
-export type ReactionSiteInputFormControls = { [key in keyof ReactionSiteInput]: FormControl };
-
 export class SomnRequest {
+  private reactionSiteValidator(control: AbstractControl) {
+    if (!control.value.smiles || !control.value.reactionSite) {
+      return {required: true};
+    }
+    return null;
+  }
+
   form = new FormGroup({
     reactantPairName: new FormControl("", [Validators.required]),
 
     arylHalideName: new FormControl("", [Validators.required]),
-    arylHalide: new FormGroup<ReactionSiteInputFormControls>({
-      smiles: new FormControl<string>("", [Validators.required]),
-      reactionSite: new FormControl<number|null>(null),
-    }),
+    arylHalide: new FormControl<ReactionSiteInput>({
+      smiles: "", 
+      reactionSite: null
+    }, [this.reactionSiteValidator]),
 
     amineName: new FormControl("", [Validators.required]),
-    amine: new FormGroup<ReactionSiteInputFormControls>({
-      smiles: new FormControl("", [Validators.required]),
-      reactionSite: new FormControl<number|null>(null),
-    }),
+    amine: new FormControl<ReactionSiteInput>({
+      smiles: "", 
+      reactionSite: null
+    }, [this.reactionSiteValidator]),
+    
 
     agreeToSubscription: new FormControl(false),
     subscriberEmail: new FormControl("", [Validators.email]),
   });
+
+  useExample() {
+    this.form.setValue(sampleRequest);
+  }
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
     const job_info = {
       reactant_pair_name: this.form.controls["reactantPairName"].value || "",
       
       nuc_name: this.form.controls["amineName"].value || "",
-      nuc: this.form.controls["amine"].value.smiles || "",
-      nuc_idx: this.form.controls["amine"].value.reactionSite || "-",
+      nuc: this.form.controls["amine"].value?.smiles || "",
+      nuc_idx: this.form.controls["amine"].value?.reactionSite || "-",
 
       el_name: this.form.controls["arylHalideName"].value || "",
-      el: this.form.controls["arylHalide"].value.smiles || "",
-      el_idx: this.form.controls["arylHalide"].value.reactionSite || "-",
+      el: this.form.controls["arylHalide"].value?.smiles || "",
+      el_idx: this.form.controls["arylHalide"].value?.reactionSite || "-",
     }
     return {
       email: this.form.controls["subscriberEmail"].value || "",
@@ -128,12 +134,6 @@ export class SomnService {
 
   newRequest() {
     return new SomnRequest();
-  }
-
-  exampleRequest() {
-    const request = new SomnRequest();
-    request.form.setValue(sampleRequest);
-    return request;
   }
 
   getColorScale(data: Product[]) {
