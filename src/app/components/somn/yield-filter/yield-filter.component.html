@@ -1,5 +1,7 @@
 <div class="rounded-md border-[#ced4da] px-3 py-2 flex justify-betweeen items-center bg-white border border-solid cursor-pointer hover:border-black"
     (mousedown)="filter.toggle($event)"
+    [class.border-[#DEE2E6]]="!popupDisplayed"
+    [class.border-black]="popupDisplayed"
 >
     <div class="grow">
         <span class="inline-flex items-center gap-1 rounded-md bg-[#EFF6FF] text-[#1D4ED8] px-3 py-1">
@@ -7,7 +9,13 @@
         </span>
     </div>
     <div><i class="pi pi-chevron-down"></i></div>
-    <p-overlayPanel #filter [style]="{width: '360px'}" styleClass="pt-4">
+    <p-overlayPanel 
+        #filter 
+        [style]="{width: '360px'}" 
+        styleClass="pt-4" 
+        (onHide)="popupDisplayed = false" 
+        (onShow)="popupDisplayed = true"
+    >
         <app-density-plot 
             *ngIf="filter.overlayVisible"
             [data]="data$.value"

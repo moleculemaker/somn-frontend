@@ -121,19 +121,26 @@
             </a>
         </div> -->
         <div class="flex link">
-            <a class="flex items-center m-1 cursor-pointer" disabled>
+            <a class="flex items-center m-1 cursor-pointer" 
+                (click)="tutorialService.driver.getConfig().steps?.length 
+                    ? tutorialService.start()
+                    : tooltip.activate()
+                "
+                tooltipEvent="focus"
+                tooltipPosition="bottom"
+                tooltipZIndex="10000"
+                [life]="3000"
+                pTooltip="When on the Somn home, request configuration, and model results pages, you will be able to access a tutorial here.">
                 <i class="mr-1 pi pi-question-circle"></i> Tutorial
             </a>
-            <a class="flex items-center m-1 ml-3 cursor-pointer" href="/about">
+            <a id="btn-about-somn" class="flex items-center m-1 ml-3 cursor-pointer" href="/about">
                 <i class="mr-1 pi pi-info-circle"></i> About Somn
             </a>
         </div>
     </div>
 </div>
 
-<div class="content">
-    <router-outlet></router-outlet>
-</div>
+<router-outlet></router-outlet>
 
 <!-- <cite>
     <div class="page_container">

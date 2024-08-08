@@ -154,7 +154,6 @@
                                     <ng-template
                                         pTemplate="filter"
                                         let-value
-                                        let-filter="filterCallback"
                                     >
                                         <p-multiSelect
                                             [display]="selectedArylHalides$.value.length > 1 ? 'comma' : 'chip'"
@@ -163,7 +162,7 @@
                                             [ngModel]="selectedArylHalides$ | async"
                                             [options]="(arylHalidesOptions$ | async) || []"
                                             placeholder="Aryl Halides"
-                                            (onChange)="filter($event.value); selectedArylHalides$.next($event.value)"
+                                            (onChange)="selectedArylHalides$.next($event.value)"
                                             display="chip"
                                         >
                                         </p-multiSelect>
@@ -179,7 +178,6 @@
                                     <ng-template
                                         pTemplate="filter"
                                         let-value
-                                        let-filter="filterCallback"
                                     >
                                         <p-multiSelect
                                             [display]="selectedAmines$.value.length > 1 ? 'comma' : 'chip'"
@@ -188,7 +186,7 @@
                                             [ngModel]="selectedAmines$ | async"
                                             [options]="(aminesOptions$ | async) || []"
                                             placeholder="Amines"
-                                            (onChange)="filter($event.value); selectedAmines$.next($event.value)"
+                                            (onChange)="selectedAmines$.next($event.value)"
                                             display="chip"
                                         >
                                         </p-multiSelect>
@@ -196,7 +194,7 @@
                                 </p-columnFilter>
                                 <p-columnFilter
                                     class="w-1/5"
-                                    field="catalyst"
+                                    field="catalyst[0]"
                                     matchMode="in"
                                     [showMenu]="false"
                                     [showClearButton]="false"
@@ -204,7 +202,6 @@
                                     <ng-template
                                         pTemplate="filter"
                                         let-value
-                                        let-filter="filterCallback"
                                     >
                                         <p-multiSelect
                                             [display]="selectedCatalysts$.value.length > 1 ? 'comma' : 'chip'"
@@ -213,7 +210,7 @@
                                             [ngModel]="selectedCatalysts$ | async"
                                             [options]="(catalystsOptions$ | async) || []"
                                             placeholder="Catalysts"
-                                            (onChange)="filter($event.value); selectedCatalysts$.next($event.value)"
+                                            (onChange)="selectedCatalysts$.next($event.value)"
                                             display="chip"
                                         >
                                         </p-multiSelect>
@@ -229,7 +226,6 @@
                                     <ng-template
                                         pTemplate="filter"
                                         let-value
-                                        let-filter="filterCallback"
                                     >
                                         <p-multiSelect
                                             [display]="selectedSolvents$.value.length > 1 ? 'comma' : 'chip'"
@@ -238,7 +234,7 @@
                                             [ngModel]="selectedSolvents$ | async"
                                             [options]="(solventsOptions$ | async) || []"
                                             placeholder="Solvent"
-                                            (onChange)="filter($event.value); selectedSolvents$.next($event.value)"
+                                            (onChange)="selectedSolvents$.next($event.value)"
                                             display="chip"
                                         >
                                         </p-multiSelect>
@@ -254,7 +250,6 @@
                                     <ng-template
                                         pTemplate="filter"
                                         let-value
-                                        let-filter="filterCallback"
                                     >
                                         <p-multiSelect
                                             [display]="selectedBases$.value.length > 1 ? 'comma' : 'chip'"
@@ -263,14 +258,14 @@
                                             [ngModel]="selectedBases$.value"
                                             [options]="(basesOptions$ | async) || []"
                                             placeholder="Bases"
-                                            (ngModelChange)="filter($event); selectedBases$.next($event)"
+                                            (ngModelChange)="selectedBases$.next($event)"
                                         >
                                         </p-multiSelect>
                                     </ng-template>
                                 </p-columnFilter>
                                 <app-yield-filter class="w-1/4 font-normal"
                                     [originalData]="(trainingData$ | async) || []"
-                                    [data]="(filteredTrainingDataWithoutYieldRange$ | async) || []"
+                                    [data]="(trainingDataWithoutFilteringYieldRange$ | async) || []"
                                     [selectedYield]="(selectedYield$ | async)!"
                                     (selectedYieldChange)="onYieldRangeChange($event)"
                                 ></app-yield-filter>
@@ -286,7 +281,7 @@
                                 <app-density-plot
                                     styleClass="h-[220px]"
                                     [originalData]="(trainingData$ | async) || []"
-                                    [data]="(filteredTrainingDataWithoutYieldRange$ | async) || []"
+                                    [data]="(trainingDataWithoutFilteringYieldRange$ | async) || []"
                                     [selectedRegion]="(selectedYield$ | async)!"
                                     (selectedRegionChange)="onYieldRangeChange($event)"
                                 ></app-density-plot>
@@ -303,7 +298,7 @@
                                     Amine<p-sortIcon field="amine" />
                                 </th>
                                 <th pSortableColumn="catalyst">
-                                    Catalyst<p-sortIcon field="catalyst" />
+                                    Catalyst<p-sortIcon field="catalyst[0]" />
                                 </th>
                                 <th pSortableColumn="solvent">
                                     Solvent<p-sortIcon field="solvent" />
@@ -320,7 +315,35 @@
                             <tr>
                                 <td>{{ row.el_name }}</td>
                                 <td>{{ row.nuc_name }}</td>
-                                <td>{{ row.catalyst }}</td>
+                                <td (mouseenter)="catalystOverlay.show($event)"
+                                    (mouseleave)="catalystOverlay.hide()"
+                                >
+                                    [Pd(allyl)({{ row.catalyst[0] }})][OTf]
+                                    <p-overlayPanel #catalystOverlay>
+                                        <div class="w-[300px] p-4">
+                                            <div
+                                                class="flex justify-center p-2 mb-2 border border-solid rounded-md border-blue-primary"
+                                            >
+                                                <app-molecule-image [width]="260" [height]="180" [molecule]="row.catalyst[1]"></app-molecule-image>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <div class="flex justify-between mt-2">
+                                                    <span class="leading-base opacity-60">Ligand</span>
+                                                    <span class="font-semibold text-end">{{ row.catalyst[0] }}</span>
+                                                </div>
+                                                <div class="flex justify-between mt-2">
+                                                    <span class="leading-base opacity-60">Catalyst</span>
+                                                    <span class="font-semibold text-end">[Pd(allyl)({{ row.catalyst[0] }})][OTf]</span>
+                                                </div>
+                                                <!-- TODO: add CASRN -->
+                                                <!-- <div class="flex justify-between mt-2">
+                                                    <span class="leading-base opacity-60">KEGG ID</span>
+                                                    <span class="font-semibold text-end">{{ molecule.kegg_id }}</span>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </p-overlayPanel>
+                                </td>
                                 <td>{{ row.solvent }}</td>
                                 <td>{{ row.base }}</td>
                                 <td>

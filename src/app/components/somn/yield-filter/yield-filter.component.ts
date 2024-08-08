@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { OverlayPanel } from 'primeng/overlaypanel';
 import { BehaviorSubject } from 'rxjs';
-import { Products } from '~/app/services/somn.service';
+import { Product } from '~/app/services/somn.service';
 
 @Component({
   selector: 'app-yield-filter',
@@ -9,10 +9,10 @@ import { Products } from '~/app/services/somn.service';
   styleUrls: ['./yield-filter.component.scss']
 })
 export class YieldFilterComponent {
-  @Input() originalData: Products = [];
+  @Input() originalData: Product[] = [];
   
-  data$ = new BehaviorSubject<Products>([]);
-  @Input() set data(value: Products) {
+  data$ = new BehaviorSubject<Product[]>([]);
+  @Input() set data(value: Product[]) {
     this.data$.next(value);
   }
 
@@ -25,6 +25,8 @@ export class YieldFilterComponent {
 
   @Output() selectedYieldChange = new EventEmitter<[number, number]>();
   @ViewChild('filter') filter: OverlayPanel;
+
+  popupDisplayed = false;
 
   onClickClear() {
     this.filter.hide();

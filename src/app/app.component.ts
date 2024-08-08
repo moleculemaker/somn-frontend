@@ -1,13 +1,15 @@
-import { Component } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { UserInfoService } from "./services/userinfo.service";
 import { MenuItem } from "primeng/api";
+import { TutorialService } from "./services/tutorial.service";
+import { Tooltip } from "primeng/tooltip";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   emailstring: string =
     "mailto:somn-feedback@moleculemaker.org?Subject=User feedback for Somn";
   showCite: boolean = false;
@@ -15,6 +17,8 @@ export class AppComponent {
   showComingSoonPopup: boolean = false;
   comingSoonTimerID: number | null = null;
   autocloseComingSoonPopup: boolean = true;
+
+  @ViewChild(Tooltip) tooltip: Tooltip;
 
   get userMenuItems(): Array<MenuItem> {
     return this.userInfo
@@ -32,7 +36,10 @@ export class AppComponent {
     return this.userInfoService.userInfo;
   }
 
-  constructor(private userInfoService: UserInfoService) {}
+  constructor(
+    private userInfoService: UserInfoService,
+    protected tutorialService: TutorialService
+  ) {}
 
   ngOnInit() {
     this.userInfoService.fetchUserInfo();

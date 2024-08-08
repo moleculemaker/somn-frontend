@@ -22,6 +22,7 @@
                         <div class="flex gap-2">
                             <button
                                 type="button"
+                                id="btn-use-example"
                                 class="flex items-center btn-outline"
                                 (click)="useExample()"
                             >
@@ -31,8 +32,8 @@
                         </div>
                     </ng-template>
                     <ng-template pTemplate="content">
-                        <div class="p-4">
-                            <section>
+                        <div id="container-somn-input" class="p-4">
+                            <section id="input-name-reactant-pair">
                                 <p class="font-semibold leading-lg">Name your reactant pair</p>
                                 <input
                                     pInputText
@@ -40,8 +41,11 @@
                                     placeholder="Enter reactant pair name..."
                                     formControlName="reactantPairName"
                                 />
+                                <ng-content *ngTemplateOutlet="error; context: {
+                                    controlName: 'reactantPairName'
+                                }"></ng-content>
                             </section>
-                            <section class="mt-2">
+                            <section id="input-reactants" class="mt-2">
                                 <p class="font-semibold leading-lg">
                                     Enter your reactants<i
                                         class="ml-2 pi pi-info-circle"
@@ -63,7 +67,10 @@
                                                     class="font-semibold underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['arylHalideName'].setValue('Bromobenzene');
-                                                        request.form.controls['arylHalide'].controls['smiles'].setValue('c1ccc(cc1)Br');
+                                                        request.form.controls['arylHalide'].setValue({
+                                                            smiles: 'C1=CC=C(C=C1)Br',
+                                                            reactionSite: '-'
+                                                        });
                                                     "
                                                     >Bromobenzene</small
                                                 >
@@ -75,11 +82,13 @@
                                             placeholder="Enter aryl halide name..."
                                             formControlName="arylHalideName"
                                         />
+                                        <ng-content *ngTemplateOutlet="error; context: {
+                                            controlName: 'arylHalideName'
+                                        }"></ng-content>
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter aryl halide SMILES..."
-                                            [value]="request.form.controls['arylHalide'].value"
-                                            (valueChange)="onValueChange('arylHalide', $event)"
+                                            formControlName="arylHalide"
                                             type="electrophile"
                                         >
                                         </app-marvinjs-input>
@@ -97,7 +106,10 @@
                                                     class="font-semibold underline cursor-pointer"
                                                     (click)="
                                                         request.form.controls['amineName'].setValue('Aniline');
-                                                        request.form.controls['amine'].controls['smiles'].setValue('NC1=CC=CC=C1');
+                                                        request.form.controls['amine'].setValue({
+                                                            smiles: 'C1=CC=C(C=C1)N',
+                                                            reactionSite: '-'
+                                                        });
                                                     "
                                                     >Aniline</small
                                                 >
@@ -109,12 +121,14 @@
                                             placeholder="Enter amine name..."
                                             formControlName="amineName"
                                         />
+                                        <ng-content *ngTemplateOutlet="error; context: {
+                                            controlName: 'amineName'
+                                        }"></ng-content>
                                         <app-marvinjs-input
                                             class="mt-2"
                                             placeholder="Enter amine SMILES..."
                                             type="nucleophile"
-                                            [value]="request.form.controls['amine'].value"
-                                            (valueChange)="onValueChange('amine', $event)"
+                                            formControlName="amine"
                                         >
                                         </app-marvinjs-input>
                                     </div>
@@ -128,6 +142,7 @@
 
         <!-- Subscription Email Input -->
         <div
+            id="input-subscription-email"
             class="sticky bottom-0 flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
         >
             <!-- TODO: validate parent form using input from marvin-js-input -->
@@ -169,14 +184,54 @@
                     ></p-checkbox>
                 </div>
             </div>
-            <p-button
-                label="Analyze Using Somn"
-                type="submit"
-                styleClass="bg-[#224063]"
-                [disabled]="request.form.invalid"
-                iconPos="right"
-                icon="pi pi-arrow-right"
-            ></p-button>
+            <div id="btn-use-somn">
+                <p-button
+                    label="Analyze Using Somn"
+                    type="submit"
+                    styleClass="bg-[#224063]"
+                    [disabled]="request.form.invalid"
+                    iconPos="right"
+                    icon="pi pi-arrow-right"
+                ></p-button>
+            </div>
         </div>
     </form>
 </div>
+
+<p-dialog
+    #tutorialDialog
+    header="Configuration"
+    [(visible)]="displayTutorial" 
+    [modal]="true" 
+    [style]="{ width: '350px' }" 
+    [draggable]="false" 
+    [resizable]="false"
+>
+    <div class="flex flex-col gap-6 -mb-2">
+        <p class="leading-xl">
+            It’s time to set up your job! Would you like us to show you around the request configuration page? You can always access this tour later.
+        </p>
+        <div class="flex items-center gap-2">
+            <p-checkbox [(ngModel)]="tutorialService.showTutorial" [binary]="true"></p-checkbox>
+            <label for="show-tour">Don't show this message again</label>
+        </div>
+        <div class="flex justify-between">
+            <p-button 
+                (onClick)="displayTutorial = false"
+                styleClass="p-button-outlined" 
+                label="Skip Tour">
+            </p-button>
+            <p-button
+                (onClick)="displayTutorial = false; tutorialService.driver.drive()"
+                label="Start Tour"
+                styleClass="bg-[#224063]"
+            ></p-button>
+        </div>
+    </div>
+</p-dialog>
+
+<ng-template #error let-controlName="controlName">
+    <div class="text-[--status-error-color] text-xs my-1" *ngIf="request.form.get(controlName)!.errors && request.form.get(controlName)!.dirty">
+        <div *ngIf="request.form.get(controlName)!.errors!['required']">This field is required</div>
+    </div>
+</ng-template>
