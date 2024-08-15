@@ -22,16 +22,7 @@ export class SomnResultComponent {
 
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
   displayTutorial: boolean = false;
-  _selectedProducts: Product[] = [];
-
-  get selectedProducts() {
-    return this._selectedProducts;
-  }
-
-  set selectedProducts(value: Product[]) {
-    this._selectedProducts = value;
-    console.log(this._selectedProducts);
-  }
+  // selectedProducts: number[] = [];
 
   yieldMessages: Message[] = [];
 
@@ -60,27 +51,6 @@ export class SomnResultComponent {
         of(jobInfo),
       ]).pipe(
         map(([data, el, nuc, jobInfo]) => {
-          // const hightlighedSvg = (svg: string, site: number) => {
-          //   const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
-          //   const container = document.createElement('div');
-          //   container.innerHTML = svg;
-          //   let ellipses = d3.select(container).selectAll('ellipse');
-
-          //   if (ellipses.size() === 1) {
-          //     ellipses.remove();
-          //     return container.innerHTML;
-          //   }
-
-          //   ellipses.each((d, i, nodes) => {
-          //     const node = d3.select(nodes[i]);
-          //     const data = parseInt(node.attr('class').split('atom-')[1]);
-          //     node
-          //       .attr('style', '')
-          //       .attr('fill', data === site ? colors[i % colors.length] : '#ffffff00');
-          //   });
-
-          //   return container.innerHTML;
-          // }
 
           // set up high yield messages, if there's any
           let hasMesssage = false;
@@ -159,6 +129,7 @@ export class SomnResultComponent {
 
   showFilters$ = new BehaviorSubject(true);
 
+  selectedProducts$ = new BehaviorSubject<number[]>([]);
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
@@ -188,6 +159,7 @@ export class SomnResultComponent {
     this.selectedCatalysts$,
     this.selectedBases$,
     this.selectedSolvents$,
+    this.selectedProducts$,
   ]).pipe(
     map(
       ([
@@ -195,20 +167,27 @@ export class SomnResultComponent {
         selectedCatalysts,
         selectedBases,
         selectedSolvents,
+        selectedProducts,
       ]) =>
         [
           response.data,
           response.data.filter(
             (data) =>
-              (selectedCatalysts.length
-                ? selectedCatalysts.includes(data["catalyst"][0])
-                : true) &&
-              (selectedBases.length
-                ? selectedBases.includes(data["base"])
-                : true) &&
-              (selectedSolvents.length
-                ? selectedSolvents.includes(data["solvent"])
-                : true),
+              (
+                (selectedCatalysts.length
+                  ? selectedCatalysts.includes(data["catalyst"][0])
+                  : true) &&
+                (selectedBases.length
+                  ? selectedBases.includes(data["base"])
+                  : true) &&
+                (selectedSolvents.length
+                  ? selectedSolvents.includes(data["solvent"])
+                  : true)
+              ) || (
+                (selectedProducts.length
+                  ? selectedProducts.includes(data["iid"])
+                  : false)
+              ),
           ),
         ]
     ),
@@ -271,6 +250,15 @@ export class SomnResultComponent {
     }),
   );
 
+  selectedTableRows$ = combineLatest([
+    this.selectedProducts$,
+    this.dataWithColor$,
+  ]).pipe(
+    map(([selectedProducts, data]) => 
+      data.filter((d) => selectedProducts.includes(d.iid))
+    )
+  );
+
   topYieldConditions$ = this.dataWithColor$.pipe(
     map((data) => {
       const yields = Math.max(...data.map((d) => Math.floor(d["yield"] * 100)));
@@ -287,17 +275,22 @@ export class SomnResultComponent {
     this.selectedBases$,
     this.selectedCatalysts$,
     this.selectedSolvents$,
+    this.selectedProducts$,
   ])).pipe(
-    map(([response, yieldRange, bases, catalysts, solvents]) => {
+    map(([response, yieldRange, bases, catalysts, solvents, selection]) => {
       const data = response.data;
       const map = new Map();
       const isHighlighted = (d: any) => {
         return (
-          (bases.length ? bases.includes(d.base) : true) &&
-          (catalysts.length ? catalysts.includes(d.catalyst[0]) : true) &&
-          (solvents.length ? solvents.includes(d.solvent) : true) &&
-          d.yield >= yieldRange[0] / 100 &&
-          d.yield <= yieldRange[1] / 100
+          (
+            (bases.length ? bases.includes(d.base) : true) &&
+            (catalysts.length ? catalysts.includes(d.catalyst[0]) : true) &&
+            (solvents.length ? solvents.includes(d.solvent) : true) &&
+            d.yield >= yieldRange[0] / 100 &&
+            d.yield <= yieldRange[1] / 100 
+          ) || (
+            (selection.length ? selection.includes(d.iid) : false) 
+          )
         );
       }
       data.forEach((d: Product) => {
@@ -318,6 +311,15 @@ export class SomnResultComponent {
       });
       return Array.from(map.values());
     }),
+  );
+
+  selectedHeatmapCells$ = combineLatest([
+    this.selectedProducts$,
+    this.heatmapData$,
+  ]).pipe(
+    map(([selectedProducts, data]) => 
+      data.filter((d) => selectedProducts.includes(d.iid))
+    )
   );
 
   subscriptions: Subscription[] = [];
@@ -498,6 +500,14 @@ export class SomnResultComponent {
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");
     }
+  }
+
+  onSelectedHeatmapCellsChange(cells: any) {
+    this.selectedProducts$.next(cells.map((d: Product) => d.iid));
+  }
+
+  onTableSelectionChange(rows: any) {
+    this.selectedProducts$.next(rows.map((d: Product) => d.iid));
   }
 
   onExportResults() {
