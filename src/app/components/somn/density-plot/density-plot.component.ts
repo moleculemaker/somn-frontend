@@ -336,4 +336,11 @@ export class DensityPlotComponent implements AfterViewInit, OnDestroy {
       }
     });
   }
+
+  exportPNG(filename: string) {
+    this.somnService.exportPNG(
+      this.container.nativeElement.querySelector("svg")!, 
+      `${filename}-density_plot`
+    );
+  }
 }

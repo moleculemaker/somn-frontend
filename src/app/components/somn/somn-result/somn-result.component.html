@@ -17,10 +17,11 @@
         <div class="flex items-center gap-2">
             <p-splitButton id="btn-request-options" label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
             <div id="btn-export" class="flex flex-col justify-center">
-                <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="onExportResults()">
+                <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="menu.toggle($event)">
                     <i class="mr-2 pi pi-download"></i>
                     <span class="font-semibold">Export</span>                    
                 </button>
+                <p-tieredMenu #menu [model]="exportOptions" [popup]="true" />
             </div>
         </div>
     </div>
@@ -264,16 +265,20 @@
                             #resultsTable
                             id="container-table"
                             [value]="(dataWithColor$ | async) || []"
-                            [columns]="columns"
-                            [paginator]="true"
+
+                            [columns]="exportColumns"
+                            [exportFunction]="exportFunction"
                             [exportFilename]="(exportFileName$ | async) || 'somn-results'"
+
                             selectionMode="multiple"
                             [selection]="(selectedTableRows$ | async) || []"
                             (selectionChange)="onTableSelectionChange($event)"
-                            selectionKeys="iid"
                             dataKey="iid"
+
                             [rows]="10"
                             [rowsPerPageOptions]="[10, 20, 50]"
+                            [paginator]="true"
+
                             class="w-1/2 h-full"
                             tableStyleClass="w-1/2"
                             styleClass="w-full border-l border-solid border-[--surface-d]"

@@ -189,4 +189,12 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .text("Catalyst");
     });
   }
+
+  exportPNG(filename: string) {
+    this.somnService.exportPNG(
+      this.container.nativeElement.querySelector("svg")!, 
+      `${filename}-heatmap`
+    );
+  }
+
 }
