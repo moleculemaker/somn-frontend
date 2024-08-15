@@ -16,7 +16,7 @@
             <input
                 #minRange
                 type="number"
-                class="absolute appearance-none rounded-md border border-solid p-2"
+                class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
                 (blur)="updateMinRange(minRange.value)"
                 (keyup.enter)="updateMinRange(minRange.value)"
                 [min]="0"
@@ -25,7 +25,7 @@
             <input
                 #maxRange
                 type="number"
-                class="absolute appearance-none rounded-md border border-solid p-2"
+                class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
                 (blur)="updateMaxRange(maxRange.value)"
                 (keyup.enter)="updateMaxRange(maxRange.value)"
                 [min]="0"

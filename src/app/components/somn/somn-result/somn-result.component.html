@@ -349,7 +349,13 @@
     </div>
     <div class="flex justify-between mt-2">
         <span class="leading-sm">Reaction Site</span>
-        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.reactionSite.idx + 1 }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
+            {{ 
+                molecule.reactionSitesOptions.length === 1 
+                ? 'Auto detected'
+                : molecule.reactionSite.idx + 1 
+            }}
+        </span>
     </div>
 </ng-template>
 
