@@ -2,14 +2,14 @@
     "reactantPairName": "Example Reactant Pair",
     "arylHalideName": "test1",
     "arylHalide": {
-        "smiles": "BrC1=NC=CC=C1",
-        "reactionSite": "0"
+        "smiles": "ClC(C=C1)=CC(Cl)=C1C(CN2C=CN=C2)OCC3=CC=C(Cl)C=C3",
+        "reactionSite": "6"
     },
 
     "amineName": "test2",
     "amine": {
-        "smiles": "NC1=CC=CC=C1",
-        "reactionSite": "0"
+        "smiles": "CC(NC1=CC(CC2=C3C(NC=C3C)=CC=C2)=C(C=C(F)C(NC)=C4)C4=C1)=O",
+        "reactionSite": "2"
     },
 
     "agreeToSubscription": false,

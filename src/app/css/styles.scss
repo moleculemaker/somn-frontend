@@ -2,8 +2,7 @@
 //this css library should only be loaded ONCE PER PAGE (or web component)
 //load _core.scss directly if only needing the supporting css colors, variables, mixins, and other functionality
 
-@import 'core';
-
+@import "core";
 
 //this comment will show up when exporting the css...use as instructions on the frontend output as needed
 /*
@@ -13,174 +12,170 @@ example: document.documentElement.style.setProperty('--text-color', '#ff0000');
 
 */
 
-
-
 //****************
 //root css variables
 
 :root {
-	//colors
-	@each $name, $color in $colors {
-		@include define_css_var($name);
-	}
+  //colors
+  @each $name, $color in $colors {
+    @include define_css_var($name);
+  }
 
-	//misc
-//	@include define_css_var('padding', $padding);
-//	@include define_css_var('border-radius', $border_radius);
+  //misc
+  //	@include define_css_var('padding', $padding);
+  //	@include define_css_var('border-radius', $border_radius);
 }
 
 //****************
 //support dark color scheme preference
 
 @if $automatic_dark_scheme_colors {
-	:root {
-		@media (prefers-color-scheme: dark) {
-			//colors
-			@each $name, $color in $dark_scheme_colors {
-				@include define_css_var($name, $dark_scheme_colors);
-			}
-		}
-	}
+  :root {
+    @media (prefers-color-scheme: dark) {
+      //colors
+      @each $name, $color in $dark_scheme_colors {
+        @include define_css_var($name, $dark_scheme_colors);
+      }
+    }
+  }
 }
 
 .dark_mode {
-	@media (prefers-color-scheme: dark) {
-		//colors
-		@each $name, $color in $dark_scheme_colors {
-			@include define_css_var($name, $dark_scheme_colors);
-		}
-	}
+  @media (prefers-color-scheme: dark) {
+    //colors
+    @each $name, $color in $dark_scheme_colors {
+      @include define_css_var($name, $dark_scheme_colors);
+    }
+  }
 }
 
 //****************
 
-@import 'core/reset';
-@import 'shared';
+@import "core/reset";
+@import "shared";
 
 //**************** host ******************
 
-html, body {
-	color: css_var('text');
-	background: {
-		color: css_var('background');
-	}
+html,
+body {
+  color: css_var("text");
+  background: {
+    color: css_var("background");
+  }
 
-	font: {
-		family: $font_family;
-		size: $font_size_default;
-	}
+  font: {
+    family: $font_family;
+    size: $font_size_default;
+  }
 }
 
 /************************** MMLI Customized Theme **************************/
+@import "driver";
+
 .p-panel {
-	@apply h-full;
+  @apply h-full;
 
-	.p-panel-header {
-		@apply flex;
-		@apply items-center;
-		@apply justify-between;
-		@apply p-4;
-		@apply w-full;
-		@apply font-semibold;
+  .p-panel-header {
+    @apply flex;
+    @apply items-center;
+    @apply justify-between;
+    @apply p-4;
+    @apply w-full;
+    @apply font-semibold;
 
-		.p-panel-title {
-			@apply font-semibold;
-		}
-	}
+    .p-panel-title {
+      @apply font-semibold;
+    }
+  }
 
-	.p-panel-header:has(button) {
-		@apply py-3;
-	}
-  
-	.p-panel-content {
-		padding: 0;
-		@apply flex;
-		@apply flex-col;
-		@apply grow;
-	}
+  .p-panel-header:has(button) {
+    @apply py-3;
+  }
+
+  .p-panel-content {
+    padding: 0;
+    @apply flex;
+    @apply flex-col;
+    @apply grow;
+  }
 }
 
 .p-card {
-	.p-card-body {
-		padding: 0.71429rem 0.85714rem 1.14286rem 0.85714rem;;
-	}
+  .p-card-body {
+    @apply p-3;
+    @apply pb-4;
+  }
 
-	.p-card-content {
-		padding: 0;
-	}
+  .p-card-content {
+    padding: 0;
+  }
 }
 
 .pi {
-	font-size: inherit;
+  font-size: inherit;
 }
 
-body, span, div, p {
-	@apply text-base;
+body,
+span,
+div,
+p {
+  @apply text-base;
 }
 
 button {
-	@apply font-normal;
-	@apply bg-transparent;
+  @apply font-normal;
+  @apply bg-transparent;
 }
 
 h1 {
-	@apply text-4xl;
-	@apply font-bold;
-	@apply leading-xl;
+  @apply text-4xl;
+  @apply font-bold;
+  @apply leading-xl;
 }
 
 h2 {
-	@apply text-3xl;
-	@apply font-bold;
-	@apply leading-normal;
+  @apply text-3xl;
+  @apply font-bold;
+  @apply leading-normal;
 }
 
 h4 {
-	@apply text-xl;
-	@apply leading-lg;
-	@apply opacity-100;
-	@apply font-bold;
-	@apply leading-lg;
+  @apply text-xl;
+  @apply leading-lg;
+  @apply font-bold;
+  @apply leading-lg;
 
-	text: {
-        transform: none;
-    }
+  text: {
+    transform: none;
+  }
 }
 
 h5 {
-	@apply text-lg;
+  @apply text-lg;
+  @apply opacity-60;
+  @apply font-normal;
 
-	text: {
-        transform: none;
-    }
+  text: {
+    transform: none;
+  }
 }
 
 h6 {
-	@apply text-base;
-	@apply leading-lg;
+  @apply text-base;
+  @apply leading-lg;
 }
 
 small {
-	@apply text-sm;
+  @apply text-sm;
 }
 
 hr {
-	@apply border-t;
-	@apply border-b-0;
-	@apply border-solid;
-	@apply border-[--surface-d];
-	@apply m-0;
+  @apply border-t;
+  @apply border-b-0;
+  @apply border-solid;
+  @apply border-[--surface-d];
+  @apply m-0;
 }
 
-.btn-outline {
-	@apply border;
-	@apply border-solid;
-	@apply border-[--surface-d];
-	@apply bg-transparent;
-	@apply text-text-primary;
-	@apply rounded-md;
-	@apply p-2;
-	@apply text-base;
-	@apply leading-lg;
-}
+
 /**************************** MMLI Customized END **************************/

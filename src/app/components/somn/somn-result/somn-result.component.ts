@@ -1,15 +1,13 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
-import { FilterService } from 'primeng/api';
+import { FilterService, Message } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription } from 'rxjs';
+import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
-import { Products, SomnService } from '~/app/services/somn.service';
+import { Product, SomnService } from '~/app/services/somn.service';
 
-import baseJson from "../about-somn/base_map.json";
-import solventJson from "../about-somn/solvent_map.json";
-import catalystJson from "../about-somn/catalyst_map.json";
+import { TutorialService } from '~/app/services/tutorial.service';
 
 @Component({
   selector: 'app-somn-result',
@@ -21,15 +19,28 @@ import catalystJson from "../about-somn/catalyst_map.json";
 })
 export class SomnResultComponent {
   @ViewChild("resultsTable") resultsTable: Table;
-  
+
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
+  displayTutorial: boolean = false;
+  _selectedProducts: Product[] = [];
+
+  get selectedProducts() {
+    return this._selectedProducts;
+  }
+
+  set selectedProducts(value: Product[]) {
+    this._selectedProducts = value;
+    console.log(this._selectedProducts);
+  }
+
+  yieldMessages: Message[] = [];
 
   statusResponse$ = timer(0, 10000).pipe(
     switchMap(() => this.somnService.getResultStatus(this.jobId)),
-    takeWhile((data) => 
-      data.phase === JobStatus.Processing 
+    takeWhile((data) =>
+      data.phase === JobStatus.Processing
       || data.phase === JobStatus.Queued
-    , true),
+      , true),
     shareReplay(1),
     tap((data) => { console.log('job status: ', data.phase, data) }),
   );
@@ -49,65 +60,104 @@ export class SomnResultComponent {
         of(jobInfo),
       ]).pipe(
         map(([data, el, nuc, jobInfo]) => {
-          const hightlighedSvg = (svg: string, site: number) => {
-            const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
-            const container = document.createElement('div');
-            container.innerHTML = svg;
-            let ellipses = d3.select(container).selectAll('ellipse');
+          // const hightlighedSvg = (svg: string, site: number) => {
+          //   const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
+          //   const container = document.createElement('div');
+          //   container.innerHTML = svg;
+          //   let ellipses = d3.select(container).selectAll('ellipse');
 
-            console.log(site);
+          //   if (ellipses.size() === 1) {
+          //     ellipses.remove();
+          //     return container.innerHTML;
+          //   }
 
-            ellipses.each((d, i, nodes) => {
-              const node = d3.select(nodes[i]);
-              const data = parseInt(node.attr('class').split('atom-')[1]);
-              node
-                .attr('style', '')
-                .attr('fill', data === site ? colors[i % colors.length] : '#5F6C8D40');
-            });
+          //   ellipses.each((d, i, nodes) => {
+          //     const node = d3.select(nodes[i]);
+          //     const data = parseInt(node.attr('class').split('atom-')[1]);
+          //     node
+          //       .attr('style', '')
+          //       .attr('fill', data === site ? colors[i % colors.length] : '#ffffff00');
+          //   });
 
-            return container.innerHTML;
-          }
+          //   return container.innerHTML;
+          // }
+
+          // set up high yield messages, if there's any
+          let hasMesssage = false;
+          data.forEach((d, i) => {
+            if (d.yield >= 120 && !hasMesssage) {
+              this.yieldMessages.push({
+                severity: 'warn',
+                summary: 'High Yield',
+                detail: `High yield of ${d.yield}% for reaction ${i + 1}`,
+              });
+              hasMesssage = true;
+            }
+          })
+
+          let elReactionSites = el.reaction_site_idxes.map((v, i) => ({ 
+            idx: i, 
+            value: `${v}`,
+            svg: '', 
+          }));
+          let elSelectedReactionSite = jobInfo.el_idx === '-' 
+            ? elReactionSites[0]
+            : elReactionSites.find((v) => v.value === `${jobInfo.el_idx}`)!;
+
+          let nucReactionSites = nuc.reaction_site_idxes.map((v, i) => ({ 
+            idx: i, 
+            value: `${v}`,
+            svg: '', 
+          }));
+          let nucSelectedReactionSite = jobInfo.nuc_idx === '-' 
+          ? nucReactionSites[0]
+          : nucReactionSites.find((v) => v.value === `${jobInfo.nuc_idx}`)!;
 
           return {
-            data: data as Products,
+            data: data.map((d, i) => ({ ...d, yield: Math.max(0, d.yield) })),
             reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
             arylHalide: {
               name: jobInfo.el_name || 'aryl halide',
               smiles: jobInfo.el || 'aryl halide smiles',
-              structure: hightlighedSvg(el.svg, jobInfo.el_idx),
+              reactionSitesOptions: elReactionSites,
+              reactionSite: elSelectedReactionSite,
+              structure: el.svg,
             },
             amine: {
               name: jobInfo.nuc_name || 'amine',
               smiles: jobInfo.nuc || 'amine smiles',
-              structure: hightlighedSvg(nuc.svg, jobInfo.nuc_idx),
+              reactionSitesOptions: nucReactionSites,
+              reactionSite: nucSelectedReactionSite,
+              structure: nuc.svg,
             },
           };
         })
       )
     }),
     tap((data) => { console.log('result: ', data) }),
+    tap((data) => {
+      // show tutorial
+      if (!this.tutorialService.showTutorial) {
+        this.displayTutorial = true;
+      } else {
+        this.displayTutorial = false;
+      }
+    }),
     shareReplay(1),
     map((resp) => ({
       ...resp,
-      data: resp.data.map((d, i: number) => ({
+      data: resp.data.map((d: Product) => ({
         ...d,
-        base: baseJson[`${d["base"]}` as keyof typeof baseJson],
-        catalyst: catalystJson[`${d["catalyst"]}` as keyof typeof catalystJson],
-        solvent: solventJson[`${d["solvent"]}` as keyof typeof solventJson],
         yield: d.yield / 100,
-        amineName: d.nuc_name,
-        arylHalideName: d.el_name,
+        amineName: resp.amine.name,
+        arylHalideName: resp.arylHalide.name,
         amineSmiles: resp.amine.smiles,
         arylHalideSmiles: resp.arylHalide.smiles,
-        rowId: i,
       })),
-    }))//TODO: replace with actual response
+    }))
   );
 
   showFilters$ = new BehaviorSubject(true);
-
-  selectedCell$ = new BehaviorSubject<number | null>(null);
-  selectedRow$ = new BehaviorSubject<any | null>(null);
 
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
@@ -130,30 +180,7 @@ export class SomnResultComponent {
     map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
   );
   catalystsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.catalyst))]),
-  );
-
-  dataWithColor$ = this.response$.pipe(
-    map((response) => 
-      response.data.map((d) => ({ 
-        ...d, 
-        color: this.getColorAtPercentage(
-          d["yield"], 
-          d3.min(response.data, d => d["yield"])!, 
-          d3.max(response.data, d => d["yield"])!
-        )
-      })).sort((a, b) => b["yield"] - a["yield"])
-    ),
-  );
-
-  topYieldConditions$ = this.dataWithColor$.pipe(
-    map((data) => {
-      const yields = Math.max(...data.map((d) => Math.floor(d["yield"] * 100)));
-      return {
-        topYield: yields,
-        conditions: data.filter((d) => Math.floor(d["yield"] * 100) >= yields),
-      }
-    }),
+    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]),
   );
 
   filteredDataWithoutYieldRange$ = combineLatest([
@@ -169,19 +196,89 @@ export class SomnResultComponent {
         selectedBases,
         selectedSolvents,
       ]) =>
-        response.data.filter(
-          (data) =>
-            (selectedCatalysts.length
-              ? selectedCatalysts.includes(data["catalyst"])
-              : true) &&
-            (selectedBases.length
-              ? selectedBases.includes(data["base"])
-              : true) &&
-            (selectedSolvents.length
-              ? selectedSolvents.includes(data["solvent"])
-              : true),
-        ),
+        [
+          response.data,
+          response.data.filter(
+            (data) =>
+              (selectedCatalysts.length
+                ? selectedCatalysts.includes(data["catalyst"][0])
+                : true) &&
+              (selectedBases.length
+                ? selectedBases.includes(data["base"])
+                : true) &&
+              (selectedSolvents.length
+                ? selectedSolvents.includes(data["solvent"])
+                : true),
+          ),
+        ]
     ),
+    tap(([
+      data,
+      filteredData,
+    ]) => {
+      const allResultsContainer = d3.select("#color-key-all-results");
+      const filteredResultsContainer = d3.select("#color-key-filtered-results");
+      const width = 40;
+      const height = 6;
+      const cornerRadius = 3;
+      allResultsContainer.selectAll("*").remove(); // Clear existing legend
+
+      if (filteredData.length === data.length) {
+        const gradient = this.somnService.getGradientByData(data)
+          .attr('id', 'legend-gradient');
+        allResultsContainer.html(gradient.node()!.outerHTML);
+
+        // No filters applied - show single color scale
+        allResultsContainer.append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("rx", cornerRadius)
+          .attr("ry", cornerRadius)
+          .style("fill", `url(#legend-gradient)`);
+
+      } else {
+        const gradient = this.somnService.getGradientByData(filteredData)
+          .attr('id', 'legend-gradient');
+        filteredResultsContainer.html(gradient.node()!.outerHTML);
+
+        // Original data (gray) scale
+        allResultsContainer.append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("rx", cornerRadius)
+          .attr("ry", cornerRadius)
+          .style("fill", "lightgray");
+
+        // Filtered data scale
+        filteredResultsContainer.append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("rx", cornerRadius)
+          .attr("ry", cornerRadius)
+          .style("fill", `url(#legend-gradient)`);
+      }
+    }),
+    map(([_, filteredData]) => filteredData)
+  );
+
+  dataWithColor$ = this.filteredDataWithoutYieldRange$.pipe(
+    map((data: Product[]) => {
+      const colorScale = this.somnService.getColorScale(data);
+      return data.map((d) => ({
+        ...d,
+        color: colorScale(d.yield),
+      })).sort((a, b) => b["yield"] - a["yield"])
+    }),
+  );
+
+  topYieldConditions$ = this.dataWithColor$.pipe(
+    map((data) => {
+      const yields = Math.max(...data.map((d) => Math.floor(d["yield"] * 100)));
+      return {
+        topYield: yields,
+        conditions: data.filter((d) => Math.floor(d["yield"] * 100) >= yields),
+      }
+    }),
   );
 
   heatmapData$ = combineLatest(([
@@ -197,14 +294,14 @@ export class SomnResultComponent {
       const isHighlighted = (d: any) => {
         return (
           (bases.length ? bases.includes(d.base) : true) &&
-          (catalysts.length ? catalysts.includes(d.catalyst) : true) &&
+          (catalysts.length ? catalysts.includes(d.catalyst[0]) : true) &&
           (solvents.length ? solvents.includes(d.solvent) : true) &&
           d.yield >= yieldRange[0] / 100 &&
           d.yield <= yieldRange[1] / 100
         );
       }
-      data.forEach((d) => {
-        const key = `${d.catalyst}-${d.solvent}/${d.base}`;
+      data.forEach((d: Product) => {
+        const key = `${d.catalyst[0]}-${d.solvent}/${d.base}`;
         if (map.has(key)) {
           console.warn("ignore data ", d, " because of key duplication");
           return;
@@ -215,7 +312,7 @@ export class SomnResultComponent {
           solvent: `${d.solvent}`,
           base: `${d.base}`,
           yield: d.yield,
-          rowId: d.rowId,
+          iid: d.iid,
           isHighlighted: isHighlighted(d),
         });
       });
@@ -268,29 +365,107 @@ export class SomnResultComponent {
     private somnService: SomnService,
     private filterService: FilterService,
     private route: ActivatedRoute,
+    protected tutorialService: TutorialService,
   ) {
-    const sub1 = combineLatest([
-      this.selectedCell$,
-      this.response$,
-    ]).pipe(tap(([cell, response]) => {
-      if (cell === null
-        || this.selectedRow$.value?.rowId === cell
-      ) {
-        return;
-      }
-      this.selectedRow$.next(response.data.find((d) => d.rowId === cell));
-    })).subscribe();
+    // setup tutorial
+    tutorialService.tutorialKey = 'show-result-page-tutorial';
 
-    const sub2 = this.selectedRow$.subscribe((row) => {
-      if (row === null
-        || this.selectedCell$.value === row.rowId
-      ) {
-        return;
-      }
-      this.selectedCell$.next(row.rowId);
-    });
+    tutorialService.onStart = () => {
+      this.displayTutorial = true;
+    };
 
-    this.subscriptions.push(sub1, sub2);
+    tutorialService.driver.setSteps([
+      {
+        element: '#btn-request-options',
+        popover: {
+          title: 'Request Options',
+          description: 'Modify and resubmit your request, or run a new request in another tab.',
+          side: 'bottom',
+          align: 'end'
+        }
+      },
+      {
+        element: "#btn-export",
+        popover: {
+          title: "Export",
+          description: 'Download your results. Current formats supported include PNG for visualizations (yield % distribution and heatmap) and CSV for tabular results.',
+          side: "bottom",
+          align: "end"
+        }
+      },
+      {
+        element: '#container-job-id',
+        popover: {
+          title: "Job ID",
+          description: 'Copy the link to your Job ID to revisit your results at a later time.',
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-reactants',
+        popover: {
+          title: "Reactants",
+          description: 'Review your input reactant pair.',
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-top-predictions',
+        popover: {
+          title: "Top Predictions Summary",
+          description: 'Preview the highest yield % and associated reaction conditions predicted for your request.',
+          side: "left",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-predicted-conditions',
+        popover: {
+          title: "Predicted Conditions",
+          description: 'Explore the reaction conditions and yield % predictions for your request via filters, yield % distribution and heatmap visualizations, and tabular results.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-filters',
+        popover: {
+          title: "Filter",
+          description: 'Use the filter bar to refine your results view by catalyst, base, solvent, or yield %.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#diagram-yield-distribution',
+        popover: {
+          title: "Yield % Distribution",
+          description: 'Use the sliders and/or input boxes to filter your results view by yield %.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#diagram-heatmap',
+        popover: {
+          title: "Heatmap",
+          description: 'Hover or click on an individual square in the heatmap to view the yield % details for that set of reaction conditions.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-table',
+        popover: {
+          title: "Table",
+          description: 'Sort, scroll, and page through the tabular view to find reaction conditions of interest.',
+          side: "left",
+          align: "center"
+        }
+      },
+    ]);
   }
 
   ngOnInit() {
@@ -313,27 +488,12 @@ export class SomnResultComponent {
     this.resultsTable.reset();
   }
 
-  getColorAtPercentage(percentage: number, min: number, max: number) {
-    percentage = percentage > 1 ? percentage / 100 : percentage;
-    const colorStops = [
-      { offset: "0%", color: "#470459" },
-      { offset: "50%", color: "#2E8C89" },
-      { offset: "100%", color: "#F5E61D" }
-    ];
-
-    // Create a scale to map the percentage to the corresponding color stop
-    const scale = d3.scaleLinear(colorStops.map(stop => stop.color))
-      .domain(colorStops.map(stop => parseFloat(stop.offset)));
-
-    return scale((percentage - min) / (max - min) * 100);
-  }
-
   onYieldRangeChange(value: [number, number]) {
     const v = this.selectedYield$.value;
     if (v[0] === value[0] && v[1] === value[1]) {
       return;
     }
-    
+
     this.selectedYield$.next(value);
     if (this.resultsTable) {
       this.resultsTable.filter(value, "yield", "range");

@@ -10,16 +10,13 @@ import {
   ViewChild,
 } from "@angular/core";
 import * as d3 from "d3";
+import { Product, SomnService } from "~/app/services/somn.service";
 
-interface HeatmapData {
+type HeatmapData = Product & { 
   solventBase: string;
-  solvent: string;
-  base: string;
-  catalyst: string;
-  yield: number;
-  isHighlighted: boolean;
-  rowId: number;
-}
+  isHighlighted: boolean; 
+  iid: number 
+};
 
 @Component({
   selector: "app-heatmap",
@@ -29,31 +26,31 @@ interface HeatmapData {
 export class HeatmapComponent implements AfterViewInit, OnChanges {
   @Input() styleClass: string = "";
   @Input() data: HeatmapData[] = [];
-  @Input() selectedCell: number | null = null;
-  @Output() selectedCellChange = new EventEmitter<number | null>();
+  @Input() selectedCells: Product[] = [];
+  @Output() selectedCellsChange = new EventEmitter<Product[]>();
   @ViewChild("heatmapContainer") container: ElementRef<HTMLDivElement>;
+
+  constructor(private somnService: SomnService) {}
 
   ngAfterViewInit() {
     this.render();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes["data"] && changes["data"].currentValue && this.container) {
-      this.render(this.data, null);
-    }
-    if (changes["selectedCell"]) {
+    if ((changes["data"] && changes["data"].currentValue && this.container)
+      || (changes["selectedCells"])) {
       this.render();
     }
   }
 
-  render(data: HeatmapData[] = this.data, selectedCell: number | null = this.selectedCell) {
+  render(data: HeatmapData[] = this.data, selectedCells: Product[] = this.selectedCells) {
     setTimeout(() => {
       if (!this.container) {
         return;
       }
 
       let containerEl = this.container.nativeElement;
-      let margin = { top: 120, right: 20, bottom: 100, left: 140 },
+      let margin = { top: 60, right: 20, bottom: 100, left: 140 },
         width = containerEl.clientWidth - margin.left - margin.right,
         height = containerEl.clientHeight - margin.top - margin.bottom;
 
@@ -72,7 +69,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // Labels of row and columns
-      let myGroups = new Set(this.data.map((d) => d.catalyst));
+      let myGroups = new Set(this.data.map((d) => d.catalyst[0]));
       let myVars = new Set(this.data.map((d) => d.solventBase));
 
       // Build X scales and axis:
@@ -98,14 +95,6 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
 
       d3.selectAll(".tooltip").remove();
 
-      // Build color scale
-      let colorScale = d3
-        .scaleLinear(["#470459", "#2E8C89", "#F5E61D"])
-        .domain([0, 
-          d3.mean(data.map((d) => d.yield))!,
-          d3.max(data.map((d) => d.yield))!
-        ]);
-
       let tooltip = d3
         .select(containerEl)
         .append("div")
@@ -126,28 +115,34 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
           .style("left", (event.x - 20) + "px")
           .style("top", (event.y - 40) + "px")
           .style("pointer-events", "none");
-
-        console.log(event)
       };
       let mousedown = (event: MouseEvent, d: any) => {
         if (!d.isHighlighted) {
-          this.selectedCellChange.emit(null);
           return;
         }
-        this.selectedCellChange.emit(d.rowId);
+        let idx = selectedCells.findIndex((c) => c.iid === d.iid);
+        if (idx > -1) {
+          selectedCells.splice(idx, 1);
+        } else {
+          selectedCells.push(d);
+        }
+        this.render(data, selectedCells);
+        this.selectedCellsChange.emit(selectedCells);
       }
       let mouseleave = (event: MouseEvent, d: any) => {
         tooltip.style("opacity", 0);
       };
 
+      const colorScale = this.somnService.getColorScale(data);
+
       // add the squares
       svg
         .selectAll()
-        .data(this.data.filter(d => d.rowId !== selectedCell), (d: any) => d.solventBase + ":" + d.catalyst)
+        .data(this.data.filter((d) => !selectedCells.map((c) => c.iid).includes(d.iid)), (d: any) => d.solventBase + ":" + d.catalyst[0])
         .enter()
         .append("rect")
         .attr("class", "cell")
-        .attr("x", (d: any) => x(d.catalyst) || "unknown")
+        .attr("x", (d: any) => x(d.catalyst[0]) || "unknown")
         .attr("y", (d) => y(d.solventBase) || "unknown")
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
@@ -158,11 +153,11 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
 
       svg
         .selectAll()
-        .data(this.data.filter(d => d.rowId === selectedCell), (d: any) => d.solventBase + ":" + d.catalyst)
+        .data(this.data.filter((d) => selectedCells.map((c) => c.iid).includes(d.iid)), (d: any) => d.solventBase + ":" + d.catalyst[0])
         .enter()
         .append("rect")
         .attr("class", "cell")
-        .attr("x", (d: any) => x(d.catalyst) || "unknown")
+        .attr("x", (d: any) => x(d.catalyst[0]) || "unknown")
         .attr("y", (d) => y(d.solventBase) || "unknown")
         .attr("width", x.bandwidth())
         .attr("height", y.bandwidth())
