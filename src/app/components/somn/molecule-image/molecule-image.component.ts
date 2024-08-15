@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import * as d3 from 'd3';
 
 export interface ReactionSiteOption {
@@ -18,6 +18,7 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
   @Input() height: number = 150;
   @Input() selectedReactionSite: ReactionSiteOption | null;
   @Input() reactionSitesOptions: ReactionSiteOption[];
+  @Input() interactive: boolean = true;
   @Output() selectedReactionSiteChange = new EventEmitter<ReactionSiteOption>();
   @ViewChild('container') container: ElementRef<HTMLDivElement>;
 
@@ -89,9 +90,15 @@ export class MoleculeImageComponent implements AfterViewInit, OnChanges {
 
       node
         .datum(this.reactionSitesOptions.find((o) => o.value === idx))
-        .attr('style', 'cursor: pointer;')
+        .attr('style', this.interactive ? 'cursor: pointer;' : '')
         .attr('fill', this.colors[i % this.colors.length]);
     });
+
+
+    // add interactions
+    if (!this.interactive) {
+      return;
+    }
 
     ellipses.on('mouseenter', (e, d) => {
       d3.select(e.target)

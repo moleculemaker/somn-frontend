@@ -86,15 +86,7 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
       }),
       switchMap((v) => this.somnService.checkReactionSites(v, this.type)),
       tap((resp) => {
-        if (resp.reaction_site_idxes.length == 1) {
-          const container = document.createElement('div');
-          container.innerHTML = resp.svg;
-          container.querySelectorAll('ellipse').forEach((el) => {el.remove()});
-          this.svg = container.innerHTML;
-
-        } else {
-          this.svg = resp.svg;
-        }
+        this.svg = resp.svg;
 
         this.reactionSitesOptions = [];
         resp.reaction_site_idxes.forEach((atomIdx, i) => {

@@ -56,6 +56,15 @@
                 </app-molecule-image>
             </div>
             <div
+                *ngIf="reactionSitesOptions.length === 1"
+                class="flex flex-col gap-2 p-2 m-2 rounded-md bg-[#E4F8F0]"
+            >
+                <div class="flex items-center gap-2 text-[#1EA97C]">
+                    <i class="pi pi-check-circle"></i>
+                    <div>Somn will compute on the detected reaction site.</div>
+                </div>
+            </div>
+            <div
                 *ngIf="reactionSitesOptions.length > 1"
                 class="flex flex-col gap-2 p-2 m-2 rounded-md"
                 [class]="(!control.value)? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"

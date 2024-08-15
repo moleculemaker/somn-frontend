@@ -46,7 +46,15 @@
                                     <div
                                         class="rounded-md border border-solid border-[--surface-d] p-2"
                                     >
-                                        <app-molecule-image [width]="100" [height]="60" [molecule]="response.arylHalide.structure"></app-molecule-image>
+                                        <app-molecule-image 
+                                            [width]="100" 
+                                            [height]="60" 
+                                            [molecule]="response.arylHalide.structure"
+                                            [reactionSitesOptions]="response.arylHalide.reactionSitesOptions"
+                                            [selectedReactionSite]="response.arylHalide.reactionSite"
+                                            [interactive]="false"
+                                        >
+                                        </app-molecule-image>
                                     </div>
                                     <div
                                         class="flex flex-col justify-between grow"
@@ -72,7 +80,15 @@
                                     <div
                                         class="rounded-md border border-solid border-[--surface-d] p-2"
                                     >
-                                        <app-molecule-image [width]="100" [height]="60" [molecule]="response.amine.structure"></app-molecule-image>
+                                        <app-molecule-image 
+                                            [width]="100" 
+                                            [height]="60" 
+                                            [molecule]="response.amine.structure"
+                                            [reactionSitesOptions]="response.amine.reactionSitesOptions"
+                                            [selectedReactionSite]="response.amine.reactionSite"
+                                            [interactive]="false"
+                                        >
+                                        </app-molecule-image>
                                     </div>
                                     <div
                                         class="flex flex-col justify-between grow"
@@ -333,7 +349,7 @@
     </div>
     <div class="flex justify-between mt-2">
         <span class="leading-sm">Reaction Site</span>
-        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.reactionSite }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.reactionSite.idx }}</span>
     </div>
 </ng-template>
 

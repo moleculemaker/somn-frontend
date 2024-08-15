@@ -60,27 +60,27 @@ export class SomnResultComponent {
         of(jobInfo),
       ]).pipe(
         map(([data, el, nuc, jobInfo]) => {
-          const hightlighedSvg = (svg: string, site: number) => {
-            const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
-            const container = document.createElement('div');
-            container.innerHTML = svg;
-            let ellipses = d3.select(container).selectAll('ellipse');
+          // const hightlighedSvg = (svg: string, site: number) => {
+          //   const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
+          //   const container = document.createElement('div');
+          //   container.innerHTML = svg;
+          //   let ellipses = d3.select(container).selectAll('ellipse');
 
-            if (ellipses.size() === 1) {
-              ellipses.remove();
-              return container.innerHTML;
-            }
+          //   if (ellipses.size() === 1) {
+          //     ellipses.remove();
+          //     return container.innerHTML;
+          //   }
 
-            ellipses.each((d, i, nodes) => {
-              const node = d3.select(nodes[i]);
-              const data = parseInt(node.attr('class').split('atom-')[1]);
-              node
-                .attr('style', '')
-                .attr('fill', data === site ? colors[i % colors.length] : '#ffffff00');
-            });
+          //   ellipses.each((d, i, nodes) => {
+          //     const node = d3.select(nodes[i]);
+          //     const data = parseInt(node.attr('class').split('atom-')[1]);
+          //     node
+          //       .attr('style', '')
+          //       .attr('fill', data === site ? colors[i % colors.length] : '#ffffff00');
+          //   });
 
-            return container.innerHTML;
-          }
+          //   return container.innerHTML;
+          // }
 
           // set up high yield messages, if there's any
           let hasMesssage = false;
@@ -95,18 +95,40 @@ export class SomnResultComponent {
             }
           })
 
+          let elReactionSites = el.reaction_site_idxes.map((v, i) => ({ 
+            idx: i, 
+            value: `${v}`,
+            svg: '', 
+          }));
+          let elSelectedReactionSite = jobInfo.el_idx === '-' 
+            ? elReactionSites[0]
+            : elReactionSites.find((v) => v.value === `${jobInfo.el_idx}`)!;
+
+          let nucReactionSites = nuc.reaction_site_idxes.map((v, i) => ({ 
+            idx: i, 
+            value: `${v}`,
+            svg: '', 
+          }));
+          let nucSelectedReactionSite = jobInfo.nuc_idx === '-' 
+          ? nucReactionSites[0]
+          : nucReactionSites.find((v) => v.value === `${jobInfo.nuc_idx}`)!;
+
           return {
             data: data.map((d, i) => ({ ...d, yield: Math.max(0, d.yield) })),
             reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
             arylHalide: {
               name: jobInfo.el_name || 'aryl halide',
               smiles: jobInfo.el || 'aryl halide smiles',
-              structure: hightlighedSvg(el.svg, jobInfo.el_idx),
+              reactionSitesOptions: elReactionSites,
+              reactionSite: elSelectedReactionSite,
+              structure: el.svg,
             },
             amine: {
               name: jobInfo.nuc_name || 'amine',
               smiles: jobInfo.nuc || 'amine smiles',
-              structure: hightlighedSvg(nuc.svg, jobInfo.nuc_idx),
+              reactionSitesOptions: nucReactionSites,
+              reactionSite: nucSelectedReactionSite,
+              structure: nuc.svg,
             },
           };
         })
