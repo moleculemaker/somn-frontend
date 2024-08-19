@@ -12,7 +12,7 @@ import {
 import * as d3 from "d3";
 import { Product, SomnService } from "~/app/services/somn.service";
 
-type HeatmapData = Product & { 
+export type HeatmapData = Product & { 
   solventBase: string;
   isHighlighted: boolean; 
   iid: number 
@@ -116,6 +116,7 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
           .style("top", (event.y - 40) + "px")
           .style("pointer-events", "none");
       };
+
       let mousedown = (event: MouseEvent, d: any) => {
         if (!d.isHighlighted) {
           return;
@@ -128,7 +129,8 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         }
         this.render(data, selectedCells);
         this.selectedCellsChange.emit(selectedCells);
-      }
+      };
+
       let mouseleave = (event: MouseEvent, d: any) => {
         tooltip.style("opacity", 0);
       };
@@ -187,4 +189,12 @@ export class HeatmapComponent implements AfterViewInit, OnChanges {
         .text("Catalyst");
     });
   }
+
+  exportPNG(filename: string) {
+    this.somnService.exportPNG(
+      this.container.nativeElement.querySelector("svg")!, 
+      `${filename}-heatmap`
+    );
+  }
+
 }

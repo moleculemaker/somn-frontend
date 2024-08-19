@@ -188,4 +188,32 @@ export class SomnService {
 
     return legendGradient;
   }
+
+  exportPNG(svgEl: SVGElement, filename: string) {
+    console.log(filename, svgEl.innerHTML);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d')!;
+    const img = new Image();
+    const svgString = new XMLSerializer().serializeToString(svgEl);
+    const svg = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svg);
+
+    canvas.height = parseInt(svgEl.getAttribute('height')!);
+    canvas.width = parseInt(svgEl.getAttribute('width')!);
+
+    img.src = url;
+    img.onload = function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+
+      const link = document.createElement('a');
+      link.download = `${filename}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+
+      link.remove();
+      canvas.remove();
+    }
+  }
 }

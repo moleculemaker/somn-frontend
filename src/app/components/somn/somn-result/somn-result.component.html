@@ -17,10 +17,11 @@
         <div class="flex items-center gap-2">
             <p-splitButton id="btn-request-options" label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
             <div id="btn-export" class="flex flex-col justify-center">
-                <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="onExportResults()">
+                <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="menu.toggle($event)">
                     <i class="mr-2 pi pi-download"></i>
                     <span class="font-semibold">Export</span>                    
                 </button>
+                <p-tieredMenu #menu [model]="exportOptions" [popup]="true" />
             </div>
         </div>
     </div>
@@ -161,7 +162,13 @@
                             class="btn-outline"
                             (click)="clearAllFilters()"
                         >
-                            Clear All
+                            Clear Filters
+                        </button>
+                        <button
+                            class="btn-outline"
+                            (click)="selectedProducts$.next([])"
+                        >
+                            Clear Selections
                         </button>
                     </div>
                 </ng-template>
@@ -250,30 +257,37 @@
                                 #heatmap
                                 id="diagram-heatmap"
                                 [data]="(heatmapData$ | async) || []"
-                                [(selectedCells)]="selectedProducts"
+                                [selectedCells]="(selectedHeatmapCells$ | async) || []"
+                                (selectedCellsChange)="onSelectedHeatmapCellsChange($event)"
                             ></app-heatmap>
                         </div>
                         <p-table
                             #resultsTable
                             id="container-table"
                             [value]="(dataWithColor$ | async) || []"
-                            [columns]="columns"
-                            [paginator]="true"
+
+                            [columns]="exportColumns"
+                            [exportFunction]="exportFunction"
                             [exportFilename]="(exportFileName$ | async) || 'somn-results'"
+
                             selectionMode="multiple"
-                            [(selection)]="selectedProducts"
+                            [selection]="(selectedTableRows$ | async) || []"
+                            (selectionChange)="onTableSelectionChange($event)"
                             dataKey="iid"
+
                             [rows]="10"
                             [rowsPerPageOptions]="[10, 20, 50]"
+                            [paginator]="true"
+
                             class="w-1/2 h-full"
                             tableStyleClass="w-1/2"
                             styleClass="w-full border-l border-solid border-[--surface-d]"
                         >
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <!-- <th style="width: 4rem">
+                                    <th style="width: 4rem">
                                         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                                    </th> -->
+                                    </th>
                                     <th pSortableColumn="catalyst">
                                         Catalyst<p-sortIcon field="catalyst" />
                                     </th>
@@ -289,10 +303,10 @@
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-row>
-                                <tr [pSelectableRow]="row">
-                                    <!-- <td>
+                                <tr>
+                                    <td>
                                         <p-tableCheckbox [value]="row"></p-tableCheckbox>
-                                    </td> -->
+                                    </td>
                                     <td (mouseenter)="catalystOverlay.show($event)"
                                         (mouseleave)="catalystOverlay.hide()"
                                     >
@@ -349,7 +363,13 @@
     </div>
     <div class="flex justify-between mt-2">
         <span class="leading-sm">Reaction Site</span>
-        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.reactionSite.idx + 1 }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
+            {{ 
+                molecule.reactionSitesOptions.length === 1 
+                ? 'Auto detected'
+                : molecule.reactionSite.idx + 1 
+            }}
+        </span>
     </div>
 </ng-template>
 

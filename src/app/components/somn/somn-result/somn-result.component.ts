@@ -1,13 +1,15 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
-import { FilterService, Message } from 'primeng/api';
+import { FilterService, MenuItem, Message } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
 import { JobStatus } from '~/app/api/mmli-backend/v1';
 import { Product, SomnService } from '~/app/services/somn.service';
 
 import { TutorialService } from '~/app/services/tutorial.service';
+import { HeatmapComponent } from '../heatmap/heatmap.component';
+import { DensityPlotComponent } from '../density-plot/density-plot.component';
 
 @Component({
   selector: 'app-somn-result',
@@ -19,19 +21,49 @@ import { TutorialService } from '~/app/services/tutorial.service';
 })
 export class SomnResultComponent {
   @ViewChild("resultsTable") resultsTable: Table;
+  @ViewChild(HeatmapComponent) heatmapComponent: HeatmapComponent;
+  @ViewChild(DensityPlotComponent) densityPlotComponent: DensityPlotComponent;
 
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
+  jobInfo: any = {};
   displayTutorial: boolean = false;
-  _selectedProducts: Product[] = [];
-
-  get selectedProducts() {
-    return this._selectedProducts;
-  }
-
-  set selectedProducts(value: Product[]) {
-    this._selectedProducts = value;
-    console.log(this._selectedProducts);
-  }
+  exportOptions: MenuItem[] = [
+    {
+      label: 'Visualization (PNG)',
+      command: () => {
+        const filename = this.jobInfo.reactant_pair_name + '-' + this.jobInfo.el_name + '-' + this.jobInfo.nuc_name;
+        this.densityPlotComponent.exportPNG(filename);
+        this.heatmapComponent.exportPNG(filename);
+      }
+    },
+    {
+      label: 'Table (CSV)',
+      items: [
+        {
+          label: 'Select Row(s)',
+          command: () => {
+            this.resultsTable.exportCSV({
+              selectionOnly: true,
+            });
+          },
+        },
+        {
+          label: 'Current View',
+          command: () => {
+            this.resultsTable.exportCSV();
+          }
+        },
+        {
+          label: 'Complete Results',
+          command: () => {
+            this.resultsTable.exportCSV({
+              allValues: true,
+            });
+          }
+        }
+      ]
+    }
+  ];
 
   yieldMessages: Message[] = [];
 
@@ -59,28 +91,8 @@ export class SomnResultComponent {
         this.somnService.checkReactionSites(jobInfo.nuc, 'nucleophile'),
         of(jobInfo),
       ]).pipe(
+        tap(([data, el, nuc, jobInfo]) => { this.jobInfo = jobInfo }),
         map(([data, el, nuc, jobInfo]) => {
-          // const hightlighedSvg = (svg: string, site: number) => {
-          //   const colors = ['#DDCC7780', '#33228880', '#CC667780', '#AADDCC80', '#66332280'];
-          //   const container = document.createElement('div');
-          //   container.innerHTML = svg;
-          //   let ellipses = d3.select(container).selectAll('ellipse');
-
-          //   if (ellipses.size() === 1) {
-          //     ellipses.remove();
-          //     return container.innerHTML;
-          //   }
-
-          //   ellipses.each((d, i, nodes) => {
-          //     const node = d3.select(nodes[i]);
-          //     const data = parseInt(node.attr('class').split('atom-')[1]);
-          //     node
-          //       .attr('style', '')
-          //       .attr('fill', data === site ? colors[i % colors.length] : '#ffffff00');
-          //   });
-
-          //   return container.innerHTML;
-          // }
 
           // set up high yield messages, if there's any
           let hasMesssage = false;
@@ -95,23 +107,23 @@ export class SomnResultComponent {
             }
           })
 
-          let elReactionSites = el.reaction_site_idxes.map((v, i) => ({ 
-            idx: i, 
+          let elReactionSites = el.reaction_site_idxes.map((v, i) => ({
+            idx: i,
             value: `${v}`,
-            svg: '', 
+            svg: '',
           }));
-          let elSelectedReactionSite = jobInfo.el_idx === '-' 
+          let elSelectedReactionSite = jobInfo.el_idx === '-'
             ? elReactionSites[0]
             : elReactionSites.find((v) => v.value === `${jobInfo.el_idx}`)!;
 
-          let nucReactionSites = nuc.reaction_site_idxes.map((v, i) => ({ 
-            idx: i, 
+          let nucReactionSites = nuc.reaction_site_idxes.map((v, i) => ({
+            idx: i,
             value: `${v}`,
-            svg: '', 
+            svg: '',
           }));
-          let nucSelectedReactionSite = jobInfo.nuc_idx === '-' 
-          ? nucReactionSites[0]
-          : nucReactionSites.find((v) => v.value === `${jobInfo.nuc_idx}`)!;
+          let nucSelectedReactionSite = jobInfo.nuc_idx === '-'
+            ? nucReactionSites[0]
+            : nucReactionSites.find((v) => v.value === `${jobInfo.nuc_idx}`)!;
 
           return {
             data: data.map((d, i) => ({ ...d, yield: Math.max(0, d.yield) })),
@@ -159,6 +171,7 @@ export class SomnResultComponent {
 
   showFilters$ = new BehaviorSubject(true);
 
+  selectedProducts$ = new BehaviorSubject<number[]>([]);
   selectedCatalysts$ = new BehaviorSubject<any[]>([]);
   selectedBases$ = new BehaviorSubject<any[]>([]);
   selectedSolvents$ = new BehaviorSubject<any[]>([]);
@@ -188,6 +201,7 @@ export class SomnResultComponent {
     this.selectedCatalysts$,
     this.selectedBases$,
     this.selectedSolvents$,
+    this.selectedProducts$,
   ]).pipe(
     map(
       ([
@@ -195,20 +209,27 @@ export class SomnResultComponent {
         selectedCatalysts,
         selectedBases,
         selectedSolvents,
+        selectedProducts,
       ]) =>
         [
           response.data,
           response.data.filter(
             (data) =>
-              (selectedCatalysts.length
-                ? selectedCatalysts.includes(data["catalyst"][0])
-                : true) &&
-              (selectedBases.length
-                ? selectedBases.includes(data["base"])
-                : true) &&
-              (selectedSolvents.length
-                ? selectedSolvents.includes(data["solvent"])
-                : true),
+              (
+                (selectedCatalysts.length
+                  ? selectedCatalysts.includes(data["catalyst"][0])
+                  : true) &&
+                (selectedBases.length
+                  ? selectedBases.includes(data["base"])
+                  : true) &&
+                (selectedSolvents.length
+                  ? selectedSolvents.includes(data["solvent"])
+                  : true)
+              ) || (
+                (selectedProducts.length
+                  ? selectedProducts.includes(data["iid"])
+                  : false)
+              ),
           ),
         ]
     ),
@@ -271,6 +292,15 @@ export class SomnResultComponent {
     }),
   );
 
+  selectedTableRows$ = combineLatest([
+    this.selectedProducts$,
+    this.dataWithColor$,
+  ]).pipe(
+    map(([selectedProducts, data]) =>
+      data.filter((d) => selectedProducts.includes(d.iid))
+    )
+  );
+
   topYieldConditions$ = this.dataWithColor$.pipe(
     map((data) => {
       const yields = Math.max(...data.map((d) => Math.floor(d["yield"] * 100)));
@@ -287,17 +317,22 @@ export class SomnResultComponent {
     this.selectedBases$,
     this.selectedCatalysts$,
     this.selectedSolvents$,
+    this.selectedProducts$,
   ])).pipe(
-    map(([response, yieldRange, bases, catalysts, solvents]) => {
+    map(([response, yieldRange, bases, catalysts, solvents, selection]) => {
       const data = response.data;
       const map = new Map();
       const isHighlighted = (d: any) => {
         return (
-          (bases.length ? bases.includes(d.base) : true) &&
-          (catalysts.length ? catalysts.includes(d.catalyst[0]) : true) &&
-          (solvents.length ? solvents.includes(d.solvent) : true) &&
-          d.yield >= yieldRange[0] / 100 &&
-          d.yield <= yieldRange[1] / 100
+          (
+            (bases.length ? bases.includes(d.base) : true) &&
+            (catalysts.length ? catalysts.includes(d.catalyst[0]) : true) &&
+            (solvents.length ? solvents.includes(d.solvent) : true) &&
+            d.yield >= yieldRange[0] / 100 &&
+            d.yield <= yieldRange[1] / 100
+          ) || (
+            (selection.length ? selection.includes(d.iid) : false)
+          )
         );
       }
       data.forEach((d: Product) => {
@@ -320,9 +355,18 @@ export class SomnResultComponent {
     }),
   );
 
+  selectedHeatmapCells$ = combineLatest([
+    this.selectedProducts$,
+    this.heatmapData$,
+  ]).pipe(
+    map(([selectedProducts, data]) =>
+      data.filter((d) => selectedProducts.includes(d.iid))
+    )
+  );
+
   subscriptions: Subscription[] = [];
 
-  columns = [
+  exportColumns = [
     { field: "amineName", header: "Amine" },
     { field: "arylHalideName", header: "Aryl Halide" },
     { field: "amineSmiles", header: "Amine SMILES" },
@@ -332,6 +376,9 @@ export class SomnResultComponent {
     { field: "base", header: "Base" },
     { field: "yield", header: "Yield" },
   ]
+  exportFunction({ data, field }: { data: any, field: string }) {
+    return field === "catalyst" ? data[0] : data;
+  }
 
   requestOptions = [
     { label: "Modify and Resubmit Request", icon: "pi pi-refresh", disabled: true },
@@ -500,9 +547,11 @@ export class SomnResultComponent {
     }
   }
 
-  onExportResults() {
-    this.resultsTable.exportCSV({
+  onSelectedHeatmapCellsChange(cells: any) {
+    this.selectedProducts$.next(cells.map((d: Product) => d.iid));
+  }
 
-    });
+  onTableSelectionChange(rows: any) {
+    this.selectedProducts$.next(rows.map((d: Product) => d.iid));
   }
 }
