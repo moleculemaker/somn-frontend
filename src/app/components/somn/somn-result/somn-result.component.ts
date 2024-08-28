@@ -87,8 +87,8 @@ export class SomnResultComponent {
       const jobInfo = JSON.parse(job.job_info || '');
       return combineLatest([
         this.somnService.getResult(this.jobId),
-        this.somnService.checkReactionSites(jobInfo.el, 'electrophile'),
-        this.somnService.checkReactionSites(jobInfo.nuc, 'nucleophile'),
+        this.somnService.checkReactionSites(jobInfo.el, 'el'),
+        this.somnService.checkReactionSites(jobInfo.nuc, 'nuc'),
         of(jobInfo),
       ]).pipe(
         tap(([data, el, nuc, jobInfo]) => { this.jobInfo = jobInfo }),
