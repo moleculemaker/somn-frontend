@@ -112,6 +112,7 @@
                         #resultsTable
                         [value]="(dataWithColor$ | async) || []"
                         [exportFilename]="'training-data'"
+                        [exportFunction]="exportFunction"
                         [columns]="columns"
                         [paginator]="true"
                         [rows]="10"

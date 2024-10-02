@@ -377,7 +377,9 @@ export class SomnResultComponent {
     { field: "yield", header: "Yield" },
   ]
   exportFunction({ data, field }: { data: any, field: string }) {
-    return field === "catalyst" ? data[0] : data;
+    return field === "catalyst" 
+      ? `[Pd(allyl)(${data[0]})][OTf]` 
+      : data;
   }
 
   requestOptions = [
