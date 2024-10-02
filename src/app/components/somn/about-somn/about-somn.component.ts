@@ -163,13 +163,19 @@ export class AboutSomnComponent implements OnInit {
   );
 
   columns = [
-    { field: "arylHalide", header: "Aryl Halide" },
-    { field: "amine", header: "Amine" },
-    { field: "base", header: "Base" },
+    { field: "el_name", header: "Aryl Halide" },
+    { field: "nuc_name", header: "Amine" },
     { field: "catalyst", header: "Catalyst" },
     { field: "solvent", header: "Solvent" },
+    { field: "base", header: "Base" },
     { field: "yield", header: "Yield" },
   ]
+
+  exportFunction(data: { data: any, field: string }) {
+    return data.field === "catalyst" 
+      ? `[Pd(allyl)(${data.data[0]})][OTf]` 
+      : data.data;
+  }
 
   constructor(private filterService: FilterService) {}
 
