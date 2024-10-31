@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
-import { BodyCreateJobJobTypeJobsPost, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
+import { BodyCreateJobJobTypeJobsPost, CheckReactionSiteRequest, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
 
 import sampleRequest from '../../assets/example_request.json';
 
@@ -103,8 +103,17 @@ export class SomnService {
     return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, requestBody);
   }
 
-  checkReactionSites(smiles: string, type: string, hightlight_idxes?: number[]): Observable<CheckReactionSiteResponse> {
-    return this.somnService.checkReactionSitesSomnAllReactionSitesGet(smiles, type, hightlight_idxes);
+  checkReactionSites(
+    input: string, 
+    inputType: CheckReactionSiteRequest.InputTypeEnum, 
+    role: CheckReactionSiteRequest.RoleEnum, 
+    hightlight_idxes?: number[]
+  ): Observable<CheckReactionSiteResponse> {
+    return this.somnService.checkReactionSitesSomnAllReactionSitesPost({
+      input: input,
+      input_type: inputType,
+      role: role,
+    });
   }
 
   getResultStatus(jobID: string): Observable<Job>{

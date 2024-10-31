@@ -19,10 +19,6 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { CheckReactionSiteRequest } from '../model/checkReactionSiteRequest';
-// @ts-ignore
-import { CheckReactionSiteResponse } from '../model/checkReactionSiteResponse';
-// @ts-ignore
 import { HTTPValidationError } from '../model/hTTPValidationError';
 
 // @ts-ignore
@@ -34,7 +30,7 @@ import { Configuration }                                     from '../configurat
 @Injectable({
   providedIn: 'root'
 })
-export class SomnService {
+export class SharedService {
 
     protected basePath = 'http://localhost';
     public defaultHeaders = new HttpHeaders();
@@ -96,17 +92,23 @@ export class SomnService {
     }
 
     /**
-     * Check Reaction Sites
-     * @param checkReactionSiteRequest 
+     * Draw Smiles
+     * @param smiles 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public checkReactionSitesSomnAllReactionSitesPost(checkReactionSiteRequest: CheckReactionSiteRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<CheckReactionSiteResponse>;
-    public checkReactionSitesSomnAllReactionSitesPost(checkReactionSiteRequest: CheckReactionSiteRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<CheckReactionSiteResponse>>;
-    public checkReactionSitesSomnAllReactionSitesPost(checkReactionSiteRequest: CheckReactionSiteRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<CheckReactionSiteResponse>>;
-    public checkReactionSitesSomnAllReactionSitesPost(checkReactionSiteRequest: CheckReactionSiteRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
-        if (checkReactionSiteRequest === null || checkReactionSiteRequest === undefined) {
-            throw new Error('Required parameter checkReactionSiteRequest was null or undefined when calling checkReactionSitesSomnAllReactionSitesPost.');
+    public drawSmilesSmilesDrawGet(smiles: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any>;
+    public drawSmilesSmilesDrawGet(smiles: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpResponse<any>>;
+    public drawSmilesSmilesDrawGet(smiles: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<HttpEvent<any>>;
+    public drawSmilesSmilesDrawGet(smiles: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext}): Observable<any> {
+        if (smiles === null || smiles === undefined) {
+            throw new Error('Required parameter smiles was null or undefined when calling drawSmilesSmilesDrawGet.');
+        }
+
+        let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        if (smiles !== undefined && smiles !== null) {
+          localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+            <any>smiles, 'smiles');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -129,15 +131,6 @@ export class SomnService {
         }
 
 
-        // to determine the Content-Type header
-        const consumes: string[] = [
-            'application/json'
-        ];
-        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
-        if (httpContentTypeSelected !== undefined) {
-            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
-        }
-
         let responseType_: 'text' | 'json' | 'blob' = 'json';
         if (localVarHttpHeaderAcceptSelected) {
             if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
@@ -149,11 +142,11 @@ export class SomnService {
             }
         }
 
-        let localVarPath = `/somn/all-reaction-sites`;
-        return this.httpClient.request<CheckReactionSiteResponse>('post', `${this.configuration.basePath}${localVarPath}`,
+        let localVarPath = `/smiles/draw`;
+        return this.httpClient.request<any>('get', `${this.configuration.basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: checkReactionSiteRequest,
+                params: localVarQueryParameters,
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,
                 headers: localVarHeaders,

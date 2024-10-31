@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import { FilterService, MenuItem, Message } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
-import { JobStatus } from '~/app/api/mmli-backend/v1';
+import { CheckReactionSiteRequest, JobStatus } from '~/app/api/mmli-backend/v1';
 import { Product, SomnService } from '~/app/services/somn.service';
 
 import { TutorialService } from '~/app/services/tutorial.service';
@@ -87,8 +87,16 @@ export class SomnResultComponent {
       const jobInfo = JSON.parse(job.job_info || '');
       return combineLatest([
         this.somnService.getResult(this.jobId),
-        this.somnService.checkReactionSites(jobInfo.el, 'el'),
-        this.somnService.checkReactionSites(jobInfo.nuc, 'nuc'),
+        this.somnService.checkReactionSites(
+          jobInfo.el, 
+          CheckReactionSiteRequest.InputTypeEnum.Smi, 
+          CheckReactionSiteRequest.RoleEnum.El
+        ),
+        this.somnService.checkReactionSites(
+          jobInfo.nuc, 
+          CheckReactionSiteRequest.InputTypeEnum.Smi, 
+          CheckReactionSiteRequest.RoleEnum.Nuc
+        ),
         of(jobInfo),
       ]).pipe(
         tap(([data, el, nuc, jobInfo]) => { this.jobInfo = jobInfo }),

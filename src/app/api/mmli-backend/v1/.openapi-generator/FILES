@@ -6,7 +6,9 @@ api/chemScraper.service.ts
 api/default.service.ts
 api/files.service.ts
 api/jobs.service.ts
+api/molli.service.ts
 api/novostoic.service.ts
+api/shared.service.ts
 api/somn.service.ts
 configuration.ts
 encoder.ts
@@ -14,6 +16,7 @@ git_push.sh
 index.ts
 model/analyzeRequestBody.ts
 model/bodyCreateJobJobTypeJobsPost.ts
+model/checkReactionSiteRequest.ts
 model/checkReactionSiteResponse.ts
 model/chemicalAutoCompleteResponse.ts
 model/exportRequestBody.ts
@@ -26,6 +29,8 @@ model/jobType.ts
 model/jobUpdate.ts
 model/locationInner.ts
 model/models.ts
+model/savedMolecule.ts
+model/savedMoleculeDelete.ts
 model/validationError.ts
 param.ts
 variables.ts

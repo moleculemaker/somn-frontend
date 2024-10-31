@@ -3,6 +3,7 @@ import { AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_ASYNC
 import { BehaviorSubject, Observable, catchError, combineLatest, debounceTime, filter, interval, map, of, switchMap, take, takeUntil, tap } from "rxjs";
 import { SomnService } from "~/app/services/somn.service";
 import { ReactionSiteOption } from "../molecule-image/molecule-image.component";
+import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
 
 export interface ReactionSiteInput {
   smiles: string | null;
@@ -84,7 +85,11 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
       tap(() => {
         this.form.controls['reactionSite'].setValue(null);
       }),
-      switchMap((v) => this.somnService.checkReactionSites(v, this.type)),
+      switchMap((v) => this.somnService.checkReactionSites(
+        v, 
+        CheckReactionSiteRequest.InputTypeEnum.Smi,
+        this.type === 'nuc' ? CheckReactionSiteRequest.RoleEnum.Nuc : CheckReactionSiteRequest.RoleEnum.El,
+      )),
       tap((resp) => {
         this.svg = resp.svg;
 
