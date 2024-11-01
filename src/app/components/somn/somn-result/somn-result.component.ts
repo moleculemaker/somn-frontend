@@ -89,12 +89,12 @@ export class SomnResultComponent {
         this.somnService.getResult(this.jobId),
         this.somnService.checkReactionSites(
           jobInfo.el, 
-          CheckReactionSiteRequest.InputTypeEnum.Smi, 
+          jobInfo.el_input_type, 
           CheckReactionSiteRequest.RoleEnum.El
         ),
         this.somnService.checkReactionSites(
           jobInfo.nuc, 
-          CheckReactionSiteRequest.InputTypeEnum.Smi, 
+          jobInfo.nuc_input_type, 
           CheckReactionSiteRequest.RoleEnum.Nuc
         ),
         of(jobInfo),
@@ -138,14 +138,14 @@ export class SomnResultComponent {
             reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
             arylHalide: {
               name: jobInfo.el_name || 'aryl halide',
-              smiles: jobInfo.el || 'aryl halide smiles',
+              smiles: el.smiles || 'aryl halide smiles',
               reactionSitesOptions: elReactionSites,
               reactionSite: elSelectedReactionSite,
               structure: el.svg,
             },
             amine: {
               name: jobInfo.nuc_name || 'amine',
-              smiles: jobInfo.nuc || 'amine smiles',
+              smiles: nuc.smiles || 'amine smiles',
               reactionSitesOptions: nucReactionSites,
               reactionSite: nucSelectedReactionSite,
               structure: nuc.svg,
