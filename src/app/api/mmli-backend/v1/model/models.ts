@@ -2,6 +2,7 @@ export * from './analyzeRequestBody';
 export * from './bodyCreateJobJobTypeJobsPost';
 export * from './checkReactionSiteRequest';
 export * from './checkReactionSiteResponse';
+export * from './checkReactionSiteResponseInvalid';
 export * from './chemicalAutoCompleteResponse';
 export * from './exportRequestBody';
 export * from './flaggedMolecule';

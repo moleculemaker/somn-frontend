@@ -33,15 +33,15 @@ export type SomnResponse = Array<Omit<Product, "catalyst" | "solvent" | "base">
 
 export class SomnRequest {
   private reactionSiteValidator(control: AbstractControl) {
-    if (!control.value.smiles || !control.value.reactionSite) {
-      return {required: true};
+    if (!control.value.input || !control.value.reactionSite) {
+      return { required: true };
     }
     return null;
   }
 
   private nameValidator(control: AbstractControl) {
     if (!control.value || !control.value.trim().length) {
-      return {required: true};
+      return { required: true };
     }
     return null;
   }
@@ -51,13 +51,15 @@ export class SomnRequest {
 
     arylHalideName: new FormControl("", [Validators.required, this.nameValidator]),
     arylHalide: new FormControl<ReactionSiteInput>({
-      smiles: "", 
+      input: "",
+      input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
       reactionSite: null
     }, [this.reactionSiteValidator]),
 
     amineName: new FormControl("", [Validators.required, this.nameValidator]),
     amine: new FormControl<ReactionSiteInput>({
-      smiles: "", 
+      input: "",
+      input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
       reactionSite: null
     }, [this.reactionSiteValidator]),
     
@@ -67,7 +69,7 @@ export class SomnRequest {
   });
 
   useExample() {
-    this.form.setValue(sampleRequest);
+    this.form.setValue(sampleRequest as any);
   }
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
@@ -75,11 +77,13 @@ export class SomnRequest {
       reactant_pair_name: (this.form.controls["reactantPairName"].value || "").trim().replace(/ /g, "_"),
       
       nuc_name: (this.form.controls["amineName"].value || "").trim().replace(/ /g, "_"),
-      nuc: this.form.controls["amine"].value?.smiles || "",
+      nuc: this.form.controls["amine"].value?.input || "",
+      nuc_input_type: this.form.controls["amine"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
       nuc_idx: this.form.controls["amine"].value?.reactionSite || "-",
 
       el_name: (this.form.controls["arylHalideName"].value || "").trim().replace(/ /g, "_"),
-      el: this.form.controls["arylHalide"].value?.smiles || "",
+      el: this.form.controls["arylHalide"].value?.input || "",
+      el_input_type: this.form.controls["arylHalide"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
       el_idx: this.form.controls["arylHalide"].value?.reactionSite || "-",
     }
     return {

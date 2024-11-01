@@ -68,7 +68,8 @@
                                                     (click)="
                                                         request.form.controls['arylHalideName'].setValue('Bromobenzene');
                                                         request.form.controls['arylHalide'].setValue({
-                                                            smiles: 'C1=CC=C(C=C1)Br',
+                                                            input: 'C1=CC=C(C=C1)Br',
+                                                            input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
                                                             reactionSite: '-'
                                                         });
                                                     "
@@ -107,7 +108,8 @@
                                                     (click)="
                                                         request.form.controls['amineName'].setValue('Aniline');
                                                         request.form.controls['amine'].setValue({
-                                                            smiles: 'C1=CC=C(C=C1)N',
+                                                            input: 'C1=CC=C(C=C1)N',
+                                                            input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
                                                             reactionSite: '-'
                                                         });
                                                     "
@@ -145,7 +147,6 @@
             id="input-subscription-email"
             class="sticky bottom-0 flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
         >
-            <!-- TODO: validate parent form using input from marvin-js-input -->
             <div class="flex flex-col">
                 <div class="flex items-end justify-center mb-2">
                     <span class="pr-12 mb-1">

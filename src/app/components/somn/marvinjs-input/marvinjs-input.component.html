@@ -1,8 +1,7 @@
 <div class="marvin-filter-container"
-    [formGroup]="form"
     [class.invalid]="
-        form.controls['smiles'].errors 
-        && form.controls['smiles'].dirty
+        smilesFormControl.errors 
+        && smilesFormControl.dirty
     "
 >
     <div class="p-inputgroup">
@@ -12,7 +11,8 @@
             type="text"
             class="border-0"
             [placeholder]="placeholder"
-            formControlName="smiles"
+            [value]="smilesFormControl.value"
+            (input)="onSmilesInput($event)"
         />
         <button
             pButton
@@ -26,82 +26,134 @@
     </div>
 </div>
 
-<div class="text-[--status-error-color] text-xs my-1" *ngIf="form.controls['smiles'].errors && form.controls['smiles'].dirty">
-    <div *ngIf="form.controls['smiles'].errors['required']">This field is required</div>
-    <div *ngIf="form.controls['smiles'].errors['chemicalNotSupported']">Chemical not supported</div>
-    <div *ngIf="form.controls['smiles'].errors['noReactionSitesFound']">No reaction site found in chemical</div>
-    <div *ngIf="form.controls['smiles'].errors['invalidUserInput']">Invalid input</div>
+<div class="text-[--status-error-color] text-xs my-1" *ngIf="smilesFormControl.errors && smilesFormControl.dirty">
+    <div *ngIf="smilesFormControl.errors['required']">This field is required</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.InvalidInput]">Invalid input</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.NoReactiveNitrogens]">No reactive nitrogens detected</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.NoBrOrClInEl]">No Br or Cl sites detected in electrophile</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.NoNitrogensInNuc]">No nitrogens detected in nucleophile</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.BrInNuc]">Br detected in nucleophile</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.ClInNuc]">Cl detected in nucleophile</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.NoReactionSite]">No reaction sites found</div>
 </div>
 
-<ng-container *ngIf="form.controls['smiles'].valid">
-    <ng-container *ngIf="form.controls['reactionSite'] as control">
-        <div
-            *ngIf="svg"
-            class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
-            [class.invalid]="control.errors && control.dirty"
-        >
-            <i class="absolute pi left-3 top-3"
-                [class.pi-check-circle]="control.valid"
-                [class.pi-exclamation-circle]="control.invalid"
-            ></i>
-            <div class="flex items-center justify-center">
-                <app-molecule-image 
-                    [height]="300" 
-                    [width]="300"
-                    [molecule]="svg"
-                    [reactionSitesOptions]="reactionSitesOptions"
-                    [selectedReactionSite]="selectedReactionSite"
-                    (selectedReactionSiteChange)="selectedReactionSite = $event"
-                >
-                </app-molecule-image>
+<div class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
+    *ngIf="smilesFormControl.errors 
+        && smilesFormControl.errors[this.somnErrorTypes._3dGen]"
+>
+    <div class="flex flex-col gap-2 p-2 m-2 rounded-md bg-[#FFE7E6]">
+        <div class="flex items-center gap-2 text-[#FF5757]">
+            <i class="pi pi-times-circle"></i>
+            <div *ngIf="fileInputFormControl.pristine">
+                Sorry, we're having trouble parsing your molecule. Please input your reactant as a CDXML/CML and we'll try again.
             </div>
-            <div
-                *ngIf="reactionSitesOptions.length === 1"
-                class="flex flex-col gap-2 p-2 m-2 rounded-md bg-[#E4F8F0]"
-            >
-                <div class="flex items-center gap-2 text-[#1EA97C]">
-                    <i class="pi pi-check-circle"></i>
-                    <div>Somn will compute on the detected reaction site.</div>
+            <div *ngIf="fileInputFormControl.errors && fileInputFormControl.dirty">
+                <div class="mb-1">File is invalid. Please try inputting your reactant as a CDXML/CML again.</div>
+                <div>
+                    <span class="font-semibold">Reason: </span>
+                    <span *ngIf="fileInputFormControl.errors[this.somnErrorTypes.InvalidInput]">Invalid content</span>
+                    <span *ngIf="fileInputFormControl.errors[this.somnErrorTypes.NoReactiveNitrogens]">No reactive nitrogens detected</span>
+                    <span *ngIf="fileInputFormControl.errors[this.somnErrorTypes.NoBrOrClInEl]">No Br or Cl sites detected in electrophile</span>
+                    <span *ngIf="fileInputFormControl.errors[this.somnErrorTypes.NoNitrogensInNuc]">No nitrogens detected in nucleophile</span>
+                    <span *ngIf="fileInputFormControl.errors[this.somnErrorTypes.BrInNuc]">Br detected in nucleophile</span>
+                    <span *ngIf="fileInputFormControl.errors[this.somnErrorTypes.ClInNuc]">Cl detected in nucleophile</span>
+                    <span *ngIf="fileInputFormControl.errors[this.somnErrorTypes.NoReactionSite]">No reaction sites found</span>
                 </div>
-            </div>
-            <div
-                *ngIf="reactionSitesOptions.length > 1"
-                class="flex flex-col gap-2 p-2 m-2 rounded-md"
-                [class]="(!control.value)? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
-            >
-                <div
-                    class="flex items-center gap-2"
-                    [class]="(!control.value)? 'text-[#696CFF]' : 'text-[#1EA97C]'"
-                >
-                    <i
-                        class="pi"
-                        [class]="(!control.value)? 'pi-info-circle' : 'pi-check-circle'"
-                    ></i>
-                    <div>
-                        More than one reaction site has been detected in
-                        your input; please specify the intended site to
-                        continue.
-                    </div>
-                </div>
-
-                <button (click)="op.toggle($event)"
-                    type="button" 
-                    class="flex justify-between w-full px-2 py-3 bg-white border border-solid rounded-md"
-                    [class.border-[#DEE2E6]]="!popupDisplayed"
-                    [class.border-black]="popupDisplayed"
-                    [style]="{
-                        'box-shadow': popupDisplayed ? '0 0 0 0.2rem #BFDBFE' : 'none'
-                    }"
-                >
-                    <span class="text-[#8A92A0]">{{ (selectedReactionSite === null)
-                        ? 'Select Reaction Site' 
-                        : 'Reaction Site ' + (selectedReactionSite.idx + 1) }}</span>
-                    <i class="pi pi-chevron-down"></i>
-                </button>
             </div>
         </div>
-    </ng-container>
-</ng-container>
+        <div class="flex justify-center mt-1">
+            <button type="button" 
+                class="flex justify-center items-center px-3 py-2 bg-white border border-solid rounded-md gap-2 text-[#343a40] font-semibold"
+                (click)="onFileInput()"
+            >
+                <i class="pi pi-upload"></i>
+                <span>Upload CDXML/CML</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div
+    class="relative mt-4 grow flex-col items-center justify-center rounded-md border border-solid border-[--surface-d]"
+    [class.invalid]="reactionSiteFormControl.errors && reactionSiteFormControl.dirty"
+    *ngIf="validatedResponse"
+>
+    <div class="flex items-center justify-center">
+        <i class="absolute pi left-3 top-3"
+            [class.pi-check-circle]="reactionSiteFormControl.valid"
+            [class.pi-exclamation-circle]="reactionSiteFormControl.invalid"
+            [class.pi-exclamation-triangle]="reactionSiteFormControl.invalid"
+        ></i>
+        <app-molecule-image 
+            [height]="300" 
+            [width]="300"
+            [molecule]="validatedResponse.svg || ''"
+            [reactionSitesOptions]="reactionSitesOptions"
+            [selectedReactionSite]="selectedReactionSite"
+            (selectedReactionSiteChange)="selectedReactionSite = $event"
+        >
+        </app-molecule-image>
+    </div>
+    <div
+        class="flex flex-col gap-2 p-2 m-2 rounded-md bg-[#FFF2E2]"
+        *ngIf="validatedResponse.has_chiral"
+    >
+        <div class="flex items-center gap-2 text-[#CC8925]">
+            <i class="pi pi-exclamation-triangle"></i>
+            <div>
+                Just a heads up, if your molecule is a diastereomer (e.g. 
+                cis-trans isomers), please be sure to input the 
+                <span class="underline" pTooltip="When using SMILES for diastereomers (e.g. for geometric isomers such as cis-trans isomers), make sure to include '@' symbols at stereogenic centers (e.g. BrC1=C(C=CC=C1)CO[C@H]2CCCCC2) in your SMILES string to indicate the desired stereochemical configuration.">
+                    correct stereochemical configuration
+                </span>. This is needed in order to generate the intended results.
+            </div>
+        </div>
+    </div>
+    <div
+        *ngIf="reactionSitesOptions.length === 1"
+        class="flex flex-col gap-2 p-2 m-2 rounded-md bg-[#E4F8F0]"
+    >
+        <div class="flex items-center gap-2 text-[#1EA97C]">
+            <i class="pi pi-check-circle"></i>
+            <div>Somn will compute on the detected reaction site.</div>
+        </div>
+    </div>
+    <div
+        *ngIf="reactionSitesOptions.length > 1"
+        class="flex flex-col gap-2 p-2 m-2 rounded-md"
+        [class]="(!reactionSiteFormControl.value)? 'bg-[#e9e9ff]' : 'bg-[#E4F8F0]'"
+    >
+        <div
+            class="flex items-center gap-2"
+            [class]="(!reactionSiteFormControl.value)? 'text-[#696CFF]' : 'text-[#1EA97C]'"
+        >
+            <i
+                class="pi"
+                [class]="(!reactionSiteFormControl.value)? 'pi-info-circle' : 'pi-check-circle'"
+            ></i>
+            <div>
+                More than one reaction site has been detected in
+                your input; please specify the intended site to
+                continue.
+            </div>
+        </div>
+
+        <button (click)="op.toggle($event)"
+            type="button" 
+            class="flex justify-between w-full px-2 py-3 bg-white border border-solid rounded-md"
+            [class.border-[#DEE2E6]]="!popupDisplayed"
+            [class.border-black]="popupDisplayed"
+            [style]="{
+                'box-shadow': popupDisplayed ? '0 0 0 0.2rem #BFDBFE' : 'none'
+            }"
+        >
+            <span class="text-[#8A92A0]">{{ (selectedReactionSite === null)
+                ? 'Select Reaction Site' 
+                : 'Reaction Site ' + (selectedReactionSite.idx + 1) }}</span>
+            <i class="pi pi-chevron-down"></i>
+        </button>
+    </div>
+</div>
 
 <p-overlayPanel #op 
     [style]="{'width': '510px'}" 
@@ -110,7 +162,7 @@
 >
     <ng-template pTemplate="content">
         <ng-container *ngIf="reactionSitesOptions as options">
-            <ng-container *ngIf="form.controls['reactionSite'] as control">
+            <ng-container *ngIf="reactionSiteFormControl as control">
                 <div class="flex flex-wrap gap-4 p-4 cursor-pointer justify-stretch">
                     <span *ngFor="let option of options; let i = index" 
                         [class.active]="control.value === option.value"
@@ -140,8 +192,8 @@
 >
     <app-marvin-js-editor
         class="marvin-editor"
-        [smiles]="form.controls['smiles'].value || ''"
-        (smilesChange)="form.controls['smiles'].setValue($event)"
+        [smiles]="smilesFormControl.value || ''"
+        (smilesChange)="onSmilesInput($event)"
     ></app-marvin-js-editor>
     <ng-template pTemplate="footer">
         <p-button

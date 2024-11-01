@@ -23,6 +23,8 @@ import { CheckReactionSiteRequest } from '../model/checkReactionSiteRequest';
 // @ts-ignore
 import { CheckReactionSiteResponse } from '../model/checkReactionSiteResponse';
 // @ts-ignore
+import { CheckReactionSiteResponseInvalid } from '../model/checkReactionSiteResponseInvalid';
+// @ts-ignore
 import { HTTPValidationError } from '../model/hTTPValidationError';
 
 // @ts-ignore
