@@ -28,7 +28,7 @@
 
 <div class="text-[--status-error-color] text-xs my-1" *ngIf="smilesFormControl.errors && smilesFormControl.dirty">
     <div *ngIf="smilesFormControl.errors['required']">This field is required</div>
-    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.InvalidInput]">Invalid input</div>
+    <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.InvalidInput]">SMILES is invalid</div>
     <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.NoReactiveNitrogens]">No reactive nitrogens detected</div>
     <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.NoBrOrClInEl]">No Br or Cl sites detected in electrophile</div>
     <div *ngIf="smilesFormControl.errors[this.somnErrorTypes.NoNitrogensInNuc]">No nitrogens detected in nucleophile</div>

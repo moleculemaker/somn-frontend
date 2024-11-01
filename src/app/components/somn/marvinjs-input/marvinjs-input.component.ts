@@ -72,6 +72,7 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
       ? smiles 
       : (smiles.target as HTMLInputElement).value
     );
+    this.smilesFormControl.markAsDirty();
   }
 
   onFileInput() {
@@ -221,8 +222,6 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
         : { noReactionSitesFound: true }
       ),
       catchError(({ error }: HttpErrorResponse & { error: CheckReactionSiteResponseInvalid }) => {
-        error.type = CheckReactionSiteResponseInvalid.TypeEnum._3dGen;
-
         return of({ [error.type]: true });
       }),
     );
