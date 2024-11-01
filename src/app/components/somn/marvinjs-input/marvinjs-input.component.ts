@@ -28,6 +28,7 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
 
   @Input() value: Partial<ReactionSiteInput>;
   @Output() valueChange = new EventEmitter<ReactionSiteInput>();
+  @Output() heavyAtomsWarning = new EventEmitter<boolean>();
 
   readonly somnErrorTypes = CheckReactionSiteResponseInvalid.TypeEnum;
 
@@ -190,6 +191,8 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
       this.selectedReactionSite = this.reactionSitesOptions
         .find((option) => option.value === this.reactionSiteFormControl.value) || null;
     }
+
+    this.heavyAtomsWarning.emit(resp.num_heavy_atoms > 150);
   }
 
   smilesValidate(control: AbstractControl) {

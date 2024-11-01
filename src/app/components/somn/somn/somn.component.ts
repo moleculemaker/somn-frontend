@@ -15,10 +15,14 @@ import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
   },
 })
 export class SomnComponent {
-  request = this.somnService.newRequest();
-  displayTutorial: boolean = true;
 
   readonly CheckReactionSiteRequest = CheckReactionSiteRequest;
+
+  request = this.somnService.newRequest();
+  displayTutorial: boolean = true;
+  displayHeavyAtomsDialog: boolean = false;
+  arylHalideHasHeavyAtoms: boolean = false;
+  amineHasHeavyAtoms: boolean = false;
 
   constructor(
     private somnService: SomnService,
@@ -118,6 +122,15 @@ export class SomnComponent {
       return;
     }
 
+    if (this.arylHalideHasHeavyAtoms || this.amineHasHeavyAtoms) {
+      this.displayHeavyAtomsDialog = true;
+      return;
+    }
+
+    this.submitJob();
+  }
+
+  submitJob() {
     this.somnService.createJobAndRunSomn(
       this.request.toRequestBody()
     ).subscribe((response) => {
