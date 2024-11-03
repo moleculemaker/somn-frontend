@@ -32,113 +32,205 @@
                         </div>
                     </ng-template>
                     <ng-template pTemplate="content">
-                        <div id="container-somn-input" class="p-4">
-                            <section id="input-name-reactant-pair">
-                                <p class="font-semibold leading-lg">Name your reactant pair</p>
-                                <input
-                                    pInputText
-                                    class="w-full mt-2"
-                                    placeholder="Enter reactant pair name..."
-                                    formControlName="reactantPairName"
-                                />
-                                <ng-content *ngTemplateOutlet="error; context: {
-                                    controlName: 'reactantPairName'
-                                }"></ng-content>
-                            </section>
-                            <section id="input-reactants" class="mt-2">
-                                <p class="font-semibold leading-lg">
-                                    Enter your reactants<i
-                                        class="ml-2 pi pi-info-circle"
-                                        pTooltip="Somn has been trained on reactants with only one reaction site; thus, it is encouraged to input reactants with one reaction site for analysis. If you enter a reactant with multiple reaction sites, you will be required to specify the intended reaction site."
-                                    ></i>
-                                </p>
-                                <div class="flex w-full gap-2">
-                                    <div class="flex flex-col w-1/2">
-                                        <div
-                                            class="flex justify-between mt-2 text-sm"
-                                        >
-                                            <small class="font-semibold leading-xl"
-                                                >Aryl Halide
-                                                (bromide/chloride)</small
-                                            >
-                                            <small class="leading-xl text-text-secondary"
-                                                >Example:
-                                                <small
-                                                    class="font-semibold underline cursor-pointer"
-                                                    (click)="
-                                                        request.form.controls['arylHalideName'].setValue('Bromobenzene');
-                                                        request.form.controls['arylHalide'].setValue({
-                                                            input: 'C1=CC=C(C=C1)Br',
-                                                            input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
-                                                            reactionSite: '-'
-                                                        });
-                                                    "
-                                                    >Bromobenzene</small
-                                                >
-                                            </small>
+                        <p-table 
+                            formArrayName="reactantPairs"
+                            [value]="request.form.controls['reactantPairs'].controls"
+                        >
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Name</th>
+                                    <th>Aryl Halide</th>
+                                    <th>Amine</th>
+                                    <th></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-rp let-i="rowIndex">
+                                <tr *ngIf="rp.controls['status'].value === 'view'">
+                                    <td>{{ i + 1 }}</td>
+                                    <td>{{ rp.controls['reactantPairName'].value }}</td>
+                                    <td>{{ rp.controls['arylHalideName'].value }}</td>
+                                    <td>{{ rp.controls['amineName'].value }}</td>
+                                    <td>
+                                        <div class="flex justify-end gap-2 text-[#6C757D] pr-8">
+                                            <button type="button" title="Copy Reactant Pair" (click)="request.duplicateReactantPair(i)">
+                                                <i class="pi pi-copy"></i>
+                                            </button>
+                                            <button type="button" title="Edit Reactant Pair" (click)="rp.controls['status'].setValue('edit')">
+                                                <i class="pi pi-pencil"></i>
+                                            </button>
+                                            <button type="button" title="Remove Reactant Pair" (click)="request.removeReactantPair(i)">
+                                                <i class="pi pi-times"></i>
+                                            </button>
                                         </div>
-                                        <input
-                                            pInputText
-                                            class="w-full mt-2"
-                                            placeholder="Enter aryl halide name..."
-                                            formControlName="arylHalideName"
-                                        />
-                                        <ng-content *ngTemplateOutlet="error; context: {
-                                            controlName: 'arylHalideName'
-                                        }"></ng-content>
-                                        <app-marvinjs-input
-                                            class="mt-2"
-                                            placeholder="Enter aryl halide SMILES..."
-                                            formControlName="arylHalide"
-                                            type="el"
-                                            (heavyAtomsWarning)="arylHalideHasHeavyAtoms = $event"
+                                    </td>
+                                </tr>
+                                <tr *ngIf="rp.controls['status'].value === 'view' 
+                                    && i === request.form.controls['reactantPairs'].controls.length - 1">
+                                    <td colspan="5">
+                                        <button
+                                            type="button"
+                                            id="btn-add-reactant-pair"
+                                            class="flex items-center btn-outline !bg-[--surface-b]"
+                                            (click)="request.addReactantPair()"
                                         >
-                                        </app-marvinjs-input>
-                                    </div>
-                                    <div class="flex flex-col w-1/2">
-                                        <div
-                                            class="flex justify-between mt-2 text-sm"
-                                        >
-                                            <small class="font-semibold leading-xl"
-                                                >Amine</small
-                                            >
-                                            <small class="leading-xl text-text-secondary"
-                                                >Example:
-                                                <small
-                                                    class="font-semibold underline cursor-pointer"
-                                                    (click)="
-                                                        request.form.controls['amineName'].setValue('Aniline');
-                                                        request.form.controls['amine'].setValue({
-                                                            input: 'C1=CC=C(C=C1)N',
-                                                            input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
-                                                            reactionSite: '-'
-                                                        });
-                                                    "
-                                                    >Aniline</small
+                                            <i class="mr-2 pi pi-plus"></i>
+                                            Add Reactant Pair
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="rp.controls['status'].value === 'edit'" [formGroupName]="i">
+                                    <td colspan="5">
+                                        <div class="flex flex-col border border-dotted rounded-md bg-gray-50 p-4 w-full">
+                                            <div class="flex justify-between mb-3">
+                                                <h5 class="mt-0 opacity-100 font-semibold">Add Reactant Pair</h5>
+                                                <button
+                                                    title="Remove Reactant Pair"
+                                                    type="button"
+                                                    (click)="request.removeReactantPair(i)"
                                                 >
-                                            </small>
+                                                    <i class="pi pi-times"></i>
+                                                </button>
+                                            </div>
+                                            <div id="container-somn-input">
+                                                <section id="input-name-reactant-pair"  class="max-w-[80%]">
+                                                    <p class="font-semibold leading-lg">Name your reactant pair</p>
+                                                    <input
+                                                        pInputText
+                                                        class="w-full mt-2"
+                                                        placeholder="Enter reactant pair name..."
+                                                        formControlName="reactantPairName"
+                                                    />
+                                                    <div *ngIf="
+                                                            rp.controls['reactantPairName'].dirty 
+                                                            && rp.controls['reactantPairName'].errors
+                                                            && rp.controls['reactantPairName'].errors['required'] 
+                                                        "
+                                                        class="text-xs text-red-500 my-1"
+                                                    >
+                                                        This field is required
+                                                    </div>
+                                                </section>
+                                                <section id="input-reactants" class="mt-2">
+                                                    <p class="font-semibold leading-lg">
+                                                        Enter your reactants<i
+                                                            class="ml-2 pi pi-info-circle"
+                                                            pTooltip="Somn has been trained on reactants with only one reaction site; thus, it is encouraged to input reactants with one reaction site for analysis. If you enter a reactant with multiple reaction sites, you will be required to specify the intended reaction site."
+                                                        ></i>
+                                                    </p>
+                                                    <div class="flex w-full gap-2">
+                                                        <div class="flex flex-col w-2/5">
+                                                            <div
+                                                                class="flex justify-between mt-2 text-sm"
+                                                            >
+                                                                <small class="font-semibold leading-xl"
+                                                                    >Aryl Halide
+                                                                    (bromide/chloride)</small
+                                                                >
+                                                                <small class="leading-xl text-text-secondary"
+                                                                    >Example:
+                                                                    <small
+                                                                        class="font-semibold underline cursor-pointer"
+                                                                        (click)="
+                                                                            rp.controls['arylHalideName'].setValue('Bromobenzene');
+                                                                            rp.controls['arylHalide'].setValue({
+                                                                                input: 'C1=CC=C(C=C1)Br',
+                                                                                input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+                                                                                reactionSite: '-'
+                                                                            });
+                                                                        "
+                                                                        >Bromobenzene</small
+                                                                    >
+                                                                </small>
+                                                            </div>
+                                                            <input
+                                                                pInputText
+                                                                class="w-full mt-2"
+                                                                placeholder="Enter aryl halide name..."
+                                                                formControlName="arylHalideName"
+                                                            />
+                                                            <div *ngIf="
+                                                                    rp.controls['arylHalideName'].dirty 
+                                                                    && rp.controls['arylHalideName'].errors
+                                                                    && rp.controls['arylHalideName'].errors['required'] 
+                                                                "
+                                                                class="text-xs text-red-500 my-1"
+                                                            >
+                                                                This field is required
+                                                            </div>
+                                                            <app-marvinjs-input
+                                                                class="mt-2"
+                                                                placeholder="Enter aryl halide SMILES..."
+                                                                formControlName="arylHalide"
+                                                                type="el"
+                                                                (heavyAtomsWarning)="arylHalideHasHeavyAtoms = $event"
+                                                            >
+                                                            </app-marvinjs-input>
+                                                        </div>
+                                                        <div class="flex flex-col w-2/5">
+                                                            <div
+                                                                class="flex justify-between mt-2 text-sm"
+                                                            >
+                                                                <small class="font-semibold leading-xl"
+                                                                    >Amine</small
+                                                                >
+                                                                <small class="leading-xl text-text-secondary"
+                                                                    >Example:
+                                                                    <small
+                                                                        class="font-semibold underline cursor-pointer"
+                                                                        (click)="
+                                                                            rp.controls['amineName'].setValue('Aniline');
+                                                                            rp.controls['amine'].setValue({
+                                                                                input: 'C1=CC=C(C=C1)N',
+                                                                                input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+                                                                                reactionSite: '-'
+                                                                            });
+                                                                        "
+                                                                        >Aniline</small
+                                                                    >
+                                                                </small>
+                                                            </div>
+                                                            <input
+                                                                pInputText
+                                                                class="w-full mt-2"
+                                                                placeholder="Enter amine name..."
+                                                                formControlName="amineName"
+                                                            />
+                                                            <div *ngIf="
+                                                                    rp.controls['amineName'].dirty 
+                                                                    && rp.controls['amineName'].errors
+                                                                    && rp.controls['amineName'].errors['required'] 
+                                                                "
+                                                                class="text-xs text-red-500 my-1"
+                                                            >
+                                                                This field is required
+                                                            </div>
+                                                            <app-marvinjs-input
+                                                                class="mt-2"
+                                                                placeholder="Enter amine SMILES..."
+                                                                type="nuc"
+                                                                formControlName="amine"
+                                                                (heavyAtomsWarning)="amineHasHeavyAtoms = $event"
+                                                            >
+                                                            </app-marvinjs-input>
+                                                        </div>
+                                                        <div class="flex flex-col w-1/5 items-center justify-center relative">
+                                                            <p-button
+                                                                label="Add Reactant Pair"
+                                                                class="absolute top-8"
+                                                                [disabled]="rp.invalid"
+                                                                (onClick)="rp.controls['status'].setValue('view')"
+                                                                styleClass="bg-[#224063] font-normal"
+                                                            ></p-button>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </div>
                                         </div>
-                                        <input
-                                            pInputText
-                                            class="w-full mt-2"
-                                            placeholder="Enter amine name..."
-                                            formControlName="amineName"
-                                        />
-                                        <ng-content *ngTemplateOutlet="error; context: {
-                                            controlName: 'amineName'
-                                        }"></ng-content>
-                                        <app-marvinjs-input
-                                            class="mt-2"
-                                            placeholder="Enter amine SMILES..."
-                                            type="nuc"
-                                            formControlName="amine"
-                                            (heavyAtomsWarning)="amineHasHeavyAtoms = $event"
-                                        >
-                                        </app-marvinjs-input>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
+                                    </td>
+                                </tr> 
+                            </ng-template>
+                        </p-table>
                     </ng-template>
                 </p-panel>
             </div>
@@ -268,9 +360,3 @@
         </div>
     </div>
 </p-dialog>
-
-<ng-template #error let-controlName="controlName">
-    <div class="text-[--status-error-color] text-xs my-1" *ngIf="request.form.get(controlName)!.errors && request.form.get(controlName)!.dirty">
-        <div *ngIf="request.form.get(controlName)!.errors!['required']">This field is required</div>
-    </div>
-</ng-template>

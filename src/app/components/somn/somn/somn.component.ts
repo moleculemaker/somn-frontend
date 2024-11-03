@@ -2,7 +2,6 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 import { TutorialService } from "~/app/services/tutorial.service";
-import { ReactionSiteInput } from "../marvinjs-input/marvinjs-input.component";
 import tutorialJson from './tutorial.json'
 import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
 
@@ -136,10 +135,5 @@ export class SomnComponent {
     ).subscribe((response) => {
       this.router.navigate(['somn', 'result', response.job_id]);
     })
-  }
-
-  onReactionSiteChange(controlName: 'amine' | 'arylHalide', value: ReactionSiteInput) {
-    this.request.form.controls[controlName].setValue(value);
-    this.request.form.updateValueAndValidity();
   }
 }

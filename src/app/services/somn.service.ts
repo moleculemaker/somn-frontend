@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
 import { BodyCreateJobJobTypeJobsPost, CheckReactionSiteRequest, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
 
 import sampleRequest from '../../assets/example_request.json';
@@ -47,49 +47,91 @@ export class SomnRequest {
   }
 
   form = new FormGroup({
-    reactantPairName: new FormControl("", [Validators.required, this.nameValidator]),
-
-    arylHalideName: new FormControl("", [Validators.required, this.nameValidator]),
-    arylHalide: new FormControl<ReactionSiteInput>({
-      input: "",
-      input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
-      reactionSite: null
-    }, [this.reactionSiteValidator]),
-
-    amineName: new FormControl("", [Validators.required, this.nameValidator]),
-    amine: new FormControl<ReactionSiteInput>({
-      input: "",
-      input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
-      reactionSite: null
-    }, [this.reactionSiteValidator]),
-    
+    reactantPairs: new FormArray([
+      this.createReactantPairForm()
+    ]),
 
     agreeToSubscription: new FormControl(false),
     subscriberEmail: new FormControl("", [Validators.email]),
   });
+
+  createReactantPairForm() {
+    return new FormGroup({
+      reactantPairName: new FormControl("", [Validators.required, this.nameValidator]),
+
+      arylHalideName: new FormControl("", [Validators.required, this.nameValidator]),
+      arylHalide: new FormControl<ReactionSiteInput>({
+        input: "",
+        input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+        reactionSite: null
+      }, [this.reactionSiteValidator]),
+
+      amineName: new FormControl("", [Validators.required, this.nameValidator]),
+      amine: new FormControl<ReactionSiteInput>({
+        input: "",
+        input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+        reactionSite: null
+      }, [this.reactionSiteValidator]),
+
+      status: new FormControl<"view" | "edit">("edit")
+    });
+  }
 
   useExample() {
     this.form.setValue(sampleRequest as any);
   }
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
-    const job_info = {
-      reactant_pair_name: (this.form.controls["reactantPairName"].value || "").trim().replace(/ /g, "_"),
-      
-      nuc_name: (this.form.controls["amineName"].value || "").trim().replace(/ /g, "_"),
-      nuc: this.form.controls["amine"].value?.input || "",
-      nuc_input_type: this.form.controls["amine"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
-      nuc_idx: this.form.controls["amine"].value?.reactionSite || "-",
+    const reactantPairs = this.form.controls["reactantPairs"].value;
+    const job_info = reactantPairs.map((rp) => ({
+      reactant_pair_name: rp.reactantPairName?.trim().replace(/ /g, "_") || "-",
 
-      el_name: (this.form.controls["arylHalideName"].value || "").trim().replace(/ /g, "_"),
-      el: this.form.controls["arylHalide"].value?.input || "",
-      el_input_type: this.form.controls["arylHalide"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
-      el_idx: this.form.controls["arylHalide"].value?.reactionSite || "-",
-    }
+      nuc_name: rp.amineName?.trim().replace(/ /g, "_") || "-",
+      nuc: rp.amine?.input || "",
+      nuc_input_type: rp.amine?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
+      nuc_idx: rp.amine?.reactionSite || "-",
+
+      el_name: rp.arylHalideName?.trim().replace(/ /g, "_") || "-",
+      el: rp.arylHalide?.input || "",
+      el_input_type: rp.arylHalide?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
+      el_idx: rp.arylHalide?.reactionSite || "-",
+    }));
     return {
       email: this.form.controls["subscriberEmail"].value || "",
       job_info: JSON.stringify(job_info),
     };
+  }
+
+  addReactantPair() {
+    this.form.controls["reactantPairs"].push(this.createReactantPairForm());
+  }
+
+  removeReactantPair(index: number) {
+    this.form.controls["reactantPairs"].removeAt(index);
+    if (!this.form.controls["reactantPairs"].length) {
+      this.addReactantPair();
+    }
+  }
+
+  duplicateReactantPair(index: number) {
+    const rp = this.form.controls["reactantPairs"].controls[index];
+    const newRp = this.createReactantPairForm();
+    newRp.patchValue(rp.getRawValue());
+    this.form.controls["reactantPairs"].insert(index + 1, newRp);
+  }
+
+  private clearAllInputHelper(form: FormGroup | FormArray) {
+    Object.entries(form.controls).forEach(([key, control]) => {
+      if (control instanceof FormGroup || control instanceof FormArray) {
+        this.clearAllInputHelper(control);
+      } else {
+        control.reset();
+      }
+    });
+  }
+
+  clearAllReactantPairs() {
+    this.clearAllInputHelper(this.form.controls["reactantPairs"]);
   }
 }
 

@@ -4,6 +4,7 @@
   border-style: solid;
   border-width: 1px;
   border-radius: 6px;
+  background-color: white;
 
   &.invalid {
     border-color: var(--status-error-color);

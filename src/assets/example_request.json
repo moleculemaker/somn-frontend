@@ -1,19 +1,25 @@
 {
-    "reactantPairName": "Example Reactant Pair",
-    "arylHalideName": "test1",
-    "arylHalide": {
-        "input": "BrC1=NC=CC=C1",
-        "input_type": "smi",
-        "reactionSite": "0"
-    },
+    "reactantPairs": [
+        {
+            "reactantPairName": "Example Reactant Pair",
 
-    "amineName": "test2",
-    "amine": {
-        "input": "NC1=CC=CC=C1",
-        "input_type": "smi",
-        "reactionSite": "0"
-    },
+            "arylHalideName": "test1",
+            "arylHalide": {
+                "input": "BrC1=NC=CC=C1",
+                "input_type": "smi",
+                "reactionSite": "0"
+            },
 
+            "amineName": "test2",
+            "amine": {
+                "input": "NC1=CC=CC=C1",
+                "input_type": "smi",
+                "reactionSite": "0"
+            },
+
+            "status": "view"
+        }
+    ],
     "agreeToSubscription": false,
     "subscriberEmail": ""
 }
