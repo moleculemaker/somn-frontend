@@ -130,7 +130,7 @@ export class SomnRequest {
     });
   }
 
-  clearAllReactantPairs() {
+  clearAll() {
     this.clearAllInputHelper(this.form.controls["reactantPairs"]);
   }
 }

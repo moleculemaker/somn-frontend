@@ -6,3 +6,7 @@
 ::ng-deep .p-tooltip {
     @apply min-w-[381px];
 }
+
+::ng-deep .p-datatable-tbody > tr > td[colspan="5"]:last-child {
+    @apply border-b-0;
+}
