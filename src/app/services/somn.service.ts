@@ -46,10 +46,83 @@ export class SomnRequest {
     return null;
   }
 
+  private duplicationValidator(control: AbstractControl) {
+    const c = control as FormArray;
+    const reactantPairs = c.getRawValue();
+
+    const checkDifferentNameForSameInput = (controlName: string) => {
+      const inputMap = new Map<string, AbstractControl>();
+
+      reactantPairs.forEach((rp: any, index: number) => {
+        const input = rp[controlName].input;
+        if (input && !inputMap.has(input)) {
+          inputMap.set(input, c.at(index).get(`${controlName}Name`)!);
+        }
+      });
+      
+      reactantPairs.forEach((rp: any, index: number) => {
+        const nameControl = c.at(index).get(`${controlName}Name`)!;
+        const originalNameControl = inputMap.get(rp[controlName].input);
+        if (originalNameControl && nameControl !== originalNameControl) {
+          nameControl?.setValue(originalNameControl?.value, { emitEvent: false, onlySelf: true });
+          nameControl?.disable({ emitEvent: false, onlySelf: true });
+        }
+
+        else {
+          nameControl?.enable({ emitEvent: false, onlySelf: true });
+        }
+      });
+    }
+
+    const checkSameNameForDifferentInputs = (controlName: string) => {
+      const nameMap = new Map<string, {
+        value: string;
+        count: number;
+      }>();
+
+      reactantPairs.forEach((rp: any) => {
+        const name = rp[`${controlName}Name`]?.trim();
+        const input = rp[controlName]?.input;
+        
+        if (name && input) {
+          const key = `${name}-${input}`;
+          if (!nameMap.has(key)) {
+            nameMap.set(key, { value: name, count: 1 });
+          } else {
+            nameMap.get(key)!.count++;
+          }
+        }
+      });
+
+      reactantPairs.forEach((rp: any, index: number) => {
+        const nameControl = c.at(index).get(`${controlName}Name`)!;
+        const name = rp[`${controlName}Name`]?.trim();
+        const input = rp[controlName]?.input;
+        
+        if (name && input) {
+          const key = `${name}-${input}`;
+          const entry = nameMap.get(key)!;
+          
+          if (entry.count > 1) {
+            const currentCount = entry.count--;
+            const newName = `${name}-${currentCount}`;
+            nameControl.setValue(newName, { emitEvent: false, onlySelf: true });
+          }
+        }
+      });
+    }
+
+    checkDifferentNameForSameInput("arylHalide");
+    checkDifferentNameForSameInput("amine");
+    checkSameNameForDifferentInputs("arylHalide");
+    checkSameNameForDifferentInputs("amine");
+    return null;
+  }
+
   form = new FormGroup({
     reactantPairs: new FormArray([
       this.createReactantPairForm()
-    ]),
+    ], [this.duplicationValidator]),
 
     agreeToSubscription: new FormControl(false),
     subscriberEmail: new FormControl("", [Validators.email]),
@@ -117,6 +190,11 @@ export class SomnRequest {
     const rp = this.form.controls["reactantPairs"].controls[index];
     const newRp = this.createReactantPairForm();
     newRp.patchValue(rp.getRawValue());
+
+    newRp.controls["amineName"].disable({ emitEvent: false });
+    newRp.controls["arylHalideName"].disable({ emitEvent: false });
+    newRp.updateValueAndValidity({ emitEvent: false });
+
     this.form.controls["reactantPairs"].insert(index + 1, newRp);
   }
 
