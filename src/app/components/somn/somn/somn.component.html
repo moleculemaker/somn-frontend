@@ -66,8 +66,95 @@
                                     <tr *ngIf="rp.controls['status'].value === 'view'">
                                         <td>{{ i + 1 }}</td>
                                         <td>{{ rp.controls['reactantPairName'].value }}</td>
-                                        <td>{{ rp.controls['arylHalideName'].value }}</td>
-                                        <td>{{ rp.controls['amineName'].value }}</td>
+                                        <td (mouseenter)="arylHalideOverlay.show($event)"
+                                            (mouseleave)="arylHalideOverlay.hide()"
+                                        >
+                                            {{ rp.controls['arylHalideName'].value }}
+                                            <p-overlayPanel #arylHalideOverlay>
+                                                <div class="w-[300px] p-4">
+                                                    <div
+                                                        class="rounded-md border border-solid border-[--surface-d] p-2"
+                                                    >
+                                                        <app-molecule-image 
+                                                            [width]="260" 
+                                                            [height]="180" 
+                                                            [molecule]="rp.controls['arylHalide'].value.svg"
+                                                            [reactionSitesOptions]="rp.controls['arylHalide'].value.reaction_site_idxes"
+                                                            [selectedReactionSite]="rp.controls['arylHalide'].value.reactionSite"
+                                                            [interactive]="false"
+                                                        >
+                                                        </app-molecule-image>
+                                                    </div>
+                                                    <div
+                                                        class="flex flex-col justify-between grow"
+                                                    >
+                                                        <div class="flex justify-between mt-2">
+                                                            <span class="leading-sm">Name</span>
+                                                            <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ rp.controls['arylHalideName'].value }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between mt-2">
+                                                            <span class="leading-sm">SMILES</span>
+                                                            <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ rp.controls['arylHalide'].value.smiles }}</span>
+                                                        </div>
+                                                        <div *ngIf="rp.controls['arylHalide'].value.reaction_site_idxes" 
+                                                            class="flex justify-between mt-2">
+                                                            <span class="leading-sm">Reaction Site</span>
+                                                            <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
+                                                                {{ 
+                                                                    rp.controls['arylHalide'].value.reaction_site_idxes.length === 1 
+                                                                    ? 'Auto detected'
+                                                                    : rp.controls['arylHalide'].value.reactionSite + 1 
+                                                                }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </p-overlayPanel>
+                                        </td>
+                                        <td (mouseenter)="amineOverlay.show($event)"
+                                            (mouseleave)="amineOverlay.hide()"
+                                        >
+                                            {{ rp.controls['amineName'].value }}
+                                            <p-overlayPanel #amineOverlay>
+                                                <div class="w-[300px] p-4">
+                                                    <div
+                                                        class="rounded-md border border-solid border-[--surface-d] p-2"
+                                                    >
+                                                        <app-molecule-image 
+                                                            [width]="260" 
+                                                            [height]="180" 
+                                                            [molecule]="rp.controls['amine'].value.svg"
+                                                            [reactionSitesOptions]="rp.controls['amine'].value.reaction_site_idxes"
+                                                            [selectedReactionSite]="rp.controls['amine'].value.reactionSite"
+                                                            [interactive]="false"
+                                                        >
+                                                        </app-molecule-image>
+                                                    </div>
+                                                    <div
+                                                        class="flex flex-col justify-between grow"
+                                                    >
+                                                        <div class="flex justify-between mt-2">
+                                                            <span class="leading-sm">Name</span>
+                                                            <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ rp.controls['amineName'].value }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between mt-2">
+                                                            <span class="leading-sm">SMILES</span>
+                                                            <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ rp.controls['amine'].value.smiles }}</span>
+                                                        </div>
+                                                        <div *ngIf="rp.controls['amine'].value.reaction_site_idxes" 
+                                                            class="flex justify-between mt-2">
+                                                            <span class="leading-sm">Reaction Site</span>
+                                                            <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
+                                                                {{ 
+                                                                    rp.controls['amine'].value.reaction_site_idxes.length === 1 
+                                                                    ? 'Auto detected'
+                                                                    : rp.controls['amine'].value.reactionSite + 1 
+                                                                }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </p-overlayPanel>
                                         <td>
                                             <div class="flex justify-end gap-2 text-[#6C757D] pr-8">
                                                 <button type="button" title="Copy Reactant Pair" (click)="request.duplicateReactantPair(i)">

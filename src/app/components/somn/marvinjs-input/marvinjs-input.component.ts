@@ -6,9 +6,12 @@ import { ReactionSiteOption } from "../molecule-image/molecule-image.component";
 import { CheckReactionSiteRequest, CheckReactionSiteResponse, CheckReactionSiteResponseInvalid } from "~/app/api/mmli-backend/v1";
 import { HttpErrorResponse } from "@angular/common/http";
 
-export type ReactionSiteInput = Omit<CheckReactionSiteRequest, 'role'> & {
-  reactionSite: string | null;
-};
+export type ReactionSiteInput = 
+  Omit<CheckReactionSiteRequest, 'role'> 
+  & Partial<CheckReactionSiteResponse>
+  & {
+    reactionSite: string | null;
+  };
 
 @Component({
   selector: "app-marvinjs-input",
@@ -143,6 +146,7 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
         input: file || smiles || '',
         input_type: inputType || CheckReactionSiteRequest.InputTypeEnum.Smi,
         reactionSite,
+        ...this.validatedResponse,
       }
       fn(payload);
     });
