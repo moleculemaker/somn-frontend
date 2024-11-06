@@ -169,7 +169,7 @@ export class SomnRequest {
   }
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
-    const reactantPairs = this.form.controls["reactantPairs"].value;
+    const reactantPairs = this.form.controls["reactantPairs"].getRawValue();
     const job_info = reactantPairs.map((rp) => ({
       reactant_pair_name: rp.reactantPairName?.trim().replace(/ /g, "_") || "-",
 
