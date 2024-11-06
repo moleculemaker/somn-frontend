@@ -157,14 +157,14 @@
                                             </p-overlayPanel>
                                         <td>
                                             <div class="flex justify-end gap-2 text-[#6C757D] pr-8">
-                                                <button type="button" title="Copy Reactant Pair" (click)="request.duplicateReactantPair(i)">
-                                                    <i class="pi pi-copy"></i>
+                                                <button type="button" title="Duplicate Reactant Pair" (click)="request.duplicateReactantPair(i)">
+                                                    <i class="pi pi-copy" pTooltip="Duplicate"></i>
                                                 </button>
                                                 <button type="button" title="Edit Reactant Pair" (click)="rp.controls['status'].setValue('edit')">
-                                                    <i class="pi pi-pencil"></i>
+                                                    <i class="pi pi-pencil" pTooltip="Edit"></i>
                                                 </button>
                                                 <button type="button" title="Remove Reactant Pair" (click)="request.removeReactantPair(i)">
-                                                    <i class="pi pi-times"></i>
+                                                    <i class="pi pi-times" pTooltip="Remove"></i>
                                                 </button>
                                             </div>
                                         </td>
