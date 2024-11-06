@@ -110,6 +110,14 @@ export class SomnComponent {
         }
       }
     ]);
+
+    this.request.form.statusChanges.subscribe(() => {
+      console.log(
+        'form: ', this.request.form.value,
+        '\nstatus: ', this.request.form.status,
+        '\nerrors: ', this.request.form.errors
+      );
+    });
   }
 
   useExample() {

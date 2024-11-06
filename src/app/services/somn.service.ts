@@ -81,33 +81,46 @@ export class SomnRequest {
       }>();
 
       reactantPairs.forEach((rp: any) => {
-        const name = rp[`${controlName}Name`]?.trim();
+        const name = rp[`${controlName}Name`]?.trim().replace(/-\d+$/g, "");
         const input = rp[controlName]?.input;
         
-        if (name && input) {
-          const key = `${name}-${input}`;
-          if (!nameMap.has(key)) {
-            nameMap.set(key, { value: name, count: 1 });
-          } else {
-            nameMap.get(key)!.count++;
-          }
+        if (!nameMap.has(name)) {
+          nameMap.set(name, { value: input, count: 0 });
         }
       });
 
       reactantPairs.forEach((rp: any, index: number) => {
         const nameControl = c.at(index).get(`${controlName}Name`)!;
-        const name = rp[`${controlName}Name`]?.trim();
+        const name = rp[`${controlName}Name`]?.trim().replace(/-\d+$/g, "");
         const input = rp[controlName]?.input;
         
-        if (name && input) {
-          const key = `${name}-${input}`;
-          const entry = nameMap.get(key)!;
-          
-          if (entry.count > 1) {
-            const currentCount = entry.count--;
-            const newName = `${name}-${currentCount}`;
-            nameControl.setValue(newName, { emitEvent: false, onlySelf: true });
+        if (input && (nameMap.has(name) && nameMap.get(name)!.value !== input)) {
+          nameControl.setValue(`${name}-${++nameMap.get(name)!.count}`, { emitEvent: false, onlySelf: true });
+          nameControl.enable({ emitEvent: false, onlySelf: true });
+        }
+      });
+    }
+
+    const checkSameReactantPairName = () => {
+      const nameMap = new Map<string, number>();
+
+      reactantPairs.forEach((rp: any) => {
+        const name = rp.reactantPairName?.trim().replace(/-\d+$/g, "");
+        
+        if (!nameMap.has(name)) {
+          nameMap.set(name, 0);
+        }
+      });
+
+      reactantPairs.forEach((rp: any, index: number) => {
+        const nameControl = c.at(index).get(`reactantPairName`)!;
+        const name = rp.reactantPairName?.trim().replace(/-\d+$/g, "");
+        
+        if (rp.reactantPairName && nameMap.has(name)) {
+          if (nameMap.get(name)! > 0) {
+            nameControl.setValue(`${name}-${nameMap.get(name)!}`, { emitEvent: false, onlySelf: true });
           }
+          nameMap.set(name, nameMap.get(name)! + 1);
         }
       });
     }
@@ -116,6 +129,7 @@ export class SomnRequest {
     checkDifferentNameForSameInput("amine");
     checkSameNameForDifferentInputs("arylHalide");
     checkSameNameForDifferentInputs("amine");
+    checkSameReactantPairName();
     return null;
   }
 
