@@ -16,8 +16,8 @@ import { Slider } from 'primeng/slider';
 
 interface FilterConfig {
   field: string;
-  selected: string[];
-  options: string[];
+  selected: any[];
+  options: any[];
   matchMode: string;
 }
 
@@ -222,13 +222,17 @@ export class SomnResultSummaryComponent extends JobResult {
       return retVal;
     }),
     tap((v) => {
-      this.filters['arylHalide'].options = Array.from(new Set(v.flatMap((d: any) => d.arylHalide.name)));
-      this.filters['amine'].options = Array.from(new Set(v.flatMap((d: any) => d.amine.name)));
-      this.filters['reactionCondition'].options = Array.from(
-        new Set(v.flatMap((d: any) => d.topYieldConditions)));
-      this.filters['reactantPair'].options = Array.from(new Set(
-        this.jobInfo.map((d: any) => d.reactant_pair_name)
-      ));
+      this.filters['arylHalide'].options = Array.from(new Set(v.flatMap((d: any) => d.arylHalide.name)))
+        .map((d: string) => ({ label: d, value: d }));
+
+      this.filters['amine'].options = Array.from(new Set(v.flatMap((d: any) => d.amine.name)))
+        .map((d: string) => ({ label: d, value: d }));
+
+      this.filters['reactionCondition'].options = Array.from(new Set(v.flatMap((d: any) => d.topYieldConditions)))
+        .map((d: string) => ({ label: d, value: d }));
+
+      this.filters['reactantPair'].options = Array.from(new Set(this.jobInfo.map((d: any) => d.reactant_pair_name)))
+        .map((d: any) => ({ label: d, value: d }));
     }),
   );
 
