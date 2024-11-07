@@ -28,7 +28,7 @@
     <app-loading *ngIf="isLoading$ | async"></app-loading>
 
     <div *ngIf="response$ | async as response">
-        <div id="container-predicted-conditions" class="my-4">
+        <div id="container-summary" class="my-4">
             <p-panel>
                 <ng-template pTemplate="header">
                     <span class="grow">Job Results Summary</span>
@@ -177,6 +177,7 @@
                         dataKey="reactantPair"
                         selectionMode="multiple"
                         [(selection)]="selectedTableRows"
+                        [columns]="exportColumns"
                         tableStyleClass="w-full"
                         styleClass="w-full"
                     >
@@ -322,7 +323,7 @@
                                 </td>
                                 <td class="align-middle">
                                     <button (click)="viewResults(i)">
-                                        <p-chip styleClass="p-1 px-3"
+                                        <p-chip id="btn-view-results" styleClass="p-1 px-3"
                                             ><span class="leading-xl text-text-primary">View Results</span>
                                             <i class="ml-2 pi pi-arrow-right"></i>
                                         </p-chip>
@@ -360,7 +361,7 @@
 
 <p-dialog
     #tutorialDialog
-    header="Results"
+    header="Results - Job Summary"
     [(visible)]="displayTutorial" 
     [modal]="true" 
     [style]="{ width: '350px' }" 

@@ -35,14 +35,6 @@ export class SomnResultSummaryComponent extends JobResult {
   override jobType: JobType = JobType.Somn;
 
   displayTutorial: boolean = false;
-  exportOptions: MenuItem[] = [];
-
-  yieldMessages: Message[] = [];
-
-  reactantPairOptions = [];
-  arylHalideOptions = [];
-  amineOptions = [];
-  reactionConditionOptions = [];
 
   showFilter = true;
   selectedTableRows: any[] = [];
@@ -75,20 +67,6 @@ export class SomnResultSummaryComponent extends JobResult {
       matchMode: 'subset',
     },
   };
-
-  applyFilters() {
-    Object.values(this.filters).forEach(filter => {
-      this.resultsTable.filter(filter.selected, filter.field, filter.matchMode);
-    });
-  }
-
-  clearAllFilters() {
-    Object.values(this.filters).forEach(filter => {
-      filter.selected = [];
-    });
-    this.selectedYield = [0, 100];
-    this.resultsTable.reset();
-  }
 
   response$ = this.jobResultResponse$.pipe(
     switchMap((resp) => {
@@ -236,46 +214,35 @@ export class SomnResultSummaryComponent extends JobResult {
     }),
   );
 
-  
-  // numFilters$ = combineLatest([
-  //   this.selectedBases$,
-  //   this.selectedCatalysts$,
-  //   this.selectedSolvents$,
-  // ]).pipe(
-  //   map((filters) =>
-  //     filters.reduce((p, filter) => (filter.length ? 1 : 0) + p, 0),
-  //   ),
-  // );
-
-  // exportColumns = [
-  //   { field: "amineName", header: "Amine" },
-  //   { field: "arylHalideName", header: "Aryl Halide" },
-  //   { field: "amineSmiles", header: "Amine SMILES" },
-  //   { field: "arylHalideSmiles", header: "Aryl Halide SMILES" },
-  //   { field: "catalyst", header: "Catalyst" },
-  //   { field: "solvent", header: "Solvent" },
-  //   { field: "base", header: "Base" },
-  //   { field: "yield", header: "Yield" },
-  // ]
-  exportFunction({ data, field }: { data: any, field: string }) {
-    return field === "catalyst" 
-      ? `[Pd(allyl)(${data[0]})][OTf]` 
-      : data;
-  }
-
   requestOptions = [
     { label: "Modify and Resubmit Request", icon: "pi pi-refresh", disabled: true },
     { label: "Run a New Request", icon: "pi pi-plus", url: "/somn", target: "_blank" },
   ]
 
-  // exportFileName$ = combineLatest([
-  //   this.statusResponse$,
-  //   this.response$,
-  // ]).pipe(
-  //   map(([status, response]) => {
-  //     return `${response.reactantPairName}-${status.job_id}`;
-  //   }),
-  // );
+  exportOptions = [
+    { label: 'Job Results Summary', 
+      items: [
+        { label: 'Selected Row(s)', command: () => this.resultsTable.exportCSV({ selectionOnly: true }) },
+        // { label: 'Current View', command: () => this.resultsTable.exportCSV() },
+        { label: 'Complete Results', command: () => this.resultsTable.exportCSV({ allValues: true }) },
+      ]
+    },
+    { label: 'Reactant Pair Predicted Conditions', 
+      items: [
+        { label: 'Selected Row(s)', },
+        // { label: 'Current View', },
+        { label: 'Complete Results', },
+      ]
+    },
+  ]
+
+  exportColumns = [
+    { field: 'reactantPair', header: 'Reactant Pair Name' },
+    { field: 'arylHalide.name', header: 'Aryl Halide' },
+    { field: 'amine.name', header: 'Amine' },
+    { field: 'topYield.value', header: 'Top Yield' },
+    { field: 'topYieldConditions', header: 'Top Yield Conditions' },
+  ]
 
   constructor(
     protected somnService: SomnService,
@@ -286,6 +253,64 @@ export class SomnResultSummaryComponent extends JobResult {
   ) {
     super(somnService);
     
+    tutorialService.tutorialKey = 'result-summary-tutorial';
+    if (!tutorialService.showTutorial) {
+      this.displayTutorial = true;
+    } else {
+      this.displayTutorial = false;
+    }
+
+    tutorialService.onStart = () => {
+      this.displayTutorial = true;
+    };
+
+    tutorialService.driver.setSteps([
+      {
+        element: '#btn-request-options',
+        popover: {
+          title: 'Request Options',
+          description: 'Modify and resubmit your request, or run a new request in another tab.',
+          side: 'bottom',
+          align: 'end'
+        }
+      },
+      {
+        element: "#btn-export",
+        popover: {
+          title: "Export",
+          description: 'Download your results. Current formats supported include CSV for the job results summary table and all reactant pair predicted conditions.',
+          side: "bottom",
+          align: "end"
+        }
+      },
+      {
+        element: '#container-job-id',
+        popover: {
+          title: "Job ID",
+          description: 'Copy the link to your Job ID to revisit your results at a later time.',
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: '#container-summary',
+        popover: {
+          title: "Job Results Summary",
+          description: 'Explore top predictions (yield % and reaction conditions), summarized for each reactant pair in your job.',
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: '#btn-view-results',
+        popover: {
+          title: "View Results",
+          description: 'Access a separate page with the full predicted conditions results for a given reactant pair using the corresponding “View results” button.',
+          side: "left",
+          align: "center"
+        }
+      },
+    ]);
   }
 
   ngOnInit() {
@@ -301,10 +326,6 @@ export class SomnResultSummaryComponent extends JobResult {
         return filter.every((f) => value.includes(f));
       },
     );
-  }
-
-  ngOnDestroy() {
-    // this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   viewResults(i: number) {
@@ -356,5 +377,19 @@ export class SomnResultSummaryComponent extends JobResult {
         maxRange.value = `${value[1]}`;
       }
     });
+  }
+
+  applyFilters() {
+    Object.values(this.filters).forEach(filter => {
+      this.resultsTable.filter(filter.selected, filter.field, filter.matchMode);
+    });
+  }
+
+  clearAllFilters() {
+    Object.values(this.filters).forEach(filter => {
+      filter.selected = [];
+    });
+    this.selectedYield = [0, 100];
+    this.resultsTable.reset();
   }
 }

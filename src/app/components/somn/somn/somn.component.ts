@@ -66,14 +66,6 @@ export class SomnComponent {
           side: "top",
           align: "center",
           popoverClass: '!w-[520px] !max-w-[520px]',
-          onPopoverRender: (popover, options) => {
-            if (options.config.onPopoverRender) {
-              options.config.onPopoverRender(popover, options);
-            }
-            
-            const descriptionDOM = popover.description;
-            descriptionDOM.innerHTML = tutorialJson['input-reactants'];
-          }
         },
       },
       {
@@ -90,6 +82,15 @@ export class SomnComponent {
             descriptionDOM.innerHTML = tutorialJson['reaction-sites'];
           }
         }
+      },
+      {
+        element: '#container-manage-reactant-pairs',
+        popover: {
+          title: "Manage Reactant Pairs",
+          description: 'Add a new reactant pair or clear all input reactant pairs.',
+          side: "bottom",
+          align: "center",
+        },
       },
       {
         element: '#input-subscription-email',

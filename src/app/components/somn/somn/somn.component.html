@@ -29,22 +29,24 @@
                                 <i class="mr-2 pi pi-box"></i>
                                 Use an Example
                             </button>
-                            <button
-                                type="button"
-                                id="btn-add-reactant-pair"
-                                class="flex items-center btn-outline !bg-[--surface-b]"
-                                (click)="request.addReactantPair()"
-                            >
-                                <i class="mr-2 pi pi-plus"></i>
-                                Add Reactant Pair
-                            </button>
-                            <button
-                                type="button"
-                                class="flex items-center btn-outline !bg-[--surface-b]"
-                                (click)="request.clearAll()"
-                            >
-                                Clear All
-                            </button>
+                            <div class="flex gap-2" id="container-manage-reactant-pairs">
+                                <button
+                                    type="button"
+                                    id="btn-add-reactant-pair"
+                                    class="flex items-center btn-outline !bg-[--surface-b]"
+                                    (click)="request.addReactantPair()"
+                                >
+                                    <i class="mr-2 pi pi-plus"></i>
+                                    Add Reactant Pair
+                                </button>
+                                <button
+                                    type="button"
+                                    class="flex items-center btn-outline !bg-[--surface-b]"
+                                    (click)="request.clearAll()"
+                                >
+                                    Clear All
+                                </button>
+                            </div>
                         </div>
                     </ng-template>
                     <ng-template pTemplate="content">
