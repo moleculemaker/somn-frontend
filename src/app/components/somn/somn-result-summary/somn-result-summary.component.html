@@ -34,12 +34,11 @@
                     <span class="grow">Job Results Summary</span>
                     <div class="flex items-center gap-2">
                         <button
-                            class="btn-outline"
+                            class="btn-outline inline-flex items-center gap-2"
                             (click)="showFilter = !showFilter"
                         >
                             <i class="pi pi-filter"></i>
                             <h6 class="inline leading-lg">Filter</h6>
-                            <p-chip>{{ numFilters }}</p-chip>
                         </button>
                         <button
                             class="btn-outline"
@@ -51,8 +50,9 @@
                 </ng-template>
 
                 <div class="flex flex-col">
-                    <div *ngIf="showFilter" id="container-filters" class="flex w-full gap-4 p-2 px-4 bg-gray-50">
+                    <div *ngIf="showFilter" id="container-filters" class="flex w-full gap-4 p-2 px-4 bg-gray-50 justify-center">
                         <p-multiSelect
+                            class="w-1/5"
                             styleClass="w-full"
                             [display]="filters['reactantPair'].selected.length > 1 ? 'comma' : 'chip'"
                             [maxSelectedLabels]="1"
@@ -65,6 +65,7 @@
                         >
                         </p-multiSelect>
                         <p-multiSelect
+                            class="w-1/5"
                             styleClass="w-full"
                             [display]="filters['arylHalide'].selected.length > 1 ? 'comma' : 'chip'"
                             [maxSelectedLabels]="1"
@@ -76,32 +77,93 @@
                         >
                         </p-multiSelect>
                         <p-multiSelect
+                            class="w-1/5"
                             styleClass="w-full"
                             [display]="filters['amine'].selected.length > 1 ? 'comma' : 'chip'"
                             [maxSelectedLabels]="1"
                             [selectedItemsLabel]="'{0} items'"
                             [(ngModel)]="filters['amine'].selected"
                             [options]="filters['amine'].options"
+                            (onChange)="applyFilters()"
                             placeholder="Amine"
                             display="chip"
                         >
                         </p-multiSelect>
 
-                        <!-- <app-yield-filter
-                            [originalData]="(response$ | async)?.data || []"
-                            [data]="(filteredDataWithoutYieldRange$ | async) || []"
-                            [selectedYield]="(selectedYield$ | async)!"
-                            (selectedYieldChange)="onYieldRangeChange($event)"
-                        ></app-yield-filter> -->
+                        <div class="w-1/5 rounded-md border-[#ced4da] px-3 py-2 flex justify-betweeen items-center bg-white border border-solid cursor-pointer hover:border-black"
+                            (mousedown)="filter.toggle($event)"
+                            [class.border-[#DEE2E6]]="!filter.overlayVisible"
+                            [class.border-black]="filter.overlayVisible"
+                        >
+                            <div class="grow">
+                                <span *ngIf="selectedYield[0] === 0 && selectedYield[1] === 100">Top Yield %</span>
+                                <span *ngIf="selectedYield[0] !== 0 || selectedYield[1] !== 100" class="inline-flex items-center gap-1 rounded-md bg-[#EFF6FF] text-[#1D4ED8] px-3 py-1">
+                                    {{ selectedYield[0] }}%-{{ selectedYield[1] }}%
+                                </span>
+                            </div>
+                            <i class="pi pi-chevron-down ml-8"></i>
+                            <p-overlayPanel 
+                                #filter 
+                                [style]="{width: '360px'}" 
+                                styleClass="pt-8" 
+                            >
+                                <div class="px-8">
+                                    <p-slider
+                                        #slider
+                                        [(ngModel)]="selectedYield"
+                                        [range]="true"
+                                        [min]="0"
+                                        [max]="100"
+                                        (ngModelChange)="onYieldRangeChange(selectedYield)"
+                                    ></p-slider>
+                                    <div class="relative -mx-4 pt-4 font-thin" #inputContainer>
+                                        <input
+                                            title="Min Range"
+                                            #minRange
+                                            type="number"
+                                            class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
+                                            [(ngModel)]="selectedYield[0]"
+                                            (ngModelChange)="onYieldRangeChange(selectedYield)"
+                                            [min]="0"
+                                            [max]="100"
+                                        />
+                                        <input
+                                            #maxRange
+                                            title="Max Range"
+                                            type="number"
+                                            class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
+                                            [(ngModel)]="selectedYield[1]"
+                                            (ngModelChange)="onYieldRangeChange(selectedYield)"
+                                            [min]="0"
+                                            [max]="100"
+                                        />
+                                    </div>
+                                </div>
+                                <hr class="mt-12"/>
+                                <div class="flex justify-between p-4">
+                                    <button class="px-4 py-2 rounded-md border border-solid border-[#224063] text-[#224063] font-semibold" (click)="
+                                        selectedYield = [0, 100];
+                                        onYieldRangeChange(selectedYield);
+                                        filter.hide();
+                                    ">Clear</button>
+                                    <button class="px-4 py-2 rounded-md border border-solid bg-[#224063] text-white font-semibold" (click)="
+                                        applyFilters();
+                                        filter.hide();
+                                    ">Apply</button>
+                                </div>
+                            </p-overlayPanel>
+                        </div>
 
                         <p-multiSelect
+                            class="w-1/5"
                             styleClass="w-full"
                             [display]="filters['reactionCondition'].selected.length > 1 ? 'comma' : 'chip'"
                             [maxSelectedLabels]="1"
                             [selectedItemsLabel]="'{0} items'"
                             [(ngModel)]="filters['reactionCondition'].selected"
                             [options]="filters['reactionCondition'].options"
-                            placeholder="Reaction Condition"
+                            (onChange)="applyFilters()"
+                            placeholder="Top Reaction Conditions"
                             display="chip"
                         >
                         </p-multiSelect>

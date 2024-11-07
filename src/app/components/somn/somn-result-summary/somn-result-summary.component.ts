@@ -1,9 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
 import { MenuItem, Message, FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, shareReplay, tap, map, skipUntil, filter, combineLatest, of, BehaviorSubject, Subscription, forkJoin, take, Observable, combineLatestWith } from 'rxjs';
+import { timer, switchMap, takeWhile, shareReplay, tap, map, skipUntil, filter, combineLatest, of, BehaviorSubject, Subscription, forkJoin, take, Observable, combineLatestWith, min, max } from 'rxjs';
 import { JobStatus, CheckReactionSiteRequest, CheckReactionSiteResponse, JobType } from '~/app/api/mmli-backend/v1';
 import { Product, SomnResponse, SomnService } from '~/app/services/somn.service';
 import { TutorialService } from '~/app/services/tutorial.service';
@@ -12,11 +12,13 @@ import { JobResult } from '~/app/models/job-result';
 import catalystJson from '../about-somn/catalyst_map.json';
 import baseJson from '../about-somn/base_map.json';
 import solventJson from '../about-somn/solvent_map.json';
+import { Slider } from 'primeng/slider';
 
 interface FilterConfig {
   field: string;
   selected: string[];
   options: string[];
+  matchMode: string;
 }
 
 @Component({
@@ -26,6 +28,8 @@ interface FilterConfig {
 })
 export class SomnResultSummaryComponent extends JobResult {
   @ViewChild("resultsTable") resultsTable: Table;
+  @ViewChild('slider') slider: Slider;
+  @ViewChild('inputContainer') rangeInputContainer: ElementRef;
 
   override jobId: string = this.route.snapshot.paramMap.get("id") || "";
   override jobType: JobType = JobType.Somn;
@@ -40,38 +44,41 @@ export class SomnResultSummaryComponent extends JobResult {
   amineOptions = [];
   reactionConditionOptions = [];
 
-  showFilter = false;
-  numFilters = 0;
+  showFilter = true;
   selectedTableRows: any[] = [];
-  yieldRange: [number, number] = [0, 100];
+  selectedYield: [number, number] = [0, 100];
   numReactantPairSubmitted = 0;
 
   filters: Record<string, FilterConfig> = {
     reactantPair: {
       field: 'reactantPair',
       selected: [],
-      options: []
+      options: [],
+      matchMode: 'in',
     },
     arylHalide: {
       field: 'arylHalide.name',
       selected: [],
-      options: []
+      options: [],
+      matchMode: 'in',
     },
     amine: {
       field: 'amine.name',
       selected: [],
-      options: []
+      options: [],
+      matchMode: 'in',
     },
     reactionCondition: {
-      field: 'reactionCondition',
+      field: 'topYieldConditions',
       selected: [],
-      options: []
+      options: [],
+      matchMode: 'subset',
     },
   };
 
   applyFilters() {
     Object.values(this.filters).forEach(filter => {
-      this.resultsTable.filter(filter.selected, filter.field, 'in');
+      this.resultsTable.filter(filter.selected, filter.field, filter.matchMode);
     });
   }
 
@@ -79,6 +86,7 @@ export class SomnResultSummaryComponent extends JobResult {
     Object.values(this.filters).forEach(filter => {
       filter.selected = [];
     });
+    this.selectedYield = [0, 100];
     this.resultsTable.reset();
   }
 
@@ -120,17 +128,8 @@ export class SomnResultSummaryComponent extends JobResult {
         forkJoin(nucInfo$)
       ])
     }),
-    tap(([resp, el, nuc]) => {
-      this.filters['arylHalide'].options = Array.from(new Set(resp.flatMap((d: any) => d[0].el_name)));
-      this.filters['amine'].options = Array.from(new Set(resp.flatMap((d: any) => d[0].nuc_name)));
-      this.filters['reactionCondition'].options = resp[0].map((d: any) => 
-        `${d.catalyst[0]} | ${d.base} | ${d.solvent}`);
-      this.filters['reactantPair'].options = Array.from(new Set(
-        this.jobInfo.map((d: any) => d.reactant_pair_name)
-      ));
-    }),
     map(([ resp, el, nuc ]) => {
-      const retVal = [];
+      const retVal: any[] = [];
       for (let i = 0; i < resp.length; i++) {
         // calculate top yield conditions
         const topYield = Math.max(...resp[i].map((d: any) => Math.floor(d.yield)));
@@ -213,7 +212,7 @@ export class SomnResultSummaryComponent extends JobResult {
             value: topYield,
             count: topYieldConditions.length,
           },
-          topYieldConditions: topYieldConditions,
+          topYieldConditions: topYieldConditions.map((d: any) => `${d.catalyst[0]} | ${d.base} | ${d.solvent}`),
           topYieldConditionsSummary: {
             singleSummary,
             multiSummary,
@@ -221,6 +220,15 @@ export class SomnResultSummaryComponent extends JobResult {
         });
       }
       return retVal;
+    }),
+    tap((v) => {
+      this.filters['arylHalide'].options = Array.from(new Set(v.flatMap((d: any) => d.arylHalide.name)));
+      this.filters['amine'].options = Array.from(new Set(v.flatMap((d: any) => d.amine.name)));
+      this.filters['reactionCondition'].options = Array.from(
+        new Set(v.flatMap((d: any) => d.topYieldConditions)));
+      this.filters['reactantPair'].options = Array.from(new Set(
+        this.jobInfo.map((d: any) => d.reactant_pair_name)
+      ));
     }),
   );
 
@@ -280,7 +288,13 @@ export class SomnResultSummaryComponent extends JobResult {
     this.filterService.register(
       "range",
       (value: number, filter: [number, number]) => {
-        return value * 100 >= filter[0] && value * 100 <= filter[1];
+        return value >= filter[0] && value <= filter[1];
+      },
+    );
+    this.filterService.register(
+      "subset",
+      (value: any[], filter: any[]) => {
+        return filter.every((f) => value.includes(f));
       },
     );
   }
@@ -308,14 +322,35 @@ export class SomnResultSummaryComponent extends JobResult {
   }
 
   onYieldRangeChange(value: [number, number]) {
-    const v = this.yieldRange;
-    if (v[0] === value[0] && v[1] === value[1]) {
+    if (this.resultsTable) {
+      this.resultsTable.filter(value, "topYield.value", "range");
+    }
+
+    this.updateRangeDisplay(value);
+  }
+
+  updateRangeDisplay(value: [number, number]) {
+    if (!this.slider) {
       return;
     }
 
-    this.yieldRange = value;
-    if (this.resultsTable) {
-      this.resultsTable.filter(value, "yield", "range");
-    }
+    setTimeout(() => {
+      const [leftHandler, rightHandler] =
+        this.slider.el.nativeElement.querySelectorAll(".p-slider-handle");
+
+      if (this.rangeInputContainer) {
+        const { x: leftX } = leftHandler.getBoundingClientRect();
+        const { x: rightX } = rightHandler.getBoundingClientRect();
+        const { x: containerX } =
+          this.rangeInputContainer.nativeElement.getBoundingClientRect();
+        const [minRange, maxRange]: HTMLInputElement[] = Array.from(
+          this.rangeInputContainer.nativeElement.querySelectorAll("input"),
+        );
+        minRange.style.left = `${leftX - containerX - 12}px`;
+        maxRange.style.left = `${rightX - containerX - 12}px`;
+        minRange.value = `${value[0]}`;
+        maxRange.value = `${value[1]}`;
+      }
+    });
   }
 }
