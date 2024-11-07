@@ -4,7 +4,7 @@ import { BodyCreateJobJobTypeJobsPost, CheckReactionSiteRequest, FilesService, J
 
 import sampleRequest from '../../assets/example_request.json';
 
-import { Observable, map } from "rxjs";
+import { Observable, map, of, tap } from "rxjs";
 import { CheckReactionSiteResponse } from "../api/mmli-backend/v1/model/checkReactionSiteResponse";
 import * as d3 from "d3";
 
@@ -231,6 +231,8 @@ export class SomnRequest {
   providedIn: "root",
 })
 export class SomnService {
+  private resultCache = new Map<string, any>();
+
   constructor(
     private jobsService: JobsService,
     private filesService: FilesService,
@@ -254,26 +256,24 @@ export class SomnService {
     });
   }
 
-  getResultStatus(jobID: string): Observable<Job>{
-    return this.jobsService.listJobsByTypeAndJobIdJobTypeJobsJobIdGet(JobType.Somn, jobID)
+  getResultStatus(jobType: JobType, jobID: string): Observable<Job>{
+    return this.jobsService.listJobsByTypeAndJobIdJobTypeJobsJobIdGet(jobType, jobID)
       .pipe(map((jobs) => jobs[0]));
   }
 
-  getResult(jobID: string): Observable<Product[]>{
-    return this.filesService.getResultsBucketNameResultsJobIdGet(JobType.Somn, jobID)
-      .pipe(
-        map((data: SomnResponse) => data.map((d, i) => ({
-          ...d,
-          iid: i,
-          catalyst: catalystJson[d.catalyst],
-          solvent: solventJson[d.solvent],
-          base: baseJson[d.base],
-        })
-      )));
+  getResult(jobType: JobType, jobID: string): Observable<any> {
+    const cacheKey = `${jobType}-${jobID}`;
+    if (this.resultCache.has(cacheKey)) {
+      return of(this.resultCache.get(cacheKey));
+    }
+
+    return this.filesService.getResultsBucketNameResultsJobIdGet(jobType, jobID).pipe(
+      tap(result => this.resultCache.set(cacheKey, result))
+    );
   }
 
-  getError(jobID: string): Observable<string>{
-    return this.filesService.getErrorsBucketNameErrorsJobIdGet(JobType.Somn, jobID);
+  getError(jobType: JobType, jobID: string): Observable<string>{
+    return this.filesService.getErrorsBucketNameErrorsJobIdGet(jobType, jobID);
   }
 
   updateSubscriberEmail(jobId: string, email: string) {
