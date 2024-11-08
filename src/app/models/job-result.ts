@@ -16,7 +16,10 @@ export class JobResult {
             this.jobId,
         )),
         tap(() => this.resultLoaded$.value ? null : this.isLoading$.next(true)),
-        tap((data) => { this.jobInfo = JSON.parse(data.job_info || '[]') }),
+        tap((data) => {
+            const info = JSON.parse(data.job_info || '[]')
+            this.jobInfo = info instanceof Array ? info : [info]; // backward compatibility
+        }),
         takeWhile((data) =>
             data.phase === JobStatus.Processing
             || data.phase === JobStatus.Queued

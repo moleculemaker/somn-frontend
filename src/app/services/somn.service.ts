@@ -268,7 +268,8 @@ export class SomnService {
     }
 
     return this.filesService.getResultsBucketNameResultsJobIdGet(jobType, jobID).pipe(
-      tap(result => this.resultCache.set(cacheKey, result))
+      tap(result => this.resultCache.set(cacheKey, result)),
+      map((result) => result instanceof Array ? result : [result]) // cast to array for backward compatibility
     );
   }
 
