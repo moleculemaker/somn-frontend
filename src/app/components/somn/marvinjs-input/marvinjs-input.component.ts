@@ -226,7 +226,7 @@ export class MarvinjsInputComponent implements ControlValueAccessor {
         : { noReactionSitesFound: true }
       ),
       catchError(({ error }: HttpErrorResponse & { error: CheckReactionSiteResponseInvalid }) => {
-        error.type = CheckReactionSiteResponseInvalid.TypeEnum._3dGen;
+        // error.type = CheckReactionSiteResponseInvalid.TypeEnum._3dGen;
         return of({ [error.type]: true });
       }),
     );
