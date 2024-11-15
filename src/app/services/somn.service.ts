@@ -258,7 +258,7 @@ export class SomnService {
 
   getResultStatus(jobType: JobType, jobID: string): Observable<Job>{
     return this.jobsService.listJobsByTypeAndJobIdJobTypeJobsJobIdGet(jobType, jobID)
-      .pipe(map((jobs) => jobs[0]));
+      .pipe(map((jobs) => jobs[0]))
   }
 
   getResult(jobType: JobType, jobID: string): Observable<any> {
@@ -269,7 +269,7 @@ export class SomnService {
 
     return this.filesService.getResultsBucketNameResultsJobIdGet(jobType, jobID).pipe(
       tap(result => this.resultCache.set(cacheKey, result)),
-      map((result) => result instanceof Array ? result : [result]) // cast to array for backward compatibility
+      map((result) => result instanceof Array ? result : [result]), // cast to array for backward compatibility
     );
   }
 
