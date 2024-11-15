@@ -1,5 +1,5 @@
 {
-  "hostname": "https://mmli.fastapi.staging.mmli1.ncsa.illinois.edu",
+  "hostname": "http://localhost:8080",
   "basePath": "",
 
   "signInUrl": "https://mmli1.ncsa.illinois.edu/oauth2/start?rd=http%3A%2F%2Flocalhost:4200%2Fconfiguration",

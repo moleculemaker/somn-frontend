@@ -2,8 +2,8 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 import { TutorialService } from "~/app/services/tutorial.service";
-import { ReactionSiteInput } from "../marvinjs-input/marvinjs-input.component";
 import tutorialJson from './tutorial.json'
+import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
 
 @Component({
   selector: "app-somn",
@@ -14,8 +14,14 @@ import tutorialJson from './tutorial.json'
   },
 })
 export class SomnComponent {
+
+  readonly CheckReactionSiteRequest = CheckReactionSiteRequest;
+
   request = this.somnService.newRequest();
   displayTutorial: boolean = true;
+  displayHeavyAtomsDialog: boolean = false;
+  arylHalideHasHeavyAtoms: boolean = false;
+  amineHasHeavyAtoms: boolean = false;
 
   constructor(
     private somnService: SomnService,
@@ -60,14 +66,6 @@ export class SomnComponent {
           side: "top",
           align: "center",
           popoverClass: '!w-[520px] !max-w-[520px]',
-          onPopoverRender: (popover, options) => {
-            if (options.config.onPopoverRender) {
-              options.config.onPopoverRender(popover, options);
-            }
-            
-            const descriptionDOM = popover.description;
-            descriptionDOM.innerHTML = tutorialJson['input-reactants'];
-          }
         },
       },
       {
@@ -84,6 +82,15 @@ export class SomnComponent {
             descriptionDOM.innerHTML = tutorialJson['reaction-sites'];
           }
         }
+      },
+      {
+        element: '#container-manage-reactant-pairs',
+        popover: {
+          title: "Manage Reactant Pairs",
+          description: 'Add a new reactant pair or clear all input reactant pairs.',
+          side: "bottom",
+          align: "center",
+        },
       },
       {
         element: '#input-subscription-email',
@@ -104,6 +111,14 @@ export class SomnComponent {
         }
       }
     ]);
+
+    this.request.form.statusChanges.subscribe(() => {
+      console.log(
+        'form: ', this.request.form.value,
+        '\nstatus: ', this.request.form.status,
+        '\nerrors: ', this.request.form.errors
+      );
+    });
   }
 
   useExample() {
@@ -115,15 +130,19 @@ export class SomnComponent {
       return;
     }
 
+    if (this.arylHalideHasHeavyAtoms || this.amineHasHeavyAtoms) {
+      this.displayHeavyAtomsDialog = true;
+      return;
+    }
+
+    this.submitJob();
+  }
+
+  submitJob() {
     this.somnService.createJobAndRunSomn(
       this.request.toRequestBody()
     ).subscribe((response) => {
       this.router.navigate(['somn', 'result', response.job_id]);
     })
-  }
-
-  onReactionSiteChange(controlName: 'amine' | 'arylHalide', value: ReactionSiteInput) {
-    this.request.form.controls[controlName].setValue(value);
-    this.request.form.updateValueAndValidity();
   }
 }

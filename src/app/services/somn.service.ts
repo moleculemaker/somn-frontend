@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
-import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
-import { BodyCreateJobJobTypeJobsPost, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
+import { BodyCreateJobJobTypeJobsPost, CheckReactionSiteRequest, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
 
 import sampleRequest from '../../assets/example_request.json';
 
-import { Observable, map } from "rxjs";
+import { Observable, map, of, tap } from "rxjs";
 import { CheckReactionSiteResponse } from "../api/mmli-backend/v1/model/checkReactionSiteResponse";
 import * as d3 from "d3";
 
@@ -33,59 +33,197 @@ export type SomnResponse = Array<Omit<Product, "catalyst" | "solvent" | "base">
 
 export class SomnRequest {
   private reactionSiteValidator(control: AbstractControl) {
-    if (!control.value.smiles || !control.value.reactionSite) {
-      return {required: true};
+    if (!control.value.input || !control.value.reactionSite) {
+      return { required: true };
     }
     return null;
   }
 
   private nameValidator(control: AbstractControl) {
     if (!control.value || !control.value.trim().length) {
-      return {required: true};
+      return { required: true };
     }
     return null;
   }
 
+  private duplicationValidator(control: AbstractControl) {
+    const c = control as FormArray;
+    const reactantPairs = c.getRawValue();
+
+    const checkDifferentNameForSameInput = (controlName: string) => {
+      const inputMap = new Map<string, AbstractControl>();
+
+      reactantPairs.forEach((rp: any, index: number) => {
+        const input = rp[controlName].input;
+        if (input && !inputMap.has(input)) {
+          inputMap.set(input, c.at(index).get(`${controlName}Name`)!);
+        }
+      });
+      
+      reactantPairs.forEach((rp: any, index: number) => {
+        const nameControl = c.at(index).get(`${controlName}Name`)!;
+        const originalNameControl = inputMap.get(rp[controlName].input);
+        if (originalNameControl && nameControl !== originalNameControl) {
+          nameControl?.setValue(originalNameControl?.value, { emitEvent: false, onlySelf: true });
+          nameControl?.disable({ emitEvent: false, onlySelf: true });
+        }
+
+        else {
+          nameControl?.enable({ emitEvent: false, onlySelf: true });
+        }
+      });
+    }
+
+    const checkSameNameForDifferentInputs = (controlName: string) => {
+      const nameMap = new Map<string, {
+        value: string;
+        count: number;
+      }>();
+
+      reactantPairs.forEach((rp: any) => {
+        const name = rp[`${controlName}Name`]?.trim().replace(/-\d+$/g, "");
+        const input = rp[controlName]?.input;
+        
+        if (!nameMap.has(name)) {
+          nameMap.set(name, { value: input, count: 0 });
+        }
+      });
+
+      reactantPairs.forEach((rp: any, index: number) => {
+        const nameControl = c.at(index).get(`${controlName}Name`)!;
+        const name = rp[`${controlName}Name`]?.trim().replace(/-\d+$/g, "");
+        const input = rp[controlName]?.input;
+        
+        if (input && (nameMap.has(name) && nameMap.get(name)!.value !== input)) {
+          nameControl.setValue(`${name}-${++nameMap.get(name)!.count}`, { emitEvent: false, onlySelf: true });
+          nameControl.enable({ emitEvent: false, onlySelf: true });
+        }
+      });
+    }
+
+    const checkSameReactantPairName = () => {
+      const nameMap = new Map<string, number>();
+
+      reactantPairs.forEach((rp: any) => {
+        const name = rp.reactantPairName?.trim().replace(/-\d+$/g, "");
+        
+        if (!nameMap.has(name)) {
+          nameMap.set(name, 0);
+        }
+      });
+
+      reactantPairs.forEach((rp: any, index: number) => {
+        const nameControl = c.at(index).get(`reactantPairName`)!;
+        const name = rp.reactantPairName?.trim().replace(/-\d+$/g, "");
+        
+        if (rp.reactantPairName && nameMap.has(name)) {
+          if (nameMap.get(name)! > 0) {
+            nameControl.setValue(`${name}-${nameMap.get(name)!}`, { emitEvent: false, onlySelf: true });
+          }
+          nameMap.set(name, nameMap.get(name)! + 1);
+        }
+      });
+    }
+
+    checkDifferentNameForSameInput("arylHalide");
+    checkDifferentNameForSameInput("amine");
+    checkSameNameForDifferentInputs("arylHalide");
+    checkSameNameForDifferentInputs("amine");
+    checkSameReactantPairName();
+    return null;
+  }
+
   form = new FormGroup({
-    reactantPairName: new FormControl("", [Validators.required, this.nameValidator]),
-
-    arylHalideName: new FormControl("", [Validators.required, this.nameValidator]),
-    arylHalide: new FormControl<ReactionSiteInput>({
-      smiles: "", 
-      reactionSite: null
-    }, [this.reactionSiteValidator]),
-
-    amineName: new FormControl("", [Validators.required, this.nameValidator]),
-    amine: new FormControl<ReactionSiteInput>({
-      smiles: "", 
-      reactionSite: null
-    }, [this.reactionSiteValidator]),
-    
+    reactantPairs: new FormArray([
+      this.createReactantPairForm()
+    ], [this.duplicationValidator]),
 
     agreeToSubscription: new FormControl(false),
     subscriberEmail: new FormControl("", [Validators.email]),
   });
 
+  createReactantPairForm() {
+    return new FormGroup({
+      reactantPairName: new FormControl("", [Validators.required, this.nameValidator]),
+
+      arylHalideName: new FormControl("", [Validators.required, this.nameValidator]),
+      arylHalide: new FormControl<ReactionSiteInput>({
+        input: "",
+        input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+        reactionSite: null
+      }, [this.reactionSiteValidator]),
+
+      amineName: new FormControl("", [Validators.required, this.nameValidator]),
+      amine: new FormControl<ReactionSiteInput>({
+        input: "",
+        input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+        reactionSite: null
+      }, [this.reactionSiteValidator]),
+
+      status: new FormControl<"view" | "edit">("edit")
+    });
+  }
+
   useExample() {
-    this.form.setValue(sampleRequest);
+    this.form.setValue(sampleRequest as any);
   }
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
-    const job_info = {
-      reactant_pair_name: (this.form.controls["reactantPairName"].value || "").trim().replace(/ /g, "_"),
-      
-      nuc_name: (this.form.controls["amineName"].value || "").trim().replace(/ /g, "_"),
-      nuc: this.form.controls["amine"].value?.smiles || "",
-      nuc_idx: this.form.controls["amine"].value?.reactionSite || "-",
+    const reactantPairs = this.form.controls["reactantPairs"].getRawValue();
+    const job_info = reactantPairs.map((rp) => ({
+      reactant_pair_name: rp.reactantPairName?.trim().replace(/ /g, "_") || "-",
 
-      el_name: (this.form.controls["arylHalideName"].value || "").trim().replace(/ /g, "_"),
-      el: this.form.controls["arylHalide"].value?.smiles || "",
-      el_idx: this.form.controls["arylHalide"].value?.reactionSite || "-",
-    }
+      nuc_name: rp.amineName?.trim().replace(/ /g, "_") || "-",
+      nuc: rp.amine?.input || "",
+      nuc_input_type: rp.amine?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
+      nuc_idx: rp.amine?.reactionSite || "-",
+
+      el_name: rp.arylHalideName?.trim().replace(/ /g, "_") || "-",
+      el: rp.arylHalide?.input || "",
+      el_input_type: rp.arylHalide?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
+      el_idx: rp.arylHalide?.reactionSite || "-",
+    }));
     return {
       email: this.form.controls["subscriberEmail"].value || "",
       job_info: JSON.stringify(job_info),
     };
+  }
+
+  addReactantPair() {
+    this.form.controls["reactantPairs"].push(this.createReactantPairForm());
+  }
+
+  removeReactantPair(index: number) {
+    this.form.controls["reactantPairs"].removeAt(index);
+    if (!this.form.controls["reactantPairs"].length) {
+      this.addReactantPair();
+    }
+  }
+
+  duplicateReactantPair(index: number) {
+    const rp = this.form.controls["reactantPairs"].controls[index];
+    const newRp = this.createReactantPairForm();
+    newRp.patchValue(rp.getRawValue());
+
+    newRp.controls["amineName"].disable({ emitEvent: false });
+    newRp.controls["arylHalideName"].disable({ emitEvent: false });
+    newRp.updateValueAndValidity({ emitEvent: false });
+
+    this.form.controls["reactantPairs"].insert(index + 1, newRp);
+  }
+
+  private clearAllInputHelper(form: FormGroup | FormArray) {
+    Object.entries(form.controls).forEach(([key, control]) => {
+      if (control instanceof FormGroup || control instanceof FormArray) {
+        this.clearAllInputHelper(control);
+      } else {
+        control.reset();
+      }
+    });
+  }
+
+  clearAll() {
+    this.clearAllInputHelper(this.form.controls["reactantPairs"]);
   }
 }
 
@@ -93,6 +231,8 @@ export class SomnRequest {
   providedIn: "root",
 })
 export class SomnService {
+  private resultCache = new Map<string, any>();
+
   constructor(
     private jobsService: JobsService,
     private filesService: FilesService,
@@ -103,30 +243,38 @@ export class SomnService {
     return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, requestBody);
   }
 
-  checkReactionSites(smiles: string, type: string, hightlight_idxes?: number[]): Observable<CheckReactionSiteResponse> {
-    return this.somnService.checkReactionSitesSomnAllReactionSitesGet(smiles, type, hightlight_idxes);
+  checkReactionSites(
+    input: string, 
+    inputType: CheckReactionSiteRequest.InputTypeEnum, 
+    role: CheckReactionSiteRequest.RoleEnum, 
+    hightlight_idxes?: number[]
+  ): Observable<CheckReactionSiteResponse> {
+    return this.somnService.checkReactionSitesSomnAllReactionSitesPost({
+      input: input,
+      input_type: inputType,
+      role: role,
+    });
   }
 
-  getResultStatus(jobID: string): Observable<Job>{
-    return this.jobsService.listJobsByTypeAndJobIdJobTypeJobsJobIdGet(JobType.Somn, jobID)
-      .pipe(map((jobs) => jobs[0]));
+  getResultStatus(jobType: JobType, jobID: string): Observable<Job>{
+    return this.jobsService.listJobsByTypeAndJobIdJobTypeJobsJobIdGet(jobType, jobID)
+      .pipe(map((jobs) => jobs[0]))
   }
 
-  getResult(jobID: string): Observable<Product[]>{
-    return this.filesService.getResultsBucketNameResultsJobIdGet(JobType.Somn, jobID)
-      .pipe(
-        map((data: SomnResponse) => data.map((d, i) => ({
-          ...d,
-          iid: i,
-          catalyst: catalystJson[d.catalyst],
-          solvent: solventJson[d.solvent],
-          base: baseJson[d.base],
-        })
-      )));
+  getResult(jobType: JobType, jobID: string): Observable<any> {
+    const cacheKey = `${jobType}-${jobID}`;
+    if (this.resultCache.has(cacheKey)) {
+      return of(this.resultCache.get(cacheKey));
+    }
+
+    return this.filesService.getResultsBucketNameResultsJobIdGet(jobType, jobID).pipe(
+      tap(result => this.resultCache.set(cacheKey, result)),
+      map((result) => result instanceof Array ? result : [result]), // cast to array for backward compatibility
+    );
   }
 
-  getError(jobID: string): Observable<string>{
-    return this.filesService.getErrorsBucketNameErrorsJobIdGet(JobType.Somn, jobID);
+  getError(jobType: JobType, jobID: string): Observable<string>{
+    return this.filesService.getErrorsBucketNameErrorsJobIdGet(jobType, jobID);
   }
 
   updateSubscriberEmail(jobId: string, email: string) {

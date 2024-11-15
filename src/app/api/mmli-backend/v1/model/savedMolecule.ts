@@ -11,11 +11,11 @@
  */
 
 
-export interface CheckReactionSiteResponse { 
-    reaction_site_idxes: Array<number>;
-    smiles: string;
-    has_chiral: boolean;
-    num_heavy_atoms: number;
-    svg: string;
+export interface SavedMolecule { 
+    id?: number;
+    email?: string;
+    job_id?: string;
+    molecule_id?: string;
+    time_created?: number;
 }
 
