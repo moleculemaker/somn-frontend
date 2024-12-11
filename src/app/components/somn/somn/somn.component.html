@@ -68,7 +68,8 @@
                                                     (click)="
                                                         request.form.controls['arylHalideName'].setValue('Bromobenzene');
                                                         request.form.controls['arylHalide'].setValue({
-                                                            smiles: 'C1=CC=C(C=C1)Br',
+                                                            input: 'C1=CC=C(C=C1)Br',
+                                                            input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
                                                             reactionSite: '-'
                                                         });
                                                     "
@@ -90,6 +91,7 @@
                                             placeholder="Enter aryl halide SMILES..."
                                             formControlName="arylHalide"
                                             type="el"
+                                            (heavyAtomsWarning)="arylHalideHasHeavyAtoms = $event"
                                         >
                                         </app-marvinjs-input>
                                     </div>
@@ -107,7 +109,8 @@
                                                     (click)="
                                                         request.form.controls['amineName'].setValue('Aniline');
                                                         request.form.controls['amine'].setValue({
-                                                            smiles: 'C1=CC=C(C=C1)N',
+                                                            input: 'C1=CC=C(C=C1)N',
+                                                            input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
                                                             reactionSite: '-'
                                                         });
                                                     "
@@ -129,6 +132,7 @@
                                             placeholder="Enter amine SMILES..."
                                             type="nuc"
                                             formControlName="amine"
+                                            (heavyAtomsWarning)="amineHasHeavyAtoms = $event"
                                         >
                                         </app-marvinjs-input>
                                     </div>
@@ -145,7 +149,6 @@
             id="input-subscription-email"
             class="sticky bottom-0 flex justify-between rounded-t-md bg-[#F3F5FB] px-10 pt-8"
         >
-            <!-- TODO: validate parent form using input from marvin-js-input -->
             <div class="flex flex-col">
                 <div class="flex items-end justify-center mb-2">
                     <span class="pr-12 mb-1">
@@ -209,7 +212,7 @@
 >
     <div class="flex flex-col gap-6 -mb-2">
         <p class="leading-xl">
-            It’s time to set up your job! Would you like us to show you around the request configuration page? You can always access this tour later.
+            It's time to set up your job! Would you like us to show you around the request configuration page? You can always access this tour later.
         </p>
         <div class="flex items-center gap-2">
             <p-checkbox [(ngModel)]="tutorialService.showTutorial" [binary]="true"></p-checkbox>
@@ -224,6 +227,42 @@
             <p-button
                 (onClick)="displayTutorial = false; tutorialService.driver.drive()"
                 label="Start Tour"
+                styleClass="bg-[#224063]"
+            ></p-button>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog
+    #heavyAtomsDialog
+    header="Whoah, that's a lot of atoms!"
+    [(visible)]="displayHeavyAtomsDialog" 
+    [modal]="true" 
+    [style]="{ width: '350px' }" 
+    [draggable]="false" 
+    [resizable]="false"
+>
+    <div class="flex flex-col gap-6 -mb-2">
+        <p class="leading-xl">
+            It looks like you've entered {{ 
+                arylHalideHasHeavyAtoms && amineHasHeavyAtoms 
+                ? 'both an aryl halide and an amine' 
+                : (arylHalideHasHeavyAtoms ? 'an aryl halide' : 'an amine') 
+            }} with over 150 heavy atoms, which may not be an appropriate input for Somn. 
+            <br/>
+            <br/>
+            You may still use these reactants, but the job may time out or you might get some funky results. 
+            If this happens, truncating the molecule may allow you to pursue this reactive motif.
+        </p>
+        <div class="flex justify-between">
+            <p-button 
+                (onClick)="displayHeavyAtomsDialog = false"
+                styleClass="p-button-outlined" 
+                label="Edit Input">
+            </p-button>
+            <p-button
+                (onClick)="displayHeavyAtomsDialog = false; submitJob()"
+                label="Run Job Anyway"
                 styleClass="bg-[#224063]"
             ></p-button>
         </div>

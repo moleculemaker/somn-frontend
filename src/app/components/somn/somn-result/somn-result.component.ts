@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import { FilterService, MenuItem, Message } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
-import { JobStatus } from '~/app/api/mmli-backend/v1';
+import { CheckReactionSiteRequest, JobStatus } from '~/app/api/mmli-backend/v1';
 import { Product, SomnService } from '~/app/services/somn.service';
 
 import { TutorialService } from '~/app/services/tutorial.service';
@@ -87,8 +87,16 @@ export class SomnResultComponent {
       const jobInfo = JSON.parse(job.job_info || '');
       return combineLatest([
         this.somnService.getResult(this.jobId),
-        this.somnService.checkReactionSites(jobInfo.el, 'el'),
-        this.somnService.checkReactionSites(jobInfo.nuc, 'nuc'),
+        this.somnService.checkReactionSites(
+          jobInfo.el, 
+          jobInfo.el_input_type, 
+          CheckReactionSiteRequest.RoleEnum.El
+        ),
+        this.somnService.checkReactionSites(
+          jobInfo.nuc, 
+          jobInfo.nuc_input_type, 
+          CheckReactionSiteRequest.RoleEnum.Nuc
+        ),
         of(jobInfo),
       ]).pipe(
         tap(([data, el, nuc, jobInfo]) => { this.jobInfo = jobInfo }),
@@ -130,14 +138,14 @@ export class SomnResultComponent {
             reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
             arylHalide: {
               name: jobInfo.el_name || 'aryl halide',
-              smiles: jobInfo.el || 'aryl halide smiles',
+              smiles: el.smiles || 'aryl halide smiles',
               reactionSitesOptions: elReactionSites,
               reactionSite: elSelectedReactionSite,
               structure: el.svg,
             },
             amine: {
               name: jobInfo.nuc_name || 'amine',
-              smiles: jobInfo.nuc || 'amine smiles',
+              smiles: nuc.smiles || 'amine smiles',
               reactionSitesOptions: nucReactionSites,
               reactionSite: nucSelectedReactionSite,
               structure: nuc.svg,

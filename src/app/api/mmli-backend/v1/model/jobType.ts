@@ -14,9 +14,10 @@
 /**
  * An enumeration.
  */
-export type JobType = 'clean' | 'chemscraper' | 'molli' | 'novostoic-optstoic' | 'novostoic-pathways' | 'novostoic-enzrank' | 'novostoic-dgpredictor' | 'somn' | 'defaults';
+export type JobType = 'aceretro' | 'clean' | 'chemscraper' | 'molli' | 'novostoic-optstoic' | 'novostoic-pathways' | 'novostoic-enzrank' | 'novostoic-dgpredictor' | 'somn' | 'defaults';
 
 export const JobType = {
+    Aceretro: 'aceretro' as JobType,
     Clean: 'clean' as JobType,
     Chemscraper: 'chemscraper' as JobType,
     Molli: 'molli' as JobType,

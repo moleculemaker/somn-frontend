@@ -4,6 +4,7 @@ import { SomnRequest, SomnService } from "~/app/services/somn.service";
 import { TutorialService } from "~/app/services/tutorial.service";
 import { ReactionSiteInput } from "../marvinjs-input/marvinjs-input.component";
 import tutorialJson from './tutorial.json'
+import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
 
 @Component({
   selector: "app-somn",
@@ -14,8 +15,14 @@ import tutorialJson from './tutorial.json'
   },
 })
 export class SomnComponent {
+
+  readonly CheckReactionSiteRequest = CheckReactionSiteRequest;
+
   request = this.somnService.newRequest();
   displayTutorial: boolean = true;
+  displayHeavyAtomsDialog: boolean = false;
+  arylHalideHasHeavyAtoms: boolean = false;
+  amineHasHeavyAtoms: boolean = false;
 
   constructor(
     private somnService: SomnService,
@@ -115,6 +122,15 @@ export class SomnComponent {
       return;
     }
 
+    if (this.arylHalideHasHeavyAtoms || this.amineHasHeavyAtoms) {
+      this.displayHeavyAtomsDialog = true;
+      return;
+    }
+
+    this.submitJob();
+  }
+
+  submitJob() {
     this.somnService.createJobAndRunSomn(
       this.request.toRequestBody()
     ).subscribe((response) => {
