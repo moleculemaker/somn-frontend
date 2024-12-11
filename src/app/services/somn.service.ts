@@ -74,14 +74,25 @@ export class SomnRequest {
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
     const job_info = {
-      reactant_pair_name: (this.form.controls["reactantPairName"].value || "").trim().replace(/ /g, "_"),
+      reactant_pair_name: (this.form.controls["reactantPairName"].value || "")
+        .trim()
+        .replace(/ /g, "_")
+        .replace(/-/g, "_"),
       
-      nuc_name: (this.form.controls["amineName"].value || "").trim().replace(/ /g, "_"),
+      nuc_name: (this.form.controls["amineName"].value || "")
+        .trim()
+        .replace(/ /g, "_")
+        .replace(/-/g, "_"),
+
       nuc: this.form.controls["amine"].value?.input || "",
       nuc_input_type: this.form.controls["amine"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
       nuc_idx: this.form.controls["amine"].value?.reactionSite || "-",
 
-      el_name: (this.form.controls["arylHalideName"].value || "").trim().replace(/ /g, "_"),
+      el_name: (this.form.controls["arylHalideName"].value || "")
+        .trim()
+        .replace(/ /g, "_")
+        .replace(/-/g, "_"),
+
       el: this.form.controls["arylHalide"].value?.input || "",
       el_input_type: this.form.controls["arylHalide"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
       el_idx: this.form.controls["arylHalide"].value?.reactionSite || "-",
