@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
-import { BodyCreateJobJobTypeJobsPost, CheckReactionSiteRequest, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
+import { BodyCreateJobJobTypeJobsPost, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
 
 import sampleRequest from '../../assets/example_request.json';
 
@@ -33,15 +33,15 @@ export type SomnResponse = Array<Omit<Product, "catalyst" | "solvent" | "base">
 
 export class SomnRequest {
   private reactionSiteValidator(control: AbstractControl) {
-    if (!control.value.input || !control.value.reactionSite) {
-      return { required: true };
+    if (!control.value.smiles || !control.value.reactionSite) {
+      return {required: true};
     }
     return null;
   }
 
   private nameValidator(control: AbstractControl) {
     if (!control.value || !control.value.trim().length) {
-      return { required: true };
+      return {required: true};
     }
     return null;
   }
@@ -51,15 +51,13 @@ export class SomnRequest {
 
     arylHalideName: new FormControl("", [Validators.required, this.nameValidator]),
     arylHalide: new FormControl<ReactionSiteInput>({
-      input: "",
-      input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+      smiles: "", 
       reactionSite: null
     }, [this.reactionSiteValidator]),
 
     amineName: new FormControl("", [Validators.required, this.nameValidator]),
     amine: new FormControl<ReactionSiteInput>({
-      input: "",
-      input_type: CheckReactionSiteRequest.InputTypeEnum.Smi,
+      smiles: "", 
       reactionSite: null
     }, [this.reactionSiteValidator]),
     
@@ -69,7 +67,7 @@ export class SomnRequest {
   });
 
   useExample() {
-    this.form.setValue(sampleRequest as any);
+    this.form.setValue(sampleRequest);
   }
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
@@ -77,13 +75,11 @@ export class SomnRequest {
       reactant_pair_name: (this.form.controls["reactantPairName"].value || "").trim().replace(/ /g, "_"),
       
       nuc_name: (this.form.controls["amineName"].value || "").trim().replace(/ /g, "_"),
-      nuc: this.form.controls["amine"].value?.input || "",
-      nuc_input_type: this.form.controls["amine"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
+      nuc: this.form.controls["amine"].value?.smiles || "",
       nuc_idx: this.form.controls["amine"].value?.reactionSite || "-",
 
       el_name: (this.form.controls["arylHalideName"].value || "").trim().replace(/ /g, "_"),
-      el: this.form.controls["arylHalide"].value?.input || "",
-      el_input_type: this.form.controls["arylHalide"].value?.input_type || CheckReactionSiteRequest.InputTypeEnum.Smi,
+      el: this.form.controls["arylHalide"].value?.smiles || "",
       el_idx: this.form.controls["arylHalide"].value?.reactionSite || "-",
     }
     return {
@@ -107,17 +103,8 @@ export class SomnService {
     return this.jobsService.createJobJobTypeJobsPost(JobType.Somn, requestBody);
   }
 
-  checkReactionSites(
-    input: string, 
-    inputType: CheckReactionSiteRequest.InputTypeEnum, 
-    role: CheckReactionSiteRequest.RoleEnum, 
-    hightlight_idxes?: number[]
-  ): Observable<CheckReactionSiteResponse> {
-    return this.somnService.checkReactionSitesSomnAllReactionSitesPost({
-      input: input,
-      input_type: inputType,
-      role: role,
-    });
+  checkReactionSites(smiles: string, type: string, hightlight_idxes?: number[]): Observable<CheckReactionSiteResponse> {
+    return this.somnService.checkReactionSitesSomnAllReactionSitesGet(smiles, type, hightlight_idxes);
   }
 
   getResultStatus(jobID: string): Observable<Job>{

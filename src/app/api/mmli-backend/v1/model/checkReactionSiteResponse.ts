@@ -13,9 +13,6 @@
 
 export interface CheckReactionSiteResponse { 
     reaction_site_idxes: Array<number>;
-    smiles: string;
-    has_chiral: boolean;
-    num_heavy_atoms: number;
     svg: string;
 }
 
