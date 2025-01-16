@@ -392,7 +392,9 @@ export class SomnResultComponent {
   }
 
   requestOptions = [
-    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", disabled: true },
+    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", command: () => {
+      this.currentPage = 'input';
+    } },
     { label: "Run a New Request", icon: "pi pi-plus", url: "/somn", target: "_blank" },
   ]
 
