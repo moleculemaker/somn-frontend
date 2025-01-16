@@ -548,6 +548,7 @@ export class SomnResultComponent {
     this.selectedBases$.next([]);
     this.selectedCatalysts$.next([]);
     this.selectedSolvents$.next([]);
+    this.selectedYield$.next([0, 100]);
     this.resultsTable.reset();
   }
 
