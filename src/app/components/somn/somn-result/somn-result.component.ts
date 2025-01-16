@@ -196,13 +196,16 @@ export class SomnResultComponent {
   );
 
   solventsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
+    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]
+      .map((v) => ({ label: v, value: v }))),
   );
   basesOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
+    map((response) => [...new Set(response.data.flatMap((d) => d.base))]
+      .map((v) => ({ label: v, value: v }))),
   );
   catalystsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]),
+    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]
+      .map((v) => ({ label: v, value: v }))),
   );
 
   filteredDataWithoutYieldRange$ = combineLatest([
