@@ -10,7 +10,7 @@
 ></app-somn>
 
 <!-- Model Results -->
- <div class="grow">
+ <div class="grow" *ngIf="currentPage === 'result'">
     <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
             <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl" id="container-job-id">

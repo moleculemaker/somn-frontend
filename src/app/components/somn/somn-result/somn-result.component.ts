@@ -16,7 +16,7 @@ import { DensityPlotComponent } from '../density-plot/density-plot.component';
   templateUrl: './somn-result.component.html',
   styleUrls: ['./somn-result.component.scss'],
   host: {
-    class: "grow flex"
+    class: "grow flex flex-col"
   }
 })
 export class SomnResultComponent {
@@ -98,7 +98,7 @@ export class SomnResultComponent {
           jobInfo.nuc_input_type, 
           CheckReactionSiteRequest.RoleEnum.Nuc
         ),
-        of(jobInfo),
+        of({...jobInfo, email: job.email }),
       ]).pipe(
         tap(([data, el, nuc, jobInfo]) => { this.jobInfo = jobInfo }),
         map(([data, el, nuc, jobInfo]) => {
