@@ -27,7 +27,7 @@ import { CheckboxModule } from "primeng/checkbox";
 import { CardModule } from "primeng/card";
 import { ChipModule } from "primeng/chip";
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { InputNumber, InputNumberModule } from "primeng/inputnumber";
+import { InputNumberModule } from "primeng/inputnumber";
 import { TabViewModule } from "primeng/tabview";
 import { TabMenuModule } from "primeng/tabmenu";
 import { SplitButtonModule } from "primeng/splitbutton";
@@ -69,6 +69,7 @@ import { MainLayoutComponent } from './components/somn/main-layout/main-layout.c
 import { MoleculeImageComponent } from "./components/somn/molecule-image/molecule-image.component";
 import { ConfirmationService } from "primeng/api";
 import { CenterLayoutComponent } from "./components/somn/center-layout/center-layout.component";
+import { JobTabComponent } from "./components/somn/job-tab/job-tab.component";
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig("/assets/config/envvars.json");
@@ -91,6 +92,7 @@ const initAppFn = (envService: EnvironmentService) => {
     SomnResultComponent,
     MainLayoutComponent,
     MoleculeImageComponent,
+    JobTabComponent,
 
     // FileDragNDropDirective,
     // ConfigurationComponent,

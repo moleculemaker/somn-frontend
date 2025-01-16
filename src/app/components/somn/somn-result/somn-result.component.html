@@ -1,4 +1,15 @@
- <!-- Model Results -->
+<app-job-tab 
+  [tab]="currentPage"
+  (onTabChange)="currentPage = $event">
+</app-job-tab>
+
+<app-somn 
+  *ngIf="currentPage === 'input'"
+  [showTab]="false"
+  [formValue]="jobInfo"
+></app-somn>
+
+<!-- Model Results -->
  <div class="grow">
     <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">

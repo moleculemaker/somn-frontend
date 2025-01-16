@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { Router } from "@angular/router";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 import { TutorialService } from "~/app/services/tutorial.service";
@@ -11,10 +11,12 @@ import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
   templateUrl: "./somn.component.html",
   styleUrls: ["./somn.component.scss"],
   host: {
-    class: "flex grow",
+    class: "flex flex-col grow",
   },
 })
 export class SomnComponent {
+  @Input() showTab: boolean = true;
+  @Input() formValue: any;
 
   readonly CheckReactionSiteRequest = CheckReactionSiteRequest;
 

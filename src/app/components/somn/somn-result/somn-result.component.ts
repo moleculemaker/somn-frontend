@@ -24,6 +24,7 @@ export class SomnResultComponent {
   @ViewChild(HeatmapComponent) heatmapComponent: HeatmapComponent;
   @ViewChild(DensityPlotComponent) densityPlotComponent: DensityPlotComponent;
 
+  currentPage = 'result';
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
   jobInfo: any = {};
   displayTutorial: boolean = false;
