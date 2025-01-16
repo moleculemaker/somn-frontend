@@ -31,6 +31,7 @@
                     <button type="button" class="p-2 px-6 font-bold text-white bg-primary"
                         [class.bg-[#64748B]]="form.invalid"
                         [disabled]="form.invalid"
+                        (click)="onSubmit()"
                     >Submit</button>
                 </div>
                 <small

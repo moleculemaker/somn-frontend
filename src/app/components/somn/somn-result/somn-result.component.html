@@ -27,7 +27,7 @@
         </div>
         <div class="flex items-center gap-2">
             <p-splitButton id="btn-request-options" label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
-            <div id="btn-export" class="flex flex-col justify-center">
+            <div *ngIf="!(isLoading$ | async)" id="btn-export" class="flex flex-col justify-center">
                 <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="menu.toggle($event)">
                     <i class="mr-2 pi pi-download"></i>
                     <span class="font-semibold">Export</span>                    
