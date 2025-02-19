@@ -16,7 +16,7 @@ import { DensityPlotComponent } from '../density-plot/density-plot.component';
   templateUrl: './somn-result.component.html',
   styleUrls: ['./somn-result.component.scss'],
   host: {
-    class: "grow flex"
+    class: "grow flex flex-col"
   }
 })
 export class SomnResultComponent {
@@ -24,6 +24,7 @@ export class SomnResultComponent {
   @ViewChild(HeatmapComponent) heatmapComponent: HeatmapComponent;
   @ViewChild(DensityPlotComponent) densityPlotComponent: DensityPlotComponent;
 
+  currentPage = 'result';
   jobId: string = this.route.snapshot.paramMap.get("id") || "";
   jobInfo: any = {};
   displayTutorial: boolean = false;
@@ -97,7 +98,7 @@ export class SomnResultComponent {
           jobInfo.nuc_input_type, 
           CheckReactionSiteRequest.RoleEnum.Nuc
         ),
-        of(jobInfo),
+        of({...jobInfo, email: job.email }),
       ]).pipe(
         tap(([data, el, nuc, jobInfo]) => { this.jobInfo = jobInfo }),
         map(([data, el, nuc, jobInfo]) => {
@@ -195,13 +196,16 @@ export class SomnResultComponent {
   );
 
   solventsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
+    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]
+      .map((v) => ({ label: v, value: v }))),
   );
   basesOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
+    map((response) => [...new Set(response.data.flatMap((d) => d.base))]
+      .map((v) => ({ label: v, value: v }))),
   );
   catalystsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]),
+    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]
+      .map((v) => ({ label: v, value: v }))),
   );
 
   filteredDataWithoutYieldRange$ = combineLatest([
@@ -391,7 +395,9 @@ export class SomnResultComponent {
   }
 
   requestOptions = [
-    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", disabled: true },
+    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", command: () => {
+      this.currentPage = 'input';
+    } },
     { label: "Run a New Request", icon: "pi pi-plus", url: "/somn", target: "_blank" },
   ]
 
@@ -542,6 +548,7 @@ export class SomnResultComponent {
     this.selectedBases$.next([]);
     this.selectedCatalysts$.next([]);
     this.selectedSolvents$.next([]);
+    this.selectedYield$.next([0, 100]);
     this.resultsTable.reset();
   }
 

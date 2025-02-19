@@ -1,5 +1,16 @@
- <!-- Model Results -->
- <div class="grow">
+<app-job-tab 
+  [tab]="currentPage"
+  (onTabChange)="currentPage = $event">
+</app-job-tab>
+
+<app-somn 
+  *ngIf="currentPage === 'input'"
+  [showTab]="false"
+  [formValue]="jobInfo"
+></app-somn>
+
+<!-- Model Results -->
+ <div class="grow" *ngIf="currentPage === 'result'">
     <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
             <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl" id="container-job-id">
@@ -16,7 +27,7 @@
         </div>
         <div class="flex items-center gap-2">
             <p-splitButton id="btn-request-options" label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
-            <div id="btn-export" class="flex flex-col justify-center">
+            <div *ngIf="!(isLoading$ | async)" id="btn-export" class="flex flex-col justify-center">
                 <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="menu.toggle($event)">
                     <i class="mr-2 pi pi-download"></i>
                     <span class="font-semibold">Export</span>                    

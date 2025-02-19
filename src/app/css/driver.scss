@@ -54,11 +54,19 @@
     @apply border-solid;
     @apply text-primary;
     @apply border-primary;
+
+    &[disabled] {
+      @apply opacity-50;
+    }
   }
 
   &.btn-popover-next {
     @apply text-white;
     @apply bg-primary;
+
+    &[disabled] {
+      @apply opacity-50;
+    }
   }
 }
 
