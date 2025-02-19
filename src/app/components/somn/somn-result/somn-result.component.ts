@@ -22,7 +22,7 @@ import { Job } from '~/app/models';
   templateUrl: './somn-result.component.html',
   styleUrls: ['./somn-result.component.scss'],
   host: {
-    class: "grow flex"
+    class: "grow flex flex-col"
   }
 })
 export class SomnResultComponent extends JobResult {
@@ -34,7 +34,6 @@ export class SomnResultComponent extends JobResult {
   override jobType: JobType = JobType.Somn;
   idx: number = parseInt(this.route.snapshot.paramMap.get("idx") || '0');
   thisJobInfo!: any;
-
   displayTutorial: boolean = false;
   exportOptions: MenuItem[] = [
     {
@@ -194,13 +193,16 @@ export class SomnResultComponent extends JobResult {
   );
 
   solventsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]),
+    map((response) => [...new Set(response.data.flatMap((d) => d.solvent))]
+      .map((v) => ({ label: v, value: v }))),
   );
   basesOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.flatMap((d) => d.base))]),
+    map((response) => [...new Set(response.data.flatMap((d) => d.base))]
+      .map((v) => ({ label: v, value: v }))),
   );
   catalystsOptions$ = this.response$.pipe(
-    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]),
+    map((response) => [...new Set(response.data.map((d) => d.catalyst[0]))]
+      .map((v) => ({ label: v, value: v }))),
   );
 
   filteredDataWithoutYieldRange$ = combineLatest([
@@ -390,7 +392,9 @@ export class SomnResultComponent extends JobResult {
   }
 
   requestOptions = [
-    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", disabled: true },
+    { label: "Modify and Resubmit Request", icon: "pi pi-refresh", command: () => {
+      this.currentPage = 'input';
+    } },
     { label: "Run a New Request", icon: "pi pi-plus", url: "/somn", target: "_blank" },
   ]
 
@@ -543,6 +547,7 @@ export class SomnResultComponent extends JobResult {
     this.selectedBases$.next([]);
     this.selectedCatalysts$.next([]);
     this.selectedSolvents$.next([]);
+    this.selectedYield$.next([0, 100]);
     this.resultsTable.reset();
   }
 

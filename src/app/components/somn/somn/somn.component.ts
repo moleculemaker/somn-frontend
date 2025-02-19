@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { Router } from "@angular/router";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 import { TutorialService } from "~/app/services/tutorial.service";
@@ -10,10 +10,12 @@ import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
   templateUrl: "./somn.component.html",
   styleUrls: ["./somn.component.scss"],
   host: {
-    class: "flex grow",
+    class: "flex flex-col grow",
   },
 })
-export class SomnComponent {
+export class SomnComponent implements OnChanges {
+  @Input() showTab: boolean = true;
+  @Input() formValue: any;
 
   readonly CheckReactionSiteRequest = CheckReactionSiteRequest;
 
@@ -22,6 +24,29 @@ export class SomnComponent {
   displayHeavyAtomsDialog: boolean = false;
   arylHalideHasHeavyAtoms: boolean = false;
   amineHasHeavyAtoms: boolean = false;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['formValue'] && changes['formValue'].currentValue) {
+      const formValue = changes['formValue'].currentValue;
+      this.request.form.setValue({
+        reactantPairName: formValue.reactant_pair_name,
+        amineName: formValue.nuc_name,
+        amine: {
+          input: formValue.nuc,
+          input_type: formValue.nuc_input_type,
+          reactionSite: formValue.nuc_idx,
+        },
+        arylHalideName: formValue.el_name,
+        arylHalide: {
+          input: formValue.el,
+          input_type: formValue.el_input_type,
+          reactionSite: formValue.el_idx,
+        },
+        subscriberEmail: formValue.email,
+        agreeToSubscription: false,
+      });
+    }
+  }
 
   constructor(
     private somnService: SomnService,
@@ -142,7 +167,14 @@ export class SomnComponent {
     this.somnService.createJobAndRunSomn(
       this.request.toRequestBody()
     ).subscribe((response) => {
-      this.router.navigate(['somn', 'result', response.job_id]);
+      if (this.router.url.search(/\/.*\/result\//) !== -1) {
+        window.open(
+          this.router.url.replace(/\/result\/.*/g, `/result/${response.job_id}`), 
+          '_blank'
+        );
+      } else {
+        this.router.navigate(['somn', 'result', response.job_id]);
+      }
     })
   }
 }

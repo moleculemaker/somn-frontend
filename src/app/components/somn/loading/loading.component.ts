@@ -31,6 +31,8 @@ export class LoadingComponent {
     
     this.somnService.updateSubscriberEmail(this.jobId, 
       this.form.controls["subscriberEmail"].value || ''
-    );
+    ).subscribe((res) => {
+      console.log(res);
+    });
   }
 }
