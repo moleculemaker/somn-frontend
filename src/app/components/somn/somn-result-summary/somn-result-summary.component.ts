@@ -212,6 +212,14 @@ export class SomnResultSummaryComponent extends JobResult {
       this.filters['reactantPair'].options = Array.from(new Set(this.jobInfo.map((d: any) => d.reactant_pair_name)))
         .map((d: any) => ({ label: d, value: d }));
     }),
+    tap(() => {
+      // show tutorial
+      if (!this.tutorialService.showTutorial) {
+        this.displayTutorial = true;
+      } else {
+        this.displayTutorial = false;
+      }
+    }),
   );
 
   requestOptions = [
@@ -254,11 +262,6 @@ export class SomnResultSummaryComponent extends JobResult {
     super(somnService);
     
     tutorialService.tutorialKey = 'result-summary-tutorial';
-    if (!tutorialService.showTutorial) {
-      this.displayTutorial = true;
-    } else {
-      this.displayTutorial = false;
-    }
 
     tutorialService.onStart = () => {
       this.displayTutorial = true;

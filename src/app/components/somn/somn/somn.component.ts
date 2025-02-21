@@ -13,7 +13,7 @@ import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
     class: "flex flex-col grow",
   },
 })
-export class SomnComponent implements OnChanges {
+export class SomnComponent {
   @Input() showTab: boolean = true;
   @Input() formValue: any;
 
@@ -25,28 +25,32 @@ export class SomnComponent implements OnChanges {
   arylHalideHasHeavyAtoms: boolean = false;
   amineHasHeavyAtoms: boolean = false;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['formValue'] && changes['formValue'].currentValue) {
-      const formValue = changes['formValue'].currentValue;
-      this.request.form.setValue({
-        reactantPairName: formValue.reactant_pair_name,
-        amineName: formValue.nuc_name,
-        amine: {
-          input: formValue.nuc,
-          input_type: formValue.nuc_input_type,
-          reactionSite: formValue.nuc_idx,
-        },
-        arylHalideName: formValue.el_name,
-        arylHalide: {
-          input: formValue.el,
-          input_type: formValue.el_input_type,
-          reactionSite: formValue.el_idx,
-        },
-        subscriberEmail: formValue.email,
-        agreeToSubscription: false,
-      });
-    }
-  }
+  // ngOnChanges(changes: SimpleChanges): void {
+  //   if (changes['formValue'] && changes['formValue'].currentValue) {
+  //     const formValue = changes['formValue'].currentValue;
+  //     this.request.form.setValue({
+  //       reactantPairs: [
+  //         {
+  //           reactantPairName: formValue.reactant_pair_name,
+  //           amineName: formValue.nuc_name,
+  //           amine: {
+  //             input: formValue.nuc,
+  //         input_type: formValue.nuc_input_type,
+  //         reactionSite: formValue.nuc_idx,
+  //       },
+  //       arylHalideName: formValue.el_name,
+  //       arylHalide: {
+  //         input: formValue.el,
+  //         input_type: formValue.el_input_type,
+  //             reactionSite: formValue.el_idx,
+  //           },
+  //         }
+  //       ],
+  //       subscriberEmail: formValue.email,
+  //       agreeToSubscription: false,
+  //     });
+  //   }
+  // }
 
   constructor(
     private somnService: SomnService,

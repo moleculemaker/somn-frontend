@@ -33,6 +33,7 @@ export class SomnResultComponent extends JobResult {
   override jobId: string = this.route.snapshot.paramMap.get("id") || "";
   override jobType: JobType = JobType.Somn;
   idx: number = parseInt(this.route.snapshot.paramMap.get("idx") || '0');
+  currentPage: string = 'result';
   thisJobInfo!: any;
   displayTutorial: boolean = false;
   exportOptions: MenuItem[] = [
