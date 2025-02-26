@@ -165,7 +165,8 @@ export class SomnRequest {
   }
 
   useExample() {
-    this.form.setValue(sampleRequest as any);
+    this.clearAll();
+    this.form.reset(sampleRequest as any);
   }
 
   toRequestBody(): BodyCreateJobJobTypeJobsPost {
@@ -189,8 +190,25 @@ export class SomnRequest {
     };
   }
 
+  reactantPairFormIsEmpty(form: FormGroup) {
+    return form.controls["arylHalideName"].value === "" 
+      && form.controls["amineName"].value === ""
+      && form.controls["arylHalide"].value['input'] === ""
+      && form.controls["amine"].value['input'] === ""
+      && form.controls["reactantPairName"].value === "";
+  }
+
   addReactantPair() {
-    this.form.controls["reactantPairs"].push(this.createReactantPairForm());
+    if (this.form.controls["reactantPairs"].length === 0) {
+      this.form.controls["reactantPairs"].push(this.createReactantPairForm());
+      return;
+    }
+
+    const totalPrs = this.form.controls["reactantPairs"].length;
+    const lastRp = this.form.controls["reactantPairs"].at(totalPrs - 1);
+    if (!this.reactantPairFormIsEmpty(lastRp)) {
+      this.form.controls["reactantPairs"].push(this.createReactantPairForm());
+    }
   }
 
   removeReactantPair(index: number) {
@@ -223,7 +241,8 @@ export class SomnRequest {
   }
 
   clearAll() {
-    this.clearAllInputHelper(this.form.controls["reactantPairs"]);
+    this.form.controls["reactantPairs"].clear();
+    this.form.controls["reactantPairs"].push(this.createReactantPairForm());
   }
 }
 
