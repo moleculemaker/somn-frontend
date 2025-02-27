@@ -1,11 +1,10 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as d3 from 'd3';
-import { MenuItem, Message, FilterService } from 'primeng/api';
+import { FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, shareReplay, tap, map, skipUntil, filter, combineLatest, of, BehaviorSubject, Subscription, forkJoin, take, Observable, combineLatestWith, min, max } from 'rxjs';
-import { JobStatus, CheckReactionSiteRequest, CheckReactionSiteResponse, JobType } from '~/app/api/mmli-backend/v1';
-import { Product, SomnResponse, SomnService } from '~/app/services/somn.service';
+import { switchMap, tap, map, combineLatest, of, forkJoin, take, Observable } from 'rxjs';
+import { CheckReactionSiteRequest, CheckReactionSiteResponse, JobType } from '~/app/api/mmli-backend/v1';
+import { SomnService } from '~/app/services/somn.service';
 import { TutorialService } from '~/app/services/tutorial.service';
 import { JobResult } from '~/app/models/job-result';
 
@@ -24,7 +23,10 @@ interface FilterConfig {
 @Component({
   selector: 'app-somn-result-summary',
   templateUrl: './somn-result-summary.component.html',
-  styleUrls: ['./somn-result-summary.component.scss']
+  styleUrls: ['./somn-result-summary.component.scss'],
+  host: {
+    class: "grow flex flex-col"
+  }
 })
 export class SomnResultSummaryComponent extends JobResult {
   @ViewChild("resultsTable") resultsTable: Table;
@@ -35,6 +37,7 @@ export class SomnResultSummaryComponent extends JobResult {
   override jobType: JobType = JobType.Somn;
 
   displayTutorial: boolean = false;
+  currentPage: string = 'result';
 
   showFilter = true;
   selectedTableRows: any[] = [];

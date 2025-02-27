@@ -199,15 +199,16 @@ export class SomnRequest {
   }
 
   addReactantPair() {
+    const newRp = this.createReactantPairForm();
     if (this.form.controls["reactantPairs"].length === 0) {
-      this.form.controls["reactantPairs"].push(this.createReactantPairForm());
-      return;
-    }
+      this.form.controls["reactantPairs"].push(newRp);
 
-    const totalPrs = this.form.controls["reactantPairs"].length;
-    const lastRp = this.form.controls["reactantPairs"].at(totalPrs - 1);
-    if (!this.reactantPairFormIsEmpty(lastRp)) {
-      this.form.controls["reactantPairs"].push(this.createReactantPairForm());
+    } else {
+      const totalPrs = this.form.controls["reactantPairs"].length;
+      const lastRp = this.form.controls["reactantPairs"].at(totalPrs - 1);
+      if (!this.reactantPairFormIsEmpty(lastRp)) {
+        this.form.controls["reactantPairs"].push(newRp);
+      }
     }
   }
 

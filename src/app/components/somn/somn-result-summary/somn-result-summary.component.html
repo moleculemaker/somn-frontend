@@ -1,9 +1,14 @@
- <!-- Model Results -->
- <div class="grow">
+<app-job-tab [tab]="currentPage" (onTabChange)="currentPage = $event">
+</app-job-tab>
+
+<app-somn *ngIf="currentPage === 'input'" [showTab]="false" [formValue]="jobInfo"></app-somn>
+
+<!-- Model Results -->
+<div *ngIf="currentPage === 'result'" class="grow">
     <div class="flex items-center justify-between my-6">
         <div *ngIf="(statusResponse$ | async) as status">
             <h5 class="flex items-center gap-2 mb-2 font-bold opacity-100 leading-xl" id="container-job-id">
-                Job ID: {{ status.job_id || 'loading' }} 
+                Job ID: {{ status.job_id || 'loading' }}
                 <button type="button" title="copy job id" class="border-none cursor-pointer">
                     <i class="pi pi-copy" (click)="copyAndPasteURL()"></i>
                 </button>
@@ -15,11 +20,12 @@
             </h6>
         </div>
         <div class="flex items-center gap-2">
-            <p-splitButton id="btn-request-options" label="Request Options" styleClass="p-button-outlined" [model]="requestOptions"></p-splitButton>
+            <p-splitButton id="btn-request-options" label="Request Options" styleClass="p-button-outlined"
+                [model]="requestOptions"></p-splitButton>
             <div id="btn-export" class="flex flex-col justify-center">
                 <button class="p-3 px-4 text-white border rounded-md bg-primary" (click)="menu.toggle($event)">
                     <i class="mr-2 pi pi-download"></i>
-                    <span class="font-semibold">Export</span>                    
+                    <span class="font-semibold">Export</span>
                 </button>
                 <p-tieredMenu #menu [model]="exportOptions" [popup]="true" />
             </div>
@@ -33,120 +39,76 @@
                 <ng-template pTemplate="header">
                     <span class="grow">Job Results Summary</span>
                     <div class="flex items-center gap-2">
-                        <button
-                            class="btn-outline inline-flex items-center gap-2"
-                            (click)="showFilter = !showFilter"
-                        >
+                        <button class="btn-outline inline-flex items-center gap-2" (click)="showFilter = !showFilter">
                             <i class="pi pi-filter"></i>
                             <h6 class="inline leading-lg">Filter</h6>
                         </button>
-                        <button
-                            class="btn-outline"
-                            (click)="clearAllFilters()"
-                        >
+                        <button class="btn-outline" (click)="clearAllFilters()">
                             Clear All
                         </button>
                     </div>
                 </ng-template>
 
                 <div class="flex flex-col">
-                    <div *ngIf="showFilter" id="container-filters" class="flex w-full gap-4 p-2 px-4 bg-gray-50 justify-center">
-                        <p-multiSelect
-                            class="w-1/5"
-                            styleClass="w-full"
+                    <div *ngIf="showFilter" id="container-filters"
+                        class="flex w-full gap-4 p-2 px-4 bg-gray-50 justify-center">
+                        <p-multiSelect class="w-1/5" styleClass="w-full"
                             [display]="filters['reactantPair'].selected.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
-                            [(ngModel)]="filters['reactantPair'].selected"
-                            [options]="filters['reactantPair'].options"
-                            (onChange)="applyFilters()"
-                            placeholder="Reactant Pair"
-                            display="chip"
-                        >
+                            [maxSelectedLabels]="1" [selectedItemsLabel]="'{0} items'"
+                            [(ngModel)]="filters['reactantPair'].selected" [options]="filters['reactantPair'].options"
+                            (onChange)="applyFilters()" placeholder="Reactant Pair" display="chip">
                         </p-multiSelect>
-                        <p-multiSelect
-                            class="w-1/5"
-                            styleClass="w-full"
+                        <p-multiSelect class="w-1/5" styleClass="w-full"
                             [display]="filters['arylHalide'].selected.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
-                            [(ngModel)]="filters['arylHalide'].selected"
-                            [options]="filters['arylHalide'].options"
-                            (onChange)="applyFilters()"
-                            placeholder="Aryl Halide"
-                        >
+                            [maxSelectedLabels]="1" [selectedItemsLabel]="'{0} items'"
+                            [(ngModel)]="filters['arylHalide'].selected" [options]="filters['arylHalide'].options"
+                            (onChange)="applyFilters()" placeholder="Aryl Halide">
                         </p-multiSelect>
-                        <p-multiSelect
-                            class="w-1/5"
-                            styleClass="w-full"
-                            [display]="filters['amine'].selected.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
-                            [(ngModel)]="filters['amine'].selected"
-                            [options]="filters['amine'].options"
-                            (onChange)="applyFilters()"
-                            placeholder="Amine"
-                            display="chip"
-                        >
+                        <p-multiSelect class="w-1/5" styleClass="w-full"
+                            [display]="filters['amine'].selected.length > 1 ? 'comma' : 'chip'" [maxSelectedLabels]="1"
+                            [selectedItemsLabel]="'{0} items'" [(ngModel)]="filters['amine'].selected"
+                            [options]="filters['amine'].options" (onChange)="applyFilters()" placeholder="Amine"
+                            display="chip">
                         </p-multiSelect>
 
                         <div class="w-1/5 rounded-md border-[#ced4da] px-3 py-2 flex justify-betweeen items-center bg-white border border-solid cursor-pointer hover:border-black"
-                            (mousedown)="filter.toggle($event)"
-                            [class.border-[#DEE2E6]]="!filter.overlayVisible"
-                            [class.border-black]="filter.overlayVisible"
-                        >
+                            (mousedown)="filter.toggle($event)" [class.border-[#DEE2E6]]="!filter.overlayVisible"
+                            [class.border-black]="filter.overlayVisible">
                             <div class="grow">
                                 <span *ngIf="selectedYield[0] === 0 && selectedYield[1] === 100">Top Yield %</span>
-                                <span *ngIf="selectedYield[0] !== 0 || selectedYield[1] !== 100" class="inline-flex items-center gap-1 rounded-md bg-[#EFF6FF] text-[#1D4ED8] px-3 py-1">
+                                <span *ngIf="selectedYield[0] !== 0 || selectedYield[1] !== 100"
+                                    class="inline-flex items-center gap-1 rounded-md bg-[#EFF6FF] text-[#1D4ED8] px-3 py-1">
                                     {{ selectedYield[0] }}%-{{ selectedYield[1] }}%
                                 </span>
                             </div>
                             <i class="pi pi-chevron-down ml-8"></i>
-                            <p-overlayPanel 
-                                #filter 
-                                [style]="{width: '360px'}" 
-                                styleClass="pt-8" 
-                            >
+                            <p-overlayPanel #filter [style]="{width: '360px'}" styleClass="pt-8">
                                 <div class="px-8">
-                                    <p-slider
-                                        #slider
-                                        [(ngModel)]="selectedYield"
-                                        [range]="true"
-                                        [min]="0"
-                                        [max]="100"
-                                        (ngModelChange)="onYieldRangeChange(selectedYield)"
-                                    ></p-slider>
+                                    <p-slider #slider [(ngModel)]="selectedYield" [range]="true" [min]="0" [max]="100"
+                                        (ngModelChange)="onYieldRangeChange(selectedYield)"></p-slider>
                                     <div class="relative -mx-4 pt-4 font-thin" #inputContainer>
-                                        <input
-                                            title="Min Range"
-                                            #minRange
-                                            type="number"
+                                        <input title="Min Range" #minRange type="number"
                                             class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
                                             [(ngModel)]="selectedYield[0]"
-                                            (ngModelChange)="onYieldRangeChange(selectedYield)"
-                                            [min]="0"
-                                            [max]="100"
-                                        />
-                                        <input
-                                            #maxRange
-                                            title="Max Range"
-                                            type="number"
+                                            (ngModelChange)="onYieldRangeChange(selectedYield)" [min]="0" [max]="100" />
+                                        <input #maxRange title="Max Range" type="number"
                                             class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
                                             [(ngModel)]="selectedYield[1]"
-                                            (ngModelChange)="onYieldRangeChange(selectedYield)"
-                                            [min]="0"
-                                            [max]="100"
-                                        />
+                                            (ngModelChange)="onYieldRangeChange(selectedYield)" [min]="0" [max]="100" />
                                     </div>
                                 </div>
-                                <hr class="mt-12"/>
+                                <hr class="mt-12" />
                                 <div class="flex justify-between p-4">
-                                    <button class="px-4 py-2 rounded-md border border-solid border-[#224063] text-[#224063] font-semibold" (click)="
+                                    <button
+                                        class="px-4 py-2 rounded-md border border-solid border-[#224063] text-[#224063] font-semibold"
+                                        (click)="
                                         selectedYield = [0, 100];
                                         onYieldRangeChange(selectedYield);
                                         filter.hide();
                                     ">Clear</button>
-                                    <button class="px-4 py-2 rounded-md border border-solid bg-[#224063] text-white font-semibold" (click)="
+                                    <button
+                                        class="px-4 py-2 rounded-md border border-solid bg-[#224063] text-white font-semibold"
+                                        (click)="
                                         applyFilters();
                                         filter.hide();
                                     ">Apply</button>
@@ -154,33 +116,20 @@
                             </p-overlayPanel>
                         </div>
 
-                        <p-multiSelect
-                            class="w-1/5"
-                            styleClass="w-full"
+                        <p-multiSelect class="w-1/5" styleClass="w-full"
                             [display]="filters['reactionCondition'].selected.length > 1 ? 'comma' : 'chip'"
-                            [maxSelectedLabels]="1"
-                            [selectedItemsLabel]="'{0} items'"
+                            [maxSelectedLabels]="1" [selectedItemsLabel]="'{0} items'"
                             [(ngModel)]="filters['reactionCondition'].selected"
-                            [options]="filters['reactionCondition'].options"
-                            (onChange)="applyFilters()"
-                            placeholder="Top Reaction Conditions"
-                            display="chip"
-                        >
+                            [options]="filters['reactionCondition'].options" (onChange)="applyFilters()"
+                            placeholder="Top Reaction Conditions" display="chip">
                         </p-multiSelect>
                     </div>
 
                     <hr *ngIf="showFilter" />
 
-                    <p-table
-                        #resultsTable
-                        [value]="(response$ | async) || []"
-                        dataKey="reactantPair"
-                        selectionMode="multiple"
-                        [(selection)]="selectedTableRows"
-                        [columns]="exportColumns"
-                        tableStyleClass="w-full"
-                        styleClass="w-full"
-                    >
+                    <p-table #resultsTable [value]="(response$ | async) || []" dataKey="reactantPair"
+                        selectionMode="multiple" [(selection)]="selectedTableRows" [columns]="exportColumns"
+                        tableStyleClass="w-full" styleClass="w-full">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th style="width: 4rem">
@@ -210,45 +159,41 @@
                                 </td>
                                 <td class="align-middle">{{ i + 1 }}</td>
                                 <td class="align-middle">{{ row.reactantPair }}</td>
-                                <td class="align-middle" 
-                                    (mouseenter)="arylHalideOverlay.show($event)"
-                                    (mouseleave)="arylHalideOverlay.hide()"
-                                >
+                                <td class="align-middle" (mouseenter)="arylHalideOverlay.show($event)"
+                                    (mouseleave)="arylHalideOverlay.hide()">
                                     {{ row.arylHalide.name }}
                                     <p-overlayPanel #arylHalideOverlay>
                                         <div class="w-[300px] p-4">
-                                            <div
-                                                class="rounded-md border border-solid border-[--surface-d] p-2"
-                                            >
-                                                <app-molecule-image 
-                                                    [width]="260" 
-                                                    [height]="180" 
+                                            <div class="rounded-md border border-solid border-[--surface-d] p-2">
+                                                <app-molecule-image [width]="260" [height]="180"
                                                     [molecule]="row.arylHalide.svg"
                                                     [reactionSitesOptions]="row.arylHalide.reaction_site_idxes"
                                                     [selectedReactionSite]="row.arylHalide.reactionSite"
-                                                    [interactive]="false"
-                                                >
+                                                    [interactive]="false">
                                                 </app-molecule-image>
                                             </div>
-                                            <div
-                                                class="flex flex-col justify-between grow"
-                                            >
+                                            <div class="flex flex-col justify-between grow">
                                                 <div class="flex justify-between mt-2">
                                                     <span class="leading-sm">Name</span>
-                                                    <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ row.arylHalide.name }}</span>
+                                                    <span
+                                                        class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{
+                                                        row.arylHalide.name }}</span>
                                                 </div>
                                                 <div class="flex justify-between mt-2">
                                                     <span class="leading-sm">SMILES</span>
-                                                    <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ row.arylHalide.smiles }}</span>
+                                                    <span
+                                                        class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{
+                                                        row.arylHalide.smiles }}</span>
                                                 </div>
-                                                <div *ngIf="row.arylHalide.reaction_site_idxes" 
+                                                <div *ngIf="row.arylHalide.reaction_site_idxes"
                                                     class="flex justify-between mt-2">
                                                     <span class="leading-sm">Reaction Site</span>
-                                                    <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
-                                                        {{ 
-                                                            row.arylHalide.reaction_site_idxes.length === 1 
-                                                            ? 'Auto detected'
-                                                            : row.arylHalide.reactionSite + 1 
+                                                    <span
+                                                        class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
+                                                        {{
+                                                        row.arylHalide.reaction_site_idxes.length === 1
+                                                        ? 'Auto detected'
+                                                        : row.arylHalide.reactionSite + 1
                                                         }}
                                                     </span>
                                                 </div>
@@ -256,45 +201,41 @@
                                         </div>
                                     </p-overlayPanel>
                                 </td>
-                                <td class="align-middle"
-                                    (mouseenter)="amineOverlay.show($event)"
-                                    (mouseleave)="amineOverlay.hide()"
-                                >
+                                <td class="align-middle" (mouseenter)="amineOverlay.show($event)"
+                                    (mouseleave)="amineOverlay.hide()">
                                     {{ row.amine.name }}
                                     <p-overlayPanel #amineOverlay>
                                         <div class="w-[300px] p-4">
-                                            <div
-                                                class="rounded-md border border-solid border-[--surface-d] p-2"
-                                            >
-                                                <app-molecule-image 
-                                                    [width]="260" 
-                                                    [height]="180" 
+                                            <div class="rounded-md border border-solid border-[--surface-d] p-2">
+                                                <app-molecule-image [width]="260" [height]="180"
                                                     [molecule]="row.amine.svg"
                                                     [reactionSitesOptions]="row.amine.reaction_site_idxes"
                                                     [selectedReactionSite]="row.amine.reactionSite"
-                                                    [interactive]="false"
-                                                >
+                                                    [interactive]="false">
                                                 </app-molecule-image>
                                             </div>
-                                            <div
-                                                class="flex flex-col justify-between grow"
-                                            >
+                                            <div class="flex flex-col justify-between grow">
                                                 <div class="flex justify-between mt-2">
                                                     <span class="leading-sm">Name</span>
-                                                    <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ row.amine.name }}</span>
+                                                    <span
+                                                        class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{
+                                                        row.amine.name }}</span>
                                                 </div>
                                                 <div class="flex justify-between mt-2">
                                                     <span class="leading-sm">SMILES</span>
-                                                    <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ row.amine.smiles }}</span>
+                                                    <span
+                                                        class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{
+                                                        row.amine.smiles }}</span>
                                                 </div>
-                                                <div *ngIf="row.amine.reaction_site_idxes" 
+                                                <div *ngIf="row.amine.reaction_site_idxes"
                                                     class="flex justify-between mt-2">
                                                     <span class="leading-sm">Reaction Site</span>
-                                                    <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
-                                                        {{ 
-                                                            row.amine.reaction_site_idxes.length === 1 
-                                                            ? 'Auto detected'
-                                                            : row.amine.reactionSite + 1 
+                                                    <span
+                                                        class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
+                                                        {{
+                                                        row.amine.reaction_site_idxes.length === 1
+                                                        ? 'Auto detected'
+                                                        : row.amine.reactionSite + 1
                                                         }}
                                                     </span>
                                                 </div>
@@ -309,22 +250,20 @@
                                     </div>
                                 </td>
                                 <td class="align-middle">
-                                    <div class="leading-xl" [innerHTML]="row.topYieldConditionsSummary.singleSummary"></div>
+                                    <div class="leading-xl" [innerHTML]="row.topYieldConditionsSummary.singleSummary">
+                                    </div>
                                     <ng-container *ngIf="row.topYieldConditionsSummary.multiSummary">
-                                        <div 
-                                            class="leading-xl underline decoration-dotted"
+                                        <div class="leading-xl underline decoration-dotted"
                                             [innerHTML]="row.topYieldConditionsSummary.multiSummary.label"
                                             [pTooltip]="row.topYieldConditionsSummary.multiSummary.tooltip"
-                                            tooltipPosition="bottom"
-                                            tooltipStyleClass="min-w-[360px]"
-                                            [escape]="false"
-                                        ></div>
+                                            tooltipPosition="bottom" tooltipStyleClass="min-w-[360px]" [escape]="false">
+                                        </div>
                                     </ng-container>
                                 </td>
                                 <td class="align-middle">
                                     <button (click)="viewResults(i)">
-                                        <p-chip id="btn-view-results" styleClass="p-1 px-3"
-                                            ><span class="leading-xl text-text-primary">View Results</span>
+                                        <p-chip id="btn-view-results" styleClass="p-1 px-3"><span
+                                                class="leading-xl text-text-primary">View Results</span>
                                             <i class="ml-2 pi pi-arrow-right"></i>
                                         </p-chip>
                                     </button>
@@ -341,52 +280,42 @@
 <ng-template #moleculeInfo let-molecule let-showSmiles="showSmiles">
     <div class="flex justify-between mt-2">
         <span class="leading-sm">Name</span>
-        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.name }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.name
+            }}</span>
     </div>
     <div *ngIf="showSmiles" class="flex justify-between mt-2">
         <span class="leading-sm">SMILES</span>
-        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.smiles }}</span>
+        <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">{{ molecule.smiles
+            }}</span>
     </div>
     <div class="flex justify-between mt-2">
         <span class="leading-sm">Reaction Site</span>
         <span class="font-semibold text-end leading-base inline-block max-w-[200px] break-words">
-            {{ 
-                molecule.reactionSitesOptions.length === 1 
-                ? 'Auto detected'
-                : molecule.reactionSite.idx + 1 
+            {{
+            molecule.reactionSitesOptions.length === 1
+            ? 'Auto detected'
+            : molecule.reactionSite.idx + 1
             }}
         </span>
     </div>
 </ng-template>
 
-<p-dialog
-    #tutorialDialog
-    header="Results - Job Summary"
-    [(visible)]="displayTutorial" 
-    [modal]="true" 
-    [style]="{ width: '350px' }" 
-    [draggable]="false" 
-    [resizable]="false"
->
+<p-dialog #tutorialDialog header="Results - Job Summary" [(visible)]="displayTutorial" [modal]="true"
+    [style]="{ width: '350px' }" [draggable]="false" [resizable]="false">
     <div class="flex flex-col gap-6 -mb-2">
         <p class="leading-xl">
-            Your results are ready! Would you like us to show you around the results page? You can always access this tour later.
+            Your results are ready! Would you like us to show you around the results page? You can always access this
+            tour later.
         </p>
         <div class="flex items-center gap-2">
             <p-checkbox [(ngModel)]="tutorialService.showTutorial" [binary]="true"></p-checkbox>
             <label for="show-tour">Don't show this message again</label>
         </div>
         <div class="flex justify-between">
-            <p-button 
-                (onClick)="displayTutorial = false"
-                styleClass="p-button-outlined" 
-                label="Skip Tour">
+            <p-button (onClick)="displayTutorial = false" styleClass="p-button-outlined" label="Skip Tour">
             </p-button>
-            <p-button
-                (onClick)="displayTutorial = false; tutorialService.driver.drive()"
-                label="Start Tour"
-                styleClass="bg-[#224063]"
-            ></p-button>
+            <p-button (onClick)="displayTutorial = false; tutorialService.driver.drive()" label="Start Tour"
+                styleClass="bg-[#224063]"></p-button>
         </div>
     </div>
 </p-dialog>

@@ -25,32 +25,32 @@ export class SomnComponent {
   arylHalideHasHeavyAtoms: boolean = false;
   amineHasHeavyAtoms: boolean = false;
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   if (changes['formValue'] && changes['formValue'].currentValue) {
-  //     const formValue = changes['formValue'].currentValue;
-  //     this.request.form.setValue({
-  //       reactantPairs: [
-  //         {
-  //           reactantPairName: formValue.reactant_pair_name,
-  //           amineName: formValue.nuc_name,
-  //           amine: {
-  //             input: formValue.nuc,
-  //         input_type: formValue.nuc_input_type,
-  //         reactionSite: formValue.nuc_idx,
-  //       },
-  //       arylHalideName: formValue.el_name,
-  //       arylHalide: {
-  //         input: formValue.el,
-  //         input_type: formValue.el_input_type,
-  //             reactionSite: formValue.el_idx,
-  //           },
-  //         }
-  //       ],
-  //       subscriberEmail: formValue.email,
-  //       agreeToSubscription: false,
-  //     });
-  //   }
-  // }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['formValue'] && changes['formValue'].currentValue) {
+      console.log('formValue: ', changes['formValue'].currentValue);
+      const formValue = changes['formValue'].currentValue;
+      formValue.forEach((rp: any, i: number) => {
+        this.request.addReactantPair();
+        this.request.form.controls['reactantPairs'].at(i).patchValue({
+          reactantPairName: rp.reactant_pair_name,
+          amineName: rp.nuc_name,
+          amine: {
+            input: rp.nuc,
+            input_type: rp.nuc_input_type,
+            reactionSite: rp.nuc_idx,
+          },
+          arylHalideName: rp.el_name,
+          arylHalide: {
+            input: rp.el,
+            input_type: rp.el_input_type,
+            reactionSite: rp.el_idx,
+          },
+          status: 'view',
+        });
+      });
+      console.log(this.request.form.value);
+    }
+  }
 
   constructor(
     private somnService: SomnService,

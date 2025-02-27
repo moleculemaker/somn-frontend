@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
 import { FilterService, MenuItem, Message } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
-import { CheckReactionSiteRequest, JobStatus, JobType } from '~/app/api/mmli-backend/v1';
+import { switchMap, tap, map, combineLatest, of, BehaviorSubject, Subscription } from 'rxjs';
+import { CheckReactionSiteRequest, JobType } from '~/app/api/mmli-backend/v1';
 import { Product, SomnResponse, SomnService } from '~/app/services/somn.service';
 
 import { TutorialService } from '~/app/services/tutorial.service';
@@ -15,7 +15,6 @@ import { JobResult } from '~/app/models/job-result';
 import catalystJson from '../about-somn/catalyst_map.json';
 import baseJson from '../about-somn/base_map.json';
 import solventJson from '../about-somn/solvent_map.json';
-import { Job } from '~/app/models';
 
 @Component({
   selector: 'app-somn-result',
