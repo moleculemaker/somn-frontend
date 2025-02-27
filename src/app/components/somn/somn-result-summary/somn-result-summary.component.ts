@@ -191,6 +191,7 @@ export class SomnResultSummaryComponent extends JobResult {
             count: topYieldConditions.length,
           },
           topYieldConditions: topYieldConditions.map((d: any) => `${d.catalyst[0]} | ${d.base} | ${d.solvent}`),
+          topYieldConditionsRaw: topYieldConditions,
           topYieldConditionsSummary: {
             singleSummary,
             multiSummary,
@@ -237,9 +238,9 @@ export class SomnResultSummaryComponent extends JobResult {
     },
     { label: 'Reactant Pair Predicted Conditions', 
       items: [
-        { label: 'Selected Row(s)', },
+        { label: 'Selected Row(s)', command: () => this.exportReactionConditions(this.selectedTableRows) },
         // { label: 'Current View', },
-        { label: 'Complete Results', },
+        { label: 'Complete Results', command: () => this.exportReactionConditions(this.resultsTable.value) },
       ]
     },
   ]
@@ -314,6 +315,16 @@ export class SomnResultSummaryComponent extends JobResult {
         }
       },
     ]);
+  }
+
+  exportReactionConditions(rows: any[]) {
+    const csv = rows.map((row) => {
+      return row.topYieldConditionsRaw.map((c: any) => `${row.reactantPair},${row.arylHalide.name},${row.amine.name},${row.topYield.value},${c.catalyst[0]},${c.base},${c.solvent}`).join("\n");
+    }).join("\n");
+    const header = "Reactant Pair Name,Aryl Halide Name,Amine Name,Top Yield,Catalyst,Base,Solvent\n";
+    const blob = new Blob([header + csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
   }
 
   ngOnInit() {
