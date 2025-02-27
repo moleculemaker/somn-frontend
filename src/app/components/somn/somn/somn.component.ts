@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from "@angular/core";
 import { Router } from "@angular/router";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 import { TutorialService } from "~/app/services/tutorial.service";
 import tutorialJson from './tutorial.json'
-import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
+import { CheckReactionSiteRequest, CheckReactionSiteResponse } from "~/app/api/mmli-backend/v1";
+import { combineLatest, forkJoin, Observable, Subscription } from "rxjs";
 
 @Component({
   selector: "app-somn",
@@ -13,7 +14,7 @@ import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
     class: "flex flex-col grow",
   },
 })
-export class SomnComponent {
+export class SomnComponent implements OnDestroy {
   @Input() showTab: boolean = true;
   @Input() formValue: any;
 
@@ -25,14 +26,14 @@ export class SomnComponent {
   arylHalideHasHeavyAtoms: boolean = false;
   amineHasHeavyAtoms: boolean = false;
 
+  subscriptions: Subscription[] = [];
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['formValue'] && changes['formValue'].currentValue) {
       console.log('formValue: ', changes['formValue'].currentValue);
       const formValue = changes['formValue'].currentValue;
-      formValue.forEach((rp: any, i: number) => {
-        this.request.addReactantPair();
-        this.request.form.controls['reactantPairs'].at(i).patchValue({
-          reactantPairName: rp.reactant_pair_name,
+      const rpForms = formValue.map((rp: any) => ({
+        reactantPairName: rp.reactant_pair_name,
           amineName: rp.nuc_name,
           amine: {
             input: rp.nuc,
@@ -46,9 +47,29 @@ export class SomnComponent {
             reactionSite: rp.el_idx,
           },
           status: 'view',
+      }));
+
+      const svg$: Observable<{ 
+        amine: CheckReactionSiteResponse, 
+        arylHalide: CheckReactionSiteResponse 
+      }>[] = rpForms.map((rp: any) => forkJoin({
+        amine: this.somnService.checkReactionSites(rp.amine.input, rp.amine.input_type, CheckReactionSiteRequest.RoleEnum.Nuc),
+        arylHalide: this.somnService.checkReactionSites(rp.arylHalide.input, rp.arylHalide.input_type, CheckReactionSiteRequest.RoleEnum.El),
+      }));
+
+      const subscription = combineLatest(svg$).subscribe((results) => {
+        results.forEach(({ amine, arylHalide }, i) => {
+          rpForms[i].amine = { ...rpForms[i].amine, ...amine };
+          rpForms[i].arylHalide = { ...rpForms[i].arylHalide, ...arylHalide };
+        });
+
+        rpForms.forEach((rp: any, i: number) => {
+          this.request.addReactantPair();
+          this.request.form.controls['reactantPairs'].at(i).patchValue(rp);
         });
       });
-      console.log(this.request.form.value);
+
+      this.subscriptions.push(subscription);
     }
   }
 
@@ -148,6 +169,10 @@ export class SomnComponent {
         '\nerrors: ', this.request.form.errors
       );
     });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   useExample() {

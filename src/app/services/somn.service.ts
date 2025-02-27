@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
-import { BodyCreateJobJobTypeJobsPost, CheckReactionSiteRequest, FilesService, Job, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
+import { BodyCreateJobJobTypeJobsPost, CheckReactionSiteRequest, FilesService, Job, JobStatus, JobType, JobsService, SomnService as SomeApiService } from "../api/mmli-backend/v1";
 
 import sampleRequest from '../../assets/example_request.json';
 
-import { Observable, map, of, tap } from "rxjs";
+import { Observable, filter, map, of, tap } from "rxjs";
 import { CheckReactionSiteResponse } from "../api/mmli-backend/v1/model/checkReactionSiteResponse";
 import * as d3 from "d3";
 
@@ -251,7 +251,9 @@ export class SomnRequest {
   providedIn: "root",
 })
 export class SomnService {
+  private resultStatusCache = new Map<string, Job>();
   private resultCache = new Map<string, any>();
+  private reactionSiteCache = new Map<string, CheckReactionSiteResponse>();
 
   constructor(
     private jobsService: JobsService,
@@ -269,16 +271,35 @@ export class SomnService {
     role: CheckReactionSiteRequest.RoleEnum, 
     hightlight_idxes?: number[]
   ): Observable<CheckReactionSiteResponse> {
+    const cacheKey = `${input}-${inputType}-${role}-${hightlight_idxes?.join(',')}`;
+    if (this.reactionSiteCache.has(cacheKey)) {
+      return of(this.reactionSiteCache.get(cacheKey)!);
+    }
+
     return this.somnService.checkReactionSitesSomnAllReactionSitesPost({
       input: input,
       input_type: inputType,
       role: role,
-    });
+    }).pipe(
+      tap((result) => this.reactionSiteCache.set(cacheKey, result)),
+    );
   }
 
   getResultStatus(jobType: JobType, jobID: string): Observable<Job>{
+    const cacheKey = `${jobType}-${jobID}`;
+    if (this.resultStatusCache.has(cacheKey)) {
+      return of(this.resultStatusCache.get(cacheKey)!);
+    }
+
     return this.jobsService.listJobsByTypeAndJobIdJobTypeJobsJobIdGet(jobType, jobID)
-      .pipe(map((jobs) => jobs[0]))
+      .pipe(
+        map((jobs) => jobs[0]),
+        tap((job) => {
+          if (job.phase === JobStatus.Completed) {
+            this.resultStatusCache.set(cacheKey, job);
+          }
+        })
+      )
   }
 
   getResult(jobType: JobType, jobID: string): Observable<any> {
