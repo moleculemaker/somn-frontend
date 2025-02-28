@@ -271,7 +271,7 @@ export class SomnService {
     role: CheckReactionSiteRequest.RoleEnum, 
     hightlight_idxes?: number[]
   ): Observable<CheckReactionSiteResponse> {
-    const cacheKey = `${input}-${inputType}-${role}-${hightlight_idxes?.join(',')}`;
+    const cacheKey = `${input}-${inputType}-${role}`;
     if (this.reactionSiteCache.has(cacheKey)) {
       return of(this.reactionSiteCache.get(cacheKey)!);
     }
