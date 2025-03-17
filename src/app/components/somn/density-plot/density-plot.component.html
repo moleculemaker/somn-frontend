@@ -14,6 +14,7 @@
         ></p-slider>
         <div class="relative -mx-4 pt-4 font-thin" #inputContainer>
             <input
+                title="Min Range"
                 #minRange
                 type="number"
                 class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
@@ -24,6 +25,7 @@
             />
             <input
                 #maxRange
+                title="Max Range"
                 type="number"
                 class="absolute appearance-none rounded-md border border-solid p-2 w-12 inline-block"
                 (blur)="updateMaxRange(maxRange.value)"

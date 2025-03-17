@@ -1,10 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from "@angular/core";
 import { Router } from "@angular/router";
 import { SomnRequest, SomnService } from "~/app/services/somn.service";
 import { TutorialService } from "~/app/services/tutorial.service";
-import { ReactionSiteInput } from "../marvinjs-input/marvinjs-input.component";
 import tutorialJson from './tutorial.json'
-import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
+import { CheckReactionSiteRequest, CheckReactionSiteResponse } from "~/app/api/mmli-backend/v1";
+import { combineLatest, forkJoin, Observable, Subscription } from "rxjs";
 
 @Component({
   selector: "app-somn",
@@ -14,7 +14,7 @@ import { CheckReactionSiteRequest } from "~/app/api/mmli-backend/v1";
     class: "flex flex-col grow",
   },
 })
-export class SomnComponent implements OnChanges {
+export class SomnComponent implements OnDestroy {
   @Input() showTab: boolean = true;
   @Input() formValue: any;
 
@@ -26,26 +26,50 @@ export class SomnComponent implements OnChanges {
   arylHalideHasHeavyAtoms: boolean = false;
   amineHasHeavyAtoms: boolean = false;
 
+  subscriptions: Subscription[] = [];
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['formValue'] && changes['formValue'].currentValue) {
+      console.log('formValue: ', changes['formValue'].currentValue);
       const formValue = changes['formValue'].currentValue;
-      this.request.form.setValue({
-        reactantPairName: formValue.reactant_pair_name,
-        amineName: formValue.nuc_name,
-        amine: {
-          input: formValue.nuc,
-          input_type: formValue.nuc_input_type,
-          reactionSite: formValue.nuc_idx,
-        },
-        arylHalideName: formValue.el_name,
-        arylHalide: {
-          input: formValue.el,
-          input_type: formValue.el_input_type,
-          reactionSite: formValue.el_idx,
-        },
-        subscriberEmail: formValue.email,
-        agreeToSubscription: false,
+      const rpForms = formValue.map((rp: any) => ({
+        reactantPairName: rp.reactant_pair_name,
+          amineName: rp.nuc_name,
+          amine: {
+            input: rp.nuc,
+            input_type: rp.nuc_input_type,
+            reactionSite: rp.nuc_idx,
+          },
+          arylHalideName: rp.el_name,
+          arylHalide: {
+            input: rp.el,
+            input_type: rp.el_input_type,
+            reactionSite: rp.el_idx,
+          },
+          status: 'view',
+      }));
+
+      const svg$: Observable<{ 
+        amine: CheckReactionSiteResponse, 
+        arylHalide: CheckReactionSiteResponse 
+      }>[] = rpForms.map((rp: any) => forkJoin({
+        amine: this.somnService.checkReactionSites(rp.amine.input, rp.amine.input_type, CheckReactionSiteRequest.RoleEnum.Nuc),
+        arylHalide: this.somnService.checkReactionSites(rp.arylHalide.input, rp.arylHalide.input_type, CheckReactionSiteRequest.RoleEnum.El),
+      }));
+
+      const subscription = combineLatest(svg$).subscribe((results) => {
+        results.forEach(({ amine, arylHalide }, i) => {
+          rpForms[i].amine = { ...rpForms[i].amine, ...amine };
+          rpForms[i].arylHalide = { ...rpForms[i].arylHalide, ...arylHalide };
+        });
+
+        rpForms.forEach((rp: any, i: number) => {
+          this.request.addReactantPair();
+          this.request.form.controls['reactantPairs'].at(i).patchValue(rp);
+        });
       });
+
+      this.subscriptions.push(subscription);
     }
   }
 
@@ -92,14 +116,6 @@ export class SomnComponent implements OnChanges {
           side: "top",
           align: "center",
           popoverClass: '!w-[520px] !max-w-[520px]',
-          onPopoverRender: (popover, options) => {
-            if (options.config.onPopoverRender) {
-              options.config.onPopoverRender(popover, options);
-            }
-            
-            const descriptionDOM = popover.description;
-            descriptionDOM.innerHTML = tutorialJson['input-reactants'];
-          }
         },
       },
       {
@@ -116,6 +132,15 @@ export class SomnComponent implements OnChanges {
             descriptionDOM.innerHTML = tutorialJson['reaction-sites'];
           }
         }
+      },
+      {
+        element: '#container-manage-reactant-pairs',
+        popover: {
+          title: "Manage Reactant Pairs",
+          description: 'Add a new reactant pair or clear all input reactant pairs.',
+          side: "bottom",
+          align: "center",
+        },
       },
       {
         element: '#input-subscription-email',
@@ -136,6 +161,18 @@ export class SomnComponent implements OnChanges {
         }
       }
     ]);
+
+    this.request.form.statusChanges.subscribe(() => {
+      console.log(
+        'form: ', this.request.form.value,
+        '\nstatus: ', this.request.form.status,
+        '\nerrors: ', this.request.form.errors
+      );
+    });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   useExample() {
@@ -168,10 +205,5 @@ export class SomnComponent implements OnChanges {
         this.router.navigate(['somn', 'result', response.job_id]);
       }
     })
-  }
-
-  onReactionSiteChange(controlName: 'amine' | 'arylHalide', value: ReactionSiteInput) {
-    this.request.form.controls[controlName].setValue(value);
-    this.request.form.updateValueAndValidity();
   }
 }

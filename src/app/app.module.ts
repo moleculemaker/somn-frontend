@@ -69,6 +69,7 @@ import { MainLayoutComponent } from './components/somn/main-layout/main-layout.c
 import { MoleculeImageComponent } from "./components/somn/molecule-image/molecule-image.component";
 import { ConfirmationService } from "primeng/api";
 import { CenterLayoutComponent } from "./components/somn/center-layout/center-layout.component";
+import { SomnResultSummaryComponent } from './components/somn/somn-result-summary/somn-result-summary.component';
 import { JobTabComponent } from "./components/somn/job-tab/job-tab.component";
 
 const initAppFn = (envService: EnvironmentService) => {
@@ -92,6 +93,7 @@ const initAppFn = (envService: EnvironmentService) => {
     SomnResultComponent,
     MainLayoutComponent,
     MoleculeImageComponent,
+    SomnResultSummaryComponent,
     JobTabComponent,
 
     // FileDragNDropDirective,

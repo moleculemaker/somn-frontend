@@ -3,13 +3,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as d3 from 'd3';
 import { FilterService, MenuItem, Message } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { timer, switchMap, takeWhile, tap, map, skipUntil, filter, of, BehaviorSubject, combineLatest, take, shareReplay, Subscription, Observable } from 'rxjs';
-import { CheckReactionSiteRequest, JobStatus } from '~/app/api/mmli-backend/v1';
-import { Product, SomnService } from '~/app/services/somn.service';
+import { switchMap, tap, map, combineLatest, of, BehaviorSubject, Subscription } from 'rxjs';
+import { CheckReactionSiteRequest, JobType } from '~/app/api/mmli-backend/v1';
+import { Product, SomnResponse, SomnService } from '~/app/services/somn.service';
 
 import { TutorialService } from '~/app/services/tutorial.service';
 import { HeatmapComponent } from '../heatmap/heatmap.component';
 import { DensityPlotComponent } from '../density-plot/density-plot.component';
+import { JobResult } from '~/app/models/job-result';
+
+import catalystJson from '../about-somn/catalyst_map.json';
+import baseJson from '../about-somn/base_map.json';
+import solventJson from '../about-somn/solvent_map.json';
 
 @Component({
   selector: 'app-somn-result',
@@ -19,20 +24,22 @@ import { DensityPlotComponent } from '../density-plot/density-plot.component';
     class: "grow flex flex-col"
   }
 })
-export class SomnResultComponent {
+export class SomnResultComponent extends JobResult {
   @ViewChild("resultsTable") resultsTable: Table;
   @ViewChild(HeatmapComponent) heatmapComponent: HeatmapComponent;
   @ViewChild(DensityPlotComponent) densityPlotComponent: DensityPlotComponent;
 
-  currentPage = 'result';
-  jobId: string = this.route.snapshot.paramMap.get("id") || "";
-  jobInfo: any = {};
+  override jobId: string = this.route.snapshot.paramMap.get("id") || "";
+  override jobType: JobType = JobType.Somn;
+  idx: number = parseInt(this.route.snapshot.paramMap.get("idx") || '0');
+  currentPage: string = 'result';
+  thisJobInfo!: any;
   displayTutorial: boolean = false;
   exportOptions: MenuItem[] = [
     {
       label: 'Visualization (PNG)',
       command: () => {
-        const filename = this.jobInfo.reactant_pair_name + '-' + this.jobInfo.el_name + '-' + this.jobInfo.nuc_name;
+        const filename = this.thisJobInfo.reactant_pair_name + '-' + this.thisJobInfo.el_name + '-' + this.thisJobInfo.nuc_name;
         this.densityPlotComponent.exportPNG(filename);
         this.heatmapComponent.exportPNG(filename);
       }
@@ -68,94 +75,85 @@ export class SomnResultComponent {
 
   yieldMessages: Message[] = [];
 
-  statusResponse$ = timer(0, 10000).pipe(
-    switchMap(() => this.somnService.getResultStatus(this.jobId)),
-    takeWhile((data) =>
-      data.phase === JobStatus.Processing
-      || data.phase === JobStatus.Queued
-      , true),
-    shareReplay(1),
-    tap((data) => { console.log('job status: ', data.phase, data) }),
-  );
-
-  isLoading$ = this.statusResponse$.pipe(
-    map((job) => job.phase === JobStatus.Processing || job.phase === JobStatus.Queued),
-  );
-
-  response$ = this.statusResponse$.pipe(
-    skipUntil(this.statusResponse$.pipe(filter((job) => job.phase === JobStatus.Completed))),
-    switchMap((job) => {
-      const jobInfo = JSON.parse(job.job_info || '');
+  response$ = this.jobResultResponse$.pipe(
+    tap(() => { this.thisJobInfo = this.jobInfo[this.idx] }),
+    switchMap((resp) => {
       return combineLatest([
-        this.somnService.getResult(this.jobId),
-        this.somnService.checkReactionSites(
-          jobInfo.el, 
-          jobInfo.el_input_type, 
+        of(resp[this.idx]).pipe(
+          map((data: SomnResponse) => 
+            data.map((d, i) => ({
+              ...d,
+              iid: i,
+              catalyst: catalystJson[d.catalyst],
+              solvent: solventJson[d.solvent],
+              base: baseJson[d.base],
+            })
+          )),
+        ),
+        this.service.checkReactionSites(
+          this.thisJobInfo.el, 
+          this.thisJobInfo.el_input_type, 
           CheckReactionSiteRequest.RoleEnum.El
         ),
-        this.somnService.checkReactionSites(
-          jobInfo.nuc, 
-          jobInfo.nuc_input_type, 
+        this.service.checkReactionSites(
+          this.thisJobInfo.nuc, 
+          this.thisJobInfo.nuc_input_type, 
           CheckReactionSiteRequest.RoleEnum.Nuc
         ),
-        of({...jobInfo, email: job.email }),
-      ]).pipe(
-        tap(([data, el, nuc, jobInfo]) => { this.jobInfo = jobInfo }),
-        map(([data, el, nuc, jobInfo]) => {
-
-          // set up high yield messages, if there's any
-          let hasMesssage = false;
-          data.forEach((d, i) => {
-            if (d.yield >= 120 && !hasMesssage) {
-              this.yieldMessages.push({
-                severity: 'warn',
-                summary: 'High Yield',
-                detail: `High yield of ${d.yield}% for reaction ${i + 1}`,
-              });
-              hasMesssage = true;
-            }
-          })
-
-          let elReactionSites = el.reaction_site_idxes.map((v, i) => ({
-            idx: i,
-            value: `${v}`,
-            svg: '',
-          }));
-          let elSelectedReactionSite = jobInfo.el_idx === '-'
-            ? elReactionSites[0]
-            : elReactionSites.find((v) => v.value === `${jobInfo.el_idx}`)!;
-
-          let nucReactionSites = nuc.reaction_site_idxes.map((v, i) => ({
-            idx: i,
-            value: `${v}`,
-            svg: '',
-          }));
-          let nucSelectedReactionSite = jobInfo.nuc_idx === '-'
-            ? nucReactionSites[0]
-            : nucReactionSites.find((v) => v.value === `${jobInfo.nuc_idx}`)!;
-
-          return {
-            data: data.map((d, i) => ({ ...d, yield: Math.max(0, d.yield) })),
-            reactantPairName: jobInfo.reactant_pair_name || 'reactant pair',
-            arylHalide: {
-              name: jobInfo.el_name || 'aryl halide',
-              smiles: el.smiles || 'aryl halide smiles',
-              reactionSitesOptions: elReactionSites,
-              reactionSite: elSelectedReactionSite,
-              structure: el.svg,
-            },
-            amine: {
-              name: jobInfo.nuc_name || 'amine',
-              smiles: nuc.smiles || 'amine smiles',
-              reactionSitesOptions: nucReactionSites,
-              reactionSite: nucSelectedReactionSite,
-              structure: nuc.svg,
-            },
-          };
-        })
-      )
+      ])
     }),
-    tap((data) => { console.log('result: ', data) }),
+    map(([data, el, nuc]) => {
+      // set up high yield messages, if there's any
+      let hasMesssage = false;
+      data.forEach((d, i) => {
+        if (d.yield >= 120 && !hasMesssage) {
+          this.yieldMessages.push({
+            severity: 'warn',
+            summary: 'High Yield',
+            detail: `High yield of ${d.yield}% for reaction ${i + 1}`,
+          });
+          hasMesssage = true;
+        }
+      })
+
+      let elReactionSites = el.reaction_site_idxes.map((v, i) => ({
+        idx: i,
+        value: `${v}`,
+        svg: '',
+      }));
+      let elSelectedReactionSite = this.thisJobInfo.el_idx === '-'
+        ? elReactionSites[0]
+        : elReactionSites.find((v) => v.value === `${this.thisJobInfo.el_idx}`)!;
+
+      let nucReactionSites = nuc.reaction_site_idxes.map((v, i) => ({
+        idx: i,
+        value: `${v}`,
+        svg: '',
+      }));
+      let nucSelectedReactionSite = this.thisJobInfo.nuc_idx === '-'
+        ? nucReactionSites[0]
+        : nucReactionSites.find((v) => v.value === `${this.thisJobInfo.nuc_idx}`)!;
+
+      return {
+        data: data.map((d, i) => ({ ...d, yield: Math.max(0, d.yield) })),
+        reactantPairName: this.thisJobInfo.reactant_pair_name || 'reactant pair',
+        arylHalide: {
+          name: this.thisJobInfo.el_name || 'aryl halide',
+          smiles: el.smiles || 'aryl halide smiles',
+          reactionSitesOptions: elReactionSites,
+          reactionSite: elSelectedReactionSite,
+          structure: el.svg,
+        },
+        amine: {
+          name: this.thisJobInfo.nuc_name || 'amine',
+          smiles: nuc.smiles || 'amine smiles',
+          reactionSitesOptions: nucReactionSites,
+          reactionSite: nucSelectedReactionSite,
+          structure: nuc.svg,
+        },
+      };
+    }),
+
     tap((data) => {
       // show tutorial
       if (!this.tutorialService.showTutorial) {
@@ -164,7 +162,6 @@ export class SomnResultComponent {
         this.displayTutorial = false;
       }
     }),
-    shareReplay(1),
     map((resp) => ({
       ...resp,
       data: resp.data.map((d: Product) => ({
@@ -425,11 +422,13 @@ export class SomnResultComponent {
   }
 
   constructor(
-    private somnService: SomnService,
+    protected somnService: SomnService,
     private filterService: FilterService,
     private route: ActivatedRoute,
+    private router: Router,
     protected tutorialService: TutorialService,
   ) {
+    super(somnService);
     // setup tutorial
     tutorialService.tutorialKey = 'show-result-page-tutorial';
 
@@ -570,5 +569,9 @@ export class SomnResultComponent {
 
   onTableSelectionChange(rows: any) {
     this.selectedProducts$.next(rows.map((d: Product) => d.iid));
+  }
+
+  backToAllResults() {
+    this.router.navigate(['somn', 'result', this.jobId]);
   }
 }
