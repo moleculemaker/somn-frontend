@@ -71,6 +71,7 @@ import { ConfirmationService } from "primeng/api";
 import { CenterLayoutComponent } from "./components/somn/center-layout/center-layout.component";
 import { SomnResultSummaryComponent } from './components/somn/somn-result-summary/somn-result-summary.component';
 import { JobTabComponent } from "./components/somn/job-tab/job-tab.component";
+import { KetcherComponent } from "./components/somn/ketcher/ketcher.component";
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig("/assets/config/envvars.json");
@@ -95,6 +96,7 @@ const initAppFn = (envService: EnvironmentService) => {
     MoleculeImageComponent,
     SomnResultSummaryComponent,
     JobTabComponent,
+    KetcherComponent,
 
     // FileDragNDropDirective,
     // ConfigurationComponent,

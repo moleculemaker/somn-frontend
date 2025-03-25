@@ -190,11 +190,10 @@
     [draggable]="false"
     [resizable]="false"
 >
-    <app-marvin-js-editor
-        class="marvin-editor"
+    <app-ketcher
         [smiles]="smilesFormControl.value || ''"
         (smilesChange)="onSmilesInput($event)"
-    ></app-marvin-js-editor>
+    ></app-ketcher>
     <ng-template pTemplate="footer">
         <p-button
             icon="pi pi-check"
