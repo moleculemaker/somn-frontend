@@ -22,5 +22,17 @@
     "target": "https://marvinjs.backend.mmli1.ncsa.illinois.edu",
     "secure": true,
     "changeOrigin": true
+  },
+  "/ketcher": {
+    "localTarget": "http://localhost:4002",
+    "target": "https://ketcher.services.platform.moleculemaker.org/",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/static": {
+    "localTarget": "http://localhost:4002",
+    "target": "https://ketcher.services.platform.moleculemaker.org/",
+    "secure": false,
+    "changeOrigin": true
   }
 }
