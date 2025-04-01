@@ -32,6 +32,24 @@ export class AppComponent implements OnInit {
       : [];
   }
 
+  get tutorialMenuItems(): Array<MenuItem> {
+    return [
+      {
+        label: "Interactive Walkthrough",
+        command: () => {
+          this.tutorialService.driver.getConfig().steps?.length 
+          ? this.tutorialService.start() 
+          : this.tooltip.activate();
+        },
+      },
+      {
+        label: "Video Demo",
+        icon: "pi pi-arrow-up-right",
+        command: () => window.open("https://youtu.be/eQ2N8R1p3zU", "_blank"),
+      },
+    ];
+  }
+
   get userInfo() {
     return this.userInfoService.userInfo;
   }

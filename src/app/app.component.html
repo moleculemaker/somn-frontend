@@ -121,16 +121,15 @@
             </a>
         </div> -->
         <div class="flex link">
-            <a class="flex items-center m-1 cursor-pointer" 
-                (click)="tutorialService.driver.getConfig().steps?.length 
-                    ? tutorialService.start()
-                    : tooltip.activate()
-                "
+            <a class="flex items-center m-1 cursor-pointer" (click)="tutorialMenu.toggle($event)"
                 tooltipEvent="focus"
                 tooltipPosition="bottom"
                 tooltipZIndex="10000"
                 [life]="3000"
                 pTooltip="When on the Somn home, request configuration, and model results pages, you will be able to access a tutorial here.">
+            >
+                <p-menu #tutorialMenu [model]="tutorialMenuItems" [popup]="true" appendTo="body" [baseZIndex]="9999">
+                </p-menu>
                 <i class="mr-1 pi pi-question-circle"></i> Tutorial
             </a>
             <a id="btn-about-somn" class="flex items-center m-1 ml-3 cursor-pointer" href="/about">
