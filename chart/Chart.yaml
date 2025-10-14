@@ -5,4 +5,4 @@ version: 1.0.0
 dependencies:
 - name: common
   version: ~2.2.0
-  repository: "https://charts.bitnami.com/bitnami"
+  repository: "https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami"
