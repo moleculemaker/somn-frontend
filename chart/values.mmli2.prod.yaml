@@ -1,0 +1,36 @@
+ingress:
+  # early testing
+  hostname: somn.frontend.mmli2.ncsa.illinois.edu
+  
+  # MIGRATION: eventually enable prod redirect
+  #hostname: somn.platform.moleculemaker.org
+  #extraHosts:
+  #- somn.frontend.mmli2.ncsa.illinois.edu
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    kubernetes.io/tls-acme: "true"
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-somn-prod-domain-redirect@kubernetescrd"
+
+controller:
+  image: moleculemaker/somn-frontend:main
+
+config:
+  hostname: "https://mmli.fastapi.mmli2.ncsa.illinois.edu"
+  basePath: ""
+  signInUrl: "https://auth.platform.moleculemaker.org/oauth2/start?rd=https%3A%2F%2Fchemcraper.platform.moleculemaker.org%2Fconfiguration"
+  signOutUrl: "https://auth.platform.moleculemaker.org/oauth2/sign_out?rd=https%3A%2F%2Fsomn.platform.moleculemaker.org%2Fconfiguration"
+  userInfoUrl: "https://auth.platform.moleculemaker.org/oauth2/userinfo"
+
+extraDeploy:
+- apiVersion: traefik.io/v1alpha1
+  kind: Middleware
+  metadata:
+    name: somn-prod-domain-redirect
+    namespace: alphasynthesis
+  spec:
+    redirectRegex:
+      regex: "^https://somn.frontend.mmli2.ncsa.illinois.edu/(.*)"
+      replacement: "https://somn.platform.moleculemaker.org/${1}"
+      permanent: true
