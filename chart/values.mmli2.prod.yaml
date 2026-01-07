@@ -11,7 +11,8 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-production
     kubernetes.io/tls-acme: "true"
     traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-somn-prod-domain-redirect@kubernetescrd"
+    # MIGRATION: eventually enable prod redirect
+    #traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-somn-prod-domain-redirect@kubernetescrd"
 
 controller:
   image: moleculemaker/somn-frontend:main
