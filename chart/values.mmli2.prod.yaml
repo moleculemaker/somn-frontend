@@ -1,18 +1,13 @@
 ingress:
-  # early testing
-  hostname: somn.frontend.mmli2.ncsa.illinois.edu
-  
-  # MIGRATION: eventually enable prod redirect
-  #hostname: somn.platform.moleculemaker.org
-  #extraHosts:
-  #- somn.frontend.mmli2.ncsa.illinois.edu
+  hostname: somn.platform.moleculemaker.org
+  extraHosts:
+  - somn.frontend.mmli2.ncsa.illinois.edu
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     kubernetes.io/tls-acme: "true"
     traefik.ingress.kubernetes.io/router.tls: "true"
-    # MIGRATION: eventually enable prod redirect
-    #traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-somn-prod-domain-redirect@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-somn-prod-domain-redirect@kubernetescrd"
 
 controller:
   image: moleculemaker/somn-frontend:main
