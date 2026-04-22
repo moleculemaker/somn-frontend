@@ -1,10 +1,13 @@
 ingress:
   hostname: somn.frontend.staging.mmli2.ncsa.illinois.edu
+  extraHosts:
+  - somn.frontend.staging.mmli1.ncsa.illinois.edu
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     kubernetes.io/tls-acme: "true"
     traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: "staging-somn-staging-domain-redirect@kubernetescrd"
 
 controller:
   image: moleculemaker/somn-frontend:staging
@@ -15,3 +18,16 @@ config:
   signInUrl: "https://mmli2.ncsa.illinois.edu/oauth2/start?rd=https%3A%2F%2Fsomn.frontend.staging.mmli2.ncsa.illinois.edu%2Fconfiguration"
   signOutUrl: "https://mmli2.ncsa.illinois.edu/oauth2/sign_out?rd=https%3A%2F%2Fsomn.frontend.staging.mmli2.ncsa.illinois.edu%2Fconfiguration"
   userInfoUrl: "https://mmli2.ncsa.illinois.edu/oauth2/userinfo"
+
+extraDeploy:
+# Redirect any users attempting to go to mmli1 and bring them to mmli2 instead
+- apiVersion: traefik.io/v1alpha1
+  kind: Middleware
+  metadata:
+    name: somn-staging-domain-redirect
+    namespace: staging
+  spec:
+    redirectRegex:
+      regex: "^https:\\/\\/somn\\.frontend\\.staging\\.mmli\\d\\.ncsa\\.illinois\\.edu(\\/.*)"
+      replacement: "https://somn.frontend.staging.mmli2.ncsa.illinois.edu${1}"
+      permanent: true
