@@ -29,5 +29,5 @@ extraDeploy:
   spec:
     redirectRegex:
       regex: "^https:\\/\\/somn\\.frontend\\.mmli\\d\\.ncsa\\.illinois\\.edu(\\/.*)"
-      replacement: "https://somn.platform.moleculemaker.org/${1}"
+      replacement: "https://somn.platform.moleculemaker.org${1}"
       permanent: true
