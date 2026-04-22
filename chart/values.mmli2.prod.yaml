@@ -2,6 +2,7 @@ ingress:
   hostname: somn.platform.moleculemaker.org
   extraHosts:
   - somn.frontend.mmli2.ncsa.illinois.edu
+  - somn.frontend.mmli1.ncsa.illinois.edu
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
@@ -15,7 +16,7 @@ controller:
 config:
   hostname: "https://mmli.fastapi.mmli2.ncsa.illinois.edu"
   basePath: ""
-  signInUrl: "https://auth.platform.moleculemaker.org/oauth2/start?rd=https%3A%2F%2Fchemcraper.platform.moleculemaker.org%2Fconfiguration"
+  signInUrl: "https://auth.platform.moleculemaker.org/oauth2/start?rd=https%3A%2F%2Fsomn.platform.moleculemaker.org%2Fconfiguration"
   signOutUrl: "https://auth.platform.moleculemaker.org/oauth2/sign_out?rd=https%3A%2F%2Fsomn.platform.moleculemaker.org%2Fconfiguration"
   userInfoUrl: "https://auth.platform.moleculemaker.org/oauth2/userinfo"
 
@@ -27,6 +28,6 @@ extraDeploy:
     namespace: alphasynthesis
   spec:
     redirectRegex:
-      regex: "^https://somn.frontend.mmli2.ncsa.illinois.edu/(.*)"
+      regex: "^https:\\/\\/somn\\.frontend\\.mmli\\d\\.ncsa\\.illinois\\.edu(\\/.*)"
       replacement: "https://somn.platform.moleculemaker.org/${1}"
       permanent: true
