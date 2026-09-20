@@ -7,7 +7,6 @@ name: Docker
 #   Dockerfile is still valid.
 # To be able to push to dockerhub, this execpts the following
 # secrets to be set in the project:
-# - NPM_TOKEN : NPM auth token for accessing private chemaxon NPM registry
 # - DOCKERHUB_USERNAME : username that can push to the org
 # - DOCKERHUB_PASSWORD : password asscoaited with the username
 on:
@@ -42,7 +41,7 @@ jobs:
 
       - name: Authenticate with private NPM package
         run: |
-          echo "//hub.chemaxon.com/artifactory/api/npm/npm/:_auth=${{ secrets.NPM_TOKEN }}" > $HOME/.npmrc
+          touch $HOME/.npmrc
           echo "npmrc_path=$HOME/.npmrc" >> "$GITHUB_ENV"
 
       - name: Docker meta
