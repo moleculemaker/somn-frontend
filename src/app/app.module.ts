@@ -49,7 +49,6 @@ import { NgxMatomoRouterModule } from "@ngx-matomo/router";
 
 import { EnvironmentService } from "@services/environment.service";
 import { MenuModule } from "primeng/menu";
-import { MarvinJsModule } from "./components/somn/marvinjs/marvinjs.module";
 import { DialogModule } from "primeng/dialog";
 import { SliderModule } from "primeng/slider";
 import { MultiSelectModule } from "primeng/multiselect";
@@ -151,7 +150,6 @@ const initAppFn = (envService: EnvironmentService) => {
 
     ApiModule.forRoot(() => new Configuration()),
     ReactiveFormsModule,
-    MarvinJsModule,
     DialogModule,
   ],
   providers: [
