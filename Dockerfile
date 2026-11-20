@@ -31,7 +31,7 @@ RUN npm run build
 # Stage 2: Serve app with nginx server
 
 # Use official nginx image as the base image
-FROM nginx:1.23.3
+FROM nginx:1.30.7
 
 # Copy the build output to replace the default nginx contents
 COPY --from=build /usr/local/app/dist/somn /usr/share/nginx/html/

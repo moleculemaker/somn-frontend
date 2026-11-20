@@ -5,3 +5,4 @@ chart/charts/*
 .env
 Dockerfile
 docker-compose.*
+.claude/
