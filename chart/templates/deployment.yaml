@@ -18,6 +18,10 @@ spec:
       containers:
         - name: somn-frontend
           image: {{ .Values.controller.image }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
 
           env:
 
